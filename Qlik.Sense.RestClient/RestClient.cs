@@ -80,25 +80,33 @@ namespace Qlik.Sense.RestClient
         public string Post(string endpoint, string body)
         {
             ValidateConfiguration();
+            if (_cookieJar.Count == 0)
+                CollectCookie();
             return UploadString(new Uri(Uri, endpoint), body);
         }
 
-        public Task<string> PostAsync(string endpoint, string body)
+        public async Task<string> PostAsync(string endpoint, string body)
         {
             ValidateConfiguration();
-            return UploadStringTaskAsync(new Uri(Uri, endpoint), body);
+            if (_cookieJar.Count == 0)
+                await CollectCookieAsync();
+            return await UploadStringTaskAsync(new Uri(Uri, endpoint), body);
         }
 
         public string Delete(string endpoint)
         {
             ValidateConfiguration();
+            if (_cookieJar.Count == 0)
+                CollectCookie();
             return UploadString(new Uri(Uri, endpoint), "DELETE", "");
         }
 
-        public Task<string> DeleteAsync(string endpoint)
+        public async Task<string> DeleteAsync(string endpoint)
         {
             ValidateConfiguration();
-            return UploadStringTaskAsync(new Uri(Uri, endpoint), "DELETE", "");
+            if (_cookieJar.Count == 0)
+                await CollectCookieAsync();
+            return await UploadStringTaskAsync(new Uri(Uri, endpoint), "DELETE", "");
         }
 
         private void ValidateConfiguration()
@@ -106,6 +114,16 @@ namespace Qlik.Sense.RestClient
             if (CurrentConnectionType == null) throw new ConnectionNotConfiguredException();
             if (CurrentConnectionType == ConnectionType.DirectConnection && _certificates == null)
                 throw new CertificatesNotLoadedException();
+        }
+
+        private void CollectCookie()
+        {
+            Get("/qrs/about");
+        }
+
+        private async Task CollectCookieAsync()
+        {
+            await GetAsync("/qrs/about");
         }
 
         protected override WebRequest GetWebRequest(Uri address)
