@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security;
 using System.Security.Cryptography;
@@ -11,6 +12,7 @@ namespace Qlik.Sense.RestClient
 {
     public class RestClient : WebClient, IRestClient
     {
+        public string Url => Uri.AbsoluteUri;
         private Uri Uri { get; set; }
         private string _userDirectory;
         private string _userId;
@@ -22,6 +24,7 @@ namespace Qlik.Sense.RestClient
         public enum ConnectionType
         {
             NtlmUserViaProxy,
+            StaticHeaderUserViaProxy,
             DirectConnection
         }
 
@@ -38,8 +41,7 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
             CurrentConnectionType = ConnectionType.DirectConnection;
-            var uriBuilder = new UriBuilder(Uri);
-            uriBuilder.Port = port;
+            var uriBuilder = new UriBuilder(Uri) {Port = port};
             Uri = uriBuilder.Uri;
             _userId = userId;
             _userDirectory = userDirectory;
@@ -48,21 +50,50 @@ namespace Qlik.Sense.RestClient
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
 
-        public void AsNtlmUserViaProxy()
+        public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
             UseDefaultCredentials = true;
             CurrentConnectionType = ConnectionType.NtlmUserViaProxy;
             _userId = Environment.UserName;
             _userDirectory = Environment.UserDomainName;
+            if (!certificateValidation)
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
 
-        public void LoadCertificateFromDirectory(string path, SecureString certificatePassword = null)
+        public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
+        {
+            CurrentConnectionType = ConnectionType.StaticHeaderUserViaProxy;
+            _userId = userId;
+            _userDirectory = Environment.UserDomainName;
+            if (!certificateValidation)
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+        }
+
+        public X509Certificate2Collection LoadCertificateFromStore()
+        {
+            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+            var certificates = store.Certificates.Cast<X509Certificate2>().Where(c => c.FriendlyName == "QlikClient")
+                .ToArray();
+            store.Close();
+            if (certificates.Any())
+            {
+                Console.WriteLine("Successfully loaded client certificate from store.");
+                return new X509Certificate2Collection(certificates);
+            }
+
+            Console.WriteLine("Failed to load client certificate from store.");
+            Environment.Exit(1);
+            return null;
+        }
+
+        public X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword = null)
         {
             var clientCertPath = Path.Combine(path, "client.pfx");
             if (!Directory.Exists(path)) throw new DirectoryNotFoundException(path);
             if (!File.Exists(clientCertPath)) throw new FileNotFoundException(clientCertPath);
             var certificate = certificatePassword == null ? new X509Certificate2(clientCertPath) : new X509Certificate2(clientCertPath, certificatePassword);
-            _certificates = new X509Certificate2Collection(certificate);
+            return new X509Certificate2Collection(certificate);
         }
 
         public string Get(string endpoint)
@@ -136,7 +167,8 @@ namespace Qlik.Sense.RestClient
             switch (CurrentConnectionType)
             {
                 case ConnectionType.NtlmUserViaProxy:
-                    request.Headers.Add("X-Qlik-User", userHeaderValue);
+                    request.UseDefaultCredentials = true;
+                    request.AllowAutoRedirect = true;
                     request.UserAgent = "Windows";
                     break;
                 case ConnectionType.DirectConnection:
@@ -153,11 +185,11 @@ namespace Qlik.Sense.RestClient
 
         private static Uri AddXrefKey(Uri uri, string xrfkey)
         {
-            var query = uri.Query;
-            query = string.IsNullOrEmpty(query) ? "" : query.Substring(1) + "&";
-            query = query + "xrfkey=" + xrfkey;
-
-            var uriBuilder = new UriBuilder(uri) { Query = query };
+            var sb = new StringBuilder(uri.Query);
+            if (!string.IsNullOrEmpty(uri.Query))
+                sb.Append('&');
+            sb.Append("xrfkey=" + xrfkey);
+            var uriBuilder = new UriBuilder(uri) { Query = sb.ToString() };
             return uriBuilder.Uri;
         }
 
