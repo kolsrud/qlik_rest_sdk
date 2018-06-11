@@ -14,7 +14,7 @@ namespace Qlik.Sense.RestClient
     {
         public string Url => Uri.AbsoluteUri;
         private Uri Uri { get; set; }
-        private string _userDirectory;
+		private string _userDirectory;
         private string _userId;
         private X509Certificate2Collection _certificates;
         private readonly CookieContainer _cookieJar = new CookieContainer();
@@ -99,13 +99,13 @@ namespace Qlik.Sense.RestClient
         public string Get(string endpoint)
         {
             ValidateConfiguration();
-            return DownloadString(new Uri(Uri, endpoint));
+            return DownloadString(Url + endpoint);
         }
 
         public Task<string> GetAsync(string endpoint)
         {
             ValidateConfiguration();
-            return DownloadStringTaskAsync(new Uri(Uri, endpoint));
+            return DownloadStringTaskAsync(Url + endpoint);
         }
 
         public string Post(string endpoint, string body)
@@ -113,7 +113,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 CollectCookie();
-            return UploadString(new Uri(Uri, endpoint), body);
+            return UploadString(Url + endpoint, body);
         }
 
         public async Task<string> PostAsync(string endpoint, string body)
@@ -121,7 +121,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 await CollectCookieAsync();
-            return await UploadStringTaskAsync(new Uri(Uri, endpoint), body);
+            return await UploadStringTaskAsync(Url + endpoint, body);
         }
 
         public string Delete(string endpoint)
@@ -129,7 +129,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 CollectCookie();
-            return UploadString(new Uri(Uri, endpoint), "DELETE", "");
+            return UploadString(Url + endpoint, "DELETE", "");
         }
 
         public async Task<string> DeleteAsync(string endpoint)
@@ -137,7 +137,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 await CollectCookieAsync();
-            return await UploadStringTaskAsync(new Uri(Uri, endpoint), "DELETE", "");
+            return await UploadStringTaskAsync(Url + endpoint, "DELETE", "");
         }
 
         private void ValidateConfiguration()
