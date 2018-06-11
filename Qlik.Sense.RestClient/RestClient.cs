@@ -16,6 +16,7 @@ namespace Qlik.Sense.RestClient
         private Uri Uri { get; set; }
 		private string _userDirectory;
         private string _userId;
+	    private string _staticHeaderName;
         private X509Certificate2Collection _certificates;
         private readonly CookieContainer _cookieJar = new CookieContainer();
 
@@ -65,6 +66,7 @@ namespace Qlik.Sense.RestClient
             CurrentConnectionType = ConnectionType.StaticHeaderUserViaProxy;
             _userId = userId;
             _userDirectory = Environment.UserDomainName;
+	        _staticHeaderName = headerName;
             if (!certificateValidation)
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
@@ -172,12 +174,15 @@ namespace Qlik.Sense.RestClient
                     request.UserAgent = "Windows";
                     break;
                 case ConnectionType.DirectConnection:
-                    request.Headers.Add("X-Qlik-User", userHeaderValue);
+	                request.Headers.Add("X-Qlik-User", userHeaderValue);
                     foreach (var certificate in _certificates)
                     {
                         request.ClientCertificates.Add(certificate);
                     }
                     break;
+				case ConnectionType.StaticHeaderUserViaProxy:
+					request.Headers.Add(_staticHeaderName, _userId);
+					break;
             }
             request.CookieContainer = _cookieJar;
             return request;
