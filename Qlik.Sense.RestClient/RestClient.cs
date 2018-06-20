@@ -12,8 +12,8 @@ namespace Qlik.Sense.RestClient
 {
     public class RestClient : WebClient, IRestClient
     {
-        public string Url => Uri.AbsoluteUri;
-        private Uri Uri { get; set; }
+        public string Url => BaseUri.AbsoluteUri;
+        private Uri BaseUri { get; set; }
 		private string _userDirectory;
         private string _userId;
 	    private string _staticHeaderName;
@@ -31,7 +31,7 @@ namespace Qlik.Sense.RestClient
 
         public RestClient(string uri)
         {
-            Uri = new Uri(uri);
+            BaseUri = new Uri(uri);
         }
 
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
@@ -42,8 +42,8 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
             CurrentConnectionType = ConnectionType.DirectConnection;
-            var uriBuilder = new UriBuilder(Uri) {Port = port};
-            Uri = uriBuilder.Uri;
+            var uriBuilder = new UriBuilder(BaseUri) {Port = port};
+            BaseUri = uriBuilder.Uri;
             _userId = userId;
             _userDirectory = userDirectory;
             _certificates = certificateCollection;
@@ -101,7 +101,7 @@ namespace Qlik.Sense.RestClient
         public string Get(string endpoint)
         {
             ValidateConfiguration();
-            return DownloadString(Url + endpoint);
+            return DownloadString(BaseUri.Append(endpoint));
         }
 
         public Task<string> GetAsync(string endpoint)
@@ -115,7 +115,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 CollectCookie();
-            return UploadString(Url + endpoint, body);
+            return UploadString(BaseUri.Append(endpoint), body);
         }
 
         public async Task<string> PostAsync(string endpoint, string body)
@@ -123,7 +123,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 await CollectCookieAsync();
-            return await UploadStringTaskAsync(Url + endpoint, body);
+            return await UploadStringTaskAsync(BaseUri.Append(endpoint), body);
         }
 
         public string Delete(string endpoint)
@@ -131,7 +131,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 CollectCookie();
-            return UploadString(Url + endpoint, "DELETE", "");
+            return UploadString(BaseUri.Append(endpoint), "DELETE", "");
         }
 
         public async Task<string> DeleteAsync(string endpoint)
@@ -139,7 +139,7 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 await CollectCookieAsync();
-            return await UploadStringTaskAsync(Url + endpoint, "DELETE", "");
+            return await UploadStringTaskAsync(BaseUri.Append(endpoint), "DELETE", "");
         }
 
         private void ValidateConfiguration()
@@ -222,6 +222,14 @@ namespace Qlik.Sense.RestClient
 
         public class CertificatesNotLoadedException : Exception
         {
+        }
+    }
+
+    public static class UriExtensions
+    {
+        public static Uri Append(this Uri uri, params string[] paths)
+        {
+            return new Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
         }
     }
 }
