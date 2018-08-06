@@ -190,9 +190,11 @@ namespace Qlik.Sense.RestClient
 
         private static Uri AddXrefKey(Uri uri, string xrfkey)
         {
-            var sb = new StringBuilder(uri.Query);
-            if (!string.IsNullOrEmpty(uri.Query))
+            var sb = new StringBuilder(uri.Query.TrimStart('?'));
+            if (sb.Length > 0)
+            {
                 sb.Append('&');
+            }
             sb.Append("xrfkey=" + xrfkey);
             var uriBuilder = new UriBuilder(uri) { Query = sb.ToString() };
             return uriBuilder.Uri;
