@@ -192,9 +192,7 @@ namespace Qlik.Sense.RestClient
         {
             var sb = new StringBuilder(uri.Query.TrimStart('?'));
             if (sb.Length > 0)
-            {
                 sb.Append('&');
-            }
             sb.Append("xrfkey=" + xrfkey);
             var uriBuilder = new UriBuilder(uri) { Query = sb.ToString() };
             return uriBuilder.Uri;
@@ -231,8 +229,7 @@ namespace Qlik.Sense.RestClient
     {
         public static Uri Append(this Uri uri, params string[] paths)
         {
-            var newUri = new Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
-            return newUri;
+            return new Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
         }
     }
 }
