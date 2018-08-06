@@ -71,7 +71,7 @@ namespace Qlik.Sense.RestClient
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         }
 
-        public X509Certificate2Collection LoadCertificateFromStore()
+        public static X509Certificate2Collection LoadCertificateFromStore()
         {
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
@@ -89,7 +89,7 @@ namespace Qlik.Sense.RestClient
             return null;
         }
 
-        public X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword = null)
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword = null)
         {
             var clientCertPath = Path.Combine(path, "client.pfx");
             if (!Directory.Exists(path)) throw new DirectoryNotFoundException(path);
@@ -229,7 +229,8 @@ namespace Qlik.Sense.RestClient
     {
         public static Uri Append(this Uri uri, params string[] paths)
         {
-            return new Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+            var newUri = new Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+            return newUri;
         }
     }
 }

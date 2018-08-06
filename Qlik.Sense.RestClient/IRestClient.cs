@@ -9,8 +9,6 @@ namespace Qlik.Sense.RestClient
         void AsDirectConnection(int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
         void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
         void AsNtlmUserViaProxy(bool certificateValidation = true);
-        X509Certificate2Collection LoadCertificateFromStore();
-        X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword = null);
         string Get(string endpoint);
         Task<string> GetAsync(string endpoint);
         string Post(string endpoint, string body);
