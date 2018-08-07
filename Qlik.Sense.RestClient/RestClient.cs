@@ -19,6 +19,7 @@ namespace Qlik.Sense.RestClient
 	    private string _staticHeaderName;
         private X509Certificate2Collection _certificates;
         private readonly CookieContainer _cookieJar = new CookieContainer();
+        public Action<HttpWebRequest> WebRequestTransform { get; set; }
 
         public ConnectionType? CurrentConnectionType { get; private set; }
 
@@ -126,6 +127,22 @@ namespace Qlik.Sense.RestClient
             return await UploadStringTaskAsync(BaseUri.Append(endpoint), body);
         }
 
+        public byte[] Post(string endpoint, byte[] body)
+        {
+            ValidateConfiguration();
+            if (_cookieJar.Count == 0)
+                CollectCookie();
+            return UploadData(BaseUri.Append(endpoint), body);
+        }
+
+        public async Task<byte[]> PostAsync(string endpoint, byte[] body)
+        {
+            ValidateConfiguration();
+            if (_cookieJar.Count == 0)
+                CollectCookie();
+            return await UploadDataTaskAsync(BaseUri.Append(endpoint), body);
+        }
+
         public string Delete(string endpoint)
         {
             ValidateConfiguration();
@@ -165,6 +182,8 @@ namespace Qlik.Sense.RestClient
             var request = (HttpWebRequest)base.GetWebRequest(AddXrefKey(address, xrfkey));
             request.ContentType = "application/json";
             request.Headers.Add("X-Qlik-Xrfkey", xrfkey);
+            WebRequestTransform?.Invoke(request);
+
             var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", _userDirectory, _userId);
             switch (CurrentConnectionType)
             {
@@ -230,6 +249,39 @@ namespace Qlik.Sense.RestClient
         public static Uri Append(this Uri uri, params string[] paths)
         {
             return new Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+        }
+    }
+
+    /// <summary>
+    /// Highly experimental...
+    /// </summary>
+    public class WebRequestSetting : IDisposable
+    {
+        private readonly IRestClient _client;
+        private readonly Action<HttpWebRequest> _oldTransform;
+
+        public WebRequestSetting(IRestClient client, Action<HttpWebRequest> newTransform)
+        {
+            _client = client;
+            _oldTransform = client.WebRequestTransform;
+            client.WebRequestTransform = newTransform;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                _disposed = true;
+                _client.WebRequestTransform = _oldTransform;
+            }
         }
     }
 }
