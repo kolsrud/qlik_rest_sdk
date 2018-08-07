@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qlik.Sense.RestClient", "Qlik.Sense.RestClient.csproj", "{3D042FDD-12DF-4A2B-AD75-4619FDA94FB9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{99A63F92-5FCA-405E-B1EE-19E381DA0A09}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicConnection", "Examples\BasicConnection\BasicConnection.csproj", "{2FA5F921-17D4-4A29-9E35-0D0DD390BC0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppUpload", "Examples\AppUpload\AppUpload.csproj", "{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,11 +25,19 @@ Global
 		{2FA5F921-17D4-4A29-9E35-0D0DD390BC0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FA5F921-17D4-4A29-9E35-0D0DD390BC0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FA5F921-17D4-4A29-9E35-0D0DD390BC0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2FA5F921-17D4-4A29-9E35-0D0DD390BC0F} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
+		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BBD25572-1A54-41DA-B406-4A94B4EFA211}
 	EndGlobalSection
 EndGlobal
