@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicConnection", "Examples
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppUpload", "Examples\AppUpload\AppUpload.csproj", "{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateStream", "Examples\CreateStream\CreateStream.csproj", "{374AE1BF-7CFA-4A01-8D74-620E0F5E7320}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{374AE1BF-7CFA-4A01-8D74-620E0F5E7320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{374AE1BF-7CFA-4A01-8D74-620E0F5E7320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{374AE1BF-7CFA-4A01-8D74-620E0F5E7320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{374AE1BF-7CFA-4A01-8D74-620E0F5E7320}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2FA5F921-17D4-4A29-9E35-0D0DD390BC0F} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
 		{7ECA0A2C-A3F3-44C0-A97C-E5D896484ABF} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
+		{374AE1BF-7CFA-4A01-8D74-620E0F5E7320} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BBD25572-1A54-41DA-B406-4A94B4EFA211}
