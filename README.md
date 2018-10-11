@@ -8,3 +8,5 @@ Console.WriteLine(restClient.Get("/qrs/about"));
 ```
 
 Currently only NTLM authentication and authentication using exported certificates are supported.
+
+The library is also available from NuGet: https://www.nuget.org/packages/QlikSenseRestClient/
