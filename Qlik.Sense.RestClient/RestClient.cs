@@ -81,13 +81,9 @@ namespace Qlik.Sense.RestClient
             store.Close();
             if (certificates.Any())
             {
-                Console.WriteLine("Successfully loaded client certificate from store.");
                 return new X509Certificate2Collection(certificates);
             }
-
-            Console.WriteLine("Failed to load client certificate from store.");
-            Environment.Exit(1);
-            return null;
+			throw new CertificatesNotLoadedException();
         }
 
         public static X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword = null)
