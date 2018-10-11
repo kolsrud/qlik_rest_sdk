@@ -1,0 +1,3 @@
+#!/bin/bash
+
+nuget.exe pack Qlik.Sense.RestClient.nuspec

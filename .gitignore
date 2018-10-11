@@ -2,3 +2,4 @@
 **/obj
 **/bin
 **/*csproj.user
+**/*.nupkg
