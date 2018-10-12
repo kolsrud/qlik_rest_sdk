@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
 namespace CreateStream
@@ -12,7 +13,9 @@ namespace CreateStream
 			var restClient = new RestClient(senseServerUrl);
 			restClient.AsNtlmUserViaProxy();
 
-			Console.WriteLine(restClient.Post("qrs/stream", "{ name : \"MyStream\" }"));
+			dynamic body = new JObject();
+			body.Name = "MyStream";
+			Console.WriteLine(restClient.Post("qrs/stream", body.ToString()));
 		}
 	}
 }

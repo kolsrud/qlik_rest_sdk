@@ -3,3 +3,4 @@
 **/bin
 **/*csproj.user
 **/*.nupkg
+**/packages
