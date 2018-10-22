@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugConsole.cs" />
     <Compile Include="IRestClient.cs" />
     <Compile Include="RestClient.cs">
       <SubType>Component</SubType>

@@ -12,7 +12,8 @@ namespace BasicConnectionCertificateFromStore
 			var restClient = new RestClient(senseServerUrl);
 			var certs = RestClient.LoadCertificateFromStore();
 			restClient.AsDirectConnection(4242, false, certs);
-			Console.WriteLine(restClient.Get("/qrs/about"));
+			using (new DebugConsole())
+				restClient.Get("/qrs/about");
 		}
 	}
 }
