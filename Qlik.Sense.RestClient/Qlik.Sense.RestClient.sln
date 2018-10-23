@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicConnectionCertificateF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicConnectionCertificateFromStore", "Examples\BasicConnectionCertificateFromStore\BasicConnectionCertificateFromStore.csproj", "{4EBE1AED-CF0C-4F46-B97E-A5A6971DF49F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublishApp", "Examples\PublishApp\PublishApp.csproj", "{C9EB0076-4D26-4972-AD78-863472D82EC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{4EBE1AED-CF0C-4F46-B97E-A5A6971DF49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EBE1AED-CF0C-4F46-B97E-A5A6971DF49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EBE1AED-CF0C-4F46-B97E-A5A6971DF49F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9EB0076-4D26-4972-AD78-863472D82EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9EB0076-4D26-4972-AD78-863472D82EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9EB0076-4D26-4972-AD78-863472D82EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9EB0076-4D26-4972-AD78-863472D82EC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{374AE1BF-7CFA-4A01-8D74-620E0F5E7320} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
 		{AC8B9099-907E-43E2-ABEA-3FFD80E54FA7} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
 		{4EBE1AED-CF0C-4F46-B97E-A5A6971DF49F} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
+		{C9EB0076-4D26-4972-AD78-863472D82EC4} = {99A63F92-5FCA-405E-B1EE-19E381DA0A09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BBD25572-1A54-41DA-B406-4A94B4EFA211}
