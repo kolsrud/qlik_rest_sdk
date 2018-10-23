@@ -132,25 +132,35 @@ namespace Qlik.Sense.RestClient
         {
             ValidateConfiguration();
             LogCall("GET", endpoint);
-            return LogReceive(DownloadStringTaskAsync(Url + endpoint));
+            return LogReceive(DownloadStringTaskAsync(BaseUri.Append(endpoint)));
         }
 
-        public string Post(string endpoint, string body)
+        private string PerformUploadStringAccess(string method, string endpoint, string body)
         {
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 CollectCookie();
-            LogCall("POST", endpoint);
-            return LogReceive(UploadString(BaseUri.Append(endpoint), body));
+            LogCall(method, endpoint);
+            return LogReceive(UploadString(BaseUri.Append(endpoint), method, body));
         }
 
-        public async Task<string> PostAsync(string endpoint, string body)
+        private async Task<string> PerformUploadStringAccessAsync(string method, string endpoint, string body)
         {
             ValidateConfiguration();
             if (_cookieJar.Count == 0)
                 await CollectCookieAsync();
-            LogCall("POST", endpoint);
-            return await LogReceive(UploadStringTaskAsync(BaseUri.Append(endpoint), body));
+            LogCall(method, endpoint);
+            return await LogReceive(UploadStringTaskAsync(BaseUri.Append(endpoint), method, body));
+        }
+
+        public string Post(string endpoint, string body)
+        {
+            return PerformUploadStringAccess("POST", endpoint, body);
+        }
+
+        public Task<string> PostAsync(string endpoint, string body)
+        {
+            return PerformUploadStringAccessAsync("POST", endpoint, body);
         }
 
         public byte[] Post(string endpoint, byte[] body)
@@ -175,22 +185,24 @@ namespace Qlik.Sense.RestClient
             return data;
         }
 
-        public string Delete(string endpoint)
+        public string Put(string endpoint, string body)
         {
-            ValidateConfiguration();
-            if (_cookieJar.Count == 0)
-                CollectCookie();
-            LogCall("DELETE", endpoint);
-            return LogReceive(UploadString(BaseUri.Append(endpoint), "DELETE", ""));
+            return PerformUploadStringAccess("PUT", endpoint, body);
         }
 
-        public async Task<string> DeleteAsync(string endpoint)
+        public Task<string> PutAsync(string endpoint, string body)
         {
-            ValidateConfiguration();
-            if (_cookieJar.Count == 0)
-                await CollectCookieAsync();
-            LogCall("DELETE", endpoint);
-            return await LogReceive(UploadStringTaskAsync(BaseUri.Append(endpoint), "DELETE", ""));
+            return PerformUploadStringAccessAsync("PUT", endpoint, body);
+        }
+
+        public string Delete(string endpoint)
+        {
+            return PerformUploadStringAccess("DELETE", endpoint, "");
+        }
+
+        public Task<string> DeleteAsync(string endpoint)
+        {
+            return PerformUploadStringAccessAsync("DELETE", endpoint, "");
         }
 
         private void ValidateConfiguration()

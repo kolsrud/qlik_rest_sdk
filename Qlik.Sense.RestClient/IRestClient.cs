@@ -20,6 +20,8 @@ namespace Qlik.Sense.RestClient
         Task<string> PostAsync(string endpoint, string body);
         byte[] Post(string endpoint, byte[] body);
         Task<byte[]> PostAsync(string endpoint, byte[] body);
+        string Put(string endpoint, string body);
+        Task<string> PutAsync(string endpoint, string body);
         string Delete(string endpoint);
         Task<string> DeleteAsync(string endpoint);
     }
