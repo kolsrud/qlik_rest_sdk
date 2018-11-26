@@ -9,7 +9,7 @@ namespace Qlik.Sense.RestClient
     public interface IRestClient
     {
         string Url { get; }
-        Action<HttpWebRequest> WebRequestTransform { get; set; }
+        IRestClient WithWebTransform(Action<HttpWebRequest> transform);
 
         void AsDirectConnection(int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
         void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);

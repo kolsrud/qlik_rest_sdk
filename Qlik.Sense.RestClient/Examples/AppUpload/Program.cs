@@ -15,8 +15,7 @@ namespace AppUpload
 
             var data = File.ReadAllBytes(@"\path\to\app.qvf");
             const string nameOfApp = "MyUploadedApp";
-            using (new WebRequestSetting(restClient, req => req.ContentType = "application/vnd.qlik.sense.app"))
-                Console.WriteLine(restClient.Post("qrs/app/upload?keepData=true&name=" + nameOfApp, data));
+            Console.WriteLine(restClient.WithContentType("application/vnd.qlik.sense.app").Post("/qrs/app/upload?keepData=true&name=" + nameOfApp, data));
         }
     }
 }

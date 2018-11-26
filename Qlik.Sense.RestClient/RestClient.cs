@@ -10,17 +10,13 @@ using System.Threading.Tasks;
 
 namespace Qlik.Sense.RestClient
 {
-    public class RestClient : WebClient, IRestClient
+    public class RestClient : IRestClient
     {
         internal static DebugConsole DebugConsole { private get; set; }
-        public string Url => BaseUri.AbsoluteUri;
-        private Uri BaseUri { get; set; }
-        private string _userDirectory;
-        private string _userId;
-        private string _staticHeaderName;
-        private X509Certificate2Collection _certificates;
-        private readonly CookieContainer _cookieJar = new CookieContainer();
-        public Action<HttpWebRequest> WebRequestTransform { get; set; }
+        public string Url => ConnectionSettings.BaseUri.AbsoluteUri;
+        public Uri BaseUri => ConnectionSettings.BaseUri;
+
+        private readonly ConnectionSettings ConnectionSettings;
 
         public ConnectionType? CurrentConnectionType { get; private set; }
 
@@ -31,9 +27,28 @@ namespace Qlik.Sense.RestClient
             DirectConnection
         }
 
-        public RestClient(string uri)
+        private Pool<WebClient> clientPool;
+
+        private RestClient(ConnectionSettings settings)
         {
-            BaseUri = new Uri(uri);
+            ConnectionSettings = settings;
+            clientPool = new Pool<WebClient>(() => new SenseWebClient(ConnectionSettings.Clone()));
+        }
+
+        public RestClient(string uri) : this(new ConnectionSettings(uri))
+        {
+        }
+
+        public IRestClient WithContentType(string contentType)
+        {
+            return WithWebTransform(req => req.ContentType = contentType);
+        }
+
+        public IRestClient WithWebTransform(Action<HttpWebRequest> transform)
+        {
+            var client = new RestClient(ConnectionSettings.Clone());
+            client.ConnectionSettings.WebRequestTransform = transform;
+            return client;
         }
 
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
@@ -46,34 +61,18 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
             bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
-            CurrentConnectionType = ConnectionType.DirectConnection;
-            var uriBuilder = new UriBuilder(BaseUri) {Port = port};
-            BaseUri = uriBuilder.Uri;
-            _userId = userId;
-            _userDirectory = userDirectory;
-            _certificates = certificateCollection;
-            if (!certificateValidation)
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            ConnectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation,
+                certificateCollection);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
-            UseDefaultCredentials = true;
-            CurrentConnectionType = ConnectionType.NtlmUserViaProxy;
-            _userId = Environment.UserName;
-            _userDirectory = Environment.UserDomainName;
-            if (!certificateValidation)
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            ConnectionSettings.AsNtlmUserViaProxy(certificateValidation);
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
-            CurrentConnectionType = ConnectionType.StaticHeaderUserViaProxy;
-            _userId = userId;
-            _userDirectory = Environment.UserDomainName;
-            _staticHeaderName = headerName;
-            if (!certificateValidation)
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            ConnectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
         }
 
         public static X509Certificate2Collection LoadCertificateFromStore()
@@ -121,36 +120,49 @@ namespace Qlik.Sense.RestClient
             return new X509Certificate2Collection(certificate);
         }
 
+        private Borrowed<WebClient> GetClient()
+        {
+            return clientPool.Borrow();
+        }
+
         public string Get(string endpoint)
         {
             ValidateConfiguration();
             LogCall("GET", endpoint);
-            return LogReceive(DownloadString(BaseUri.Append(endpoint)));
+            using (var client = GetClient())
+            {
+                return LogReceive(client.It.DownloadString(BaseUri.Append(endpoint)));
+            }
         }
 
         public Task<string> GetAsync(string endpoint)
         {
             ValidateConfiguration();
             LogCall("GET", endpoint);
-            return LogReceive(DownloadStringTaskAsync(BaseUri.Append(endpoint)));
+            var client = GetClient();
+            return LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append(endpoint))).ContinueWith(t => {client.Return(); return t.Result;});
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)
         {
             ValidateConfiguration();
-            if (_cookieJar.Count == 0)
+            if (!ConnectionSettings.HasCookie)
                 CollectCookie();
             LogCall(method, endpoint);
-            return LogReceive(UploadString(BaseUri.Append(endpoint), method, body));
+            using (var client = GetClient())
+            {
+                return LogReceive(client.It.UploadString(BaseUri.Append(endpoint), method, body));
+            }
         }
 
         private async Task<string> PerformUploadStringAccessAsync(string method, string endpoint, string body)
         {
             ValidateConfiguration();
-            if (_cookieJar.Count == 0)
+            if (!ConnectionSettings.HasCookie)
                 await CollectCookieAsync();
             LogCall(method, endpoint);
-            return await LogReceive(UploadStringTaskAsync(BaseUri.Append(endpoint), method, body));
+            using (var client = GetClient())
+                return await LogReceive(client.It.UploadStringTaskAsync(BaseUri.Append(endpoint), method, body));
         }
 
         public string Post(string endpoint, string body)
@@ -166,23 +178,29 @@ namespace Qlik.Sense.RestClient
         public byte[] Post(string endpoint, byte[] body)
         {
             ValidateConfiguration();
-            if (_cookieJar.Count == 0)
+            if (!ConnectionSettings.HasCookie)
                 CollectCookie();
             LogCall("POST", endpoint);
-            var data = UploadData(BaseUri.Append(endpoint), body);
-            LogReceive("<binary data>");
-            return data;
+            using (var client = GetClient())
+            {
+                var data = client.It.UploadData(BaseUri.Append(endpoint), body);
+                LogReceive("<binary data>");
+                return data;
+            }
         }
 
         public async Task<byte[]> PostAsync(string endpoint, byte[] body)
         {
             ValidateConfiguration();
-            if (_cookieJar.Count == 0)
+            if (!ConnectionSettings.HasCookie)
                 CollectCookie();
             LogCall("POST", endpoint);
-            var data = await UploadDataTaskAsync(BaseUri.Append(endpoint), body);
-            LogReceive("<binary data>");
-            return data;
+            using (var client = GetClient())
+            {
+                var data = await client.It.UploadDataTaskAsync(BaseUri.Append(endpoint), body);
+                LogReceive("<binary data>");
+                return data;
+            }
         }
 
         public string Put(string endpoint, string body)
@@ -207,9 +225,7 @@ namespace Qlik.Sense.RestClient
 
         private void ValidateConfiguration()
         {
-            if (CurrentConnectionType == null) throw new ConnectionNotConfiguredException();
-            if (CurrentConnectionType == ConnectionType.DirectConnection && _certificates == null)
-                throw new CertificatesNotLoadedException();
+            ConnectionSettings.Validate();
         }
 
         private void CollectCookie()
@@ -222,36 +238,153 @@ namespace Qlik.Sense.RestClient
             await GetAsync("/qrs/about");
         }
 
+        public class ConnectionNotConfiguredException : Exception
+        {
+        }
+
+        public class CertificatesNotLoadedException : Exception
+        {
+        }
+    }
+
+    public static class UriExtensions
+    {
+        public static Uri Append(this Uri uri, params string[] paths)
+        {
+            return new Uri(paths.Aggregate(uri.AbsoluteUri,
+                (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+        }
+    }
+
+    class ConnectionSettings
+    {
+        public Uri BaseUri { get; set; }
+
+        public CookieContainer CookieJar { get; set; }
+
+        private bool _isConfigured = false;
+        public RestClient.ConnectionType ConnectionType;
+        public string UserDirectory;
+        public string UserId;
+        public string StaticHeaderName;
+        public bool UseDefaultCredentials;
+        public X509Certificate2Collection Certificates;
+        public Action<HttpWebRequest> WebRequestTransform { get; set; }
+
+        public bool HasCookie => CookieJar.Count > 0;
+
+        public ConnectionSettings Clone()
+        {
+            return new ConnectionSettings()
+            {
+                BaseUri = this.BaseUri,
+                CookieJar = this.CookieJar,
+                _isConfigured = this._isConfigured,
+                ConnectionType = this.ConnectionType,
+                UserDirectory = this.UserDirectory,
+                UserId = this.UserId,
+                StaticHeaderName = this.StaticHeaderName,
+                UseDefaultCredentials = this.UseDefaultCredentials,
+                Certificates = this.Certificates,
+                WebRequestTransform = this.WebRequestTransform
+            };
+        }
+
+        private ConnectionSettings()
+        {
+            CookieJar = new CookieContainer();
+        }
+
+        public ConnectionSettings(string uri) : this()
+        {
+            BaseUri = new Uri(uri);
+        }
+
+        public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
+            bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
+        {
+            ConnectionType = RestClient.ConnectionType.DirectConnection;
+            var uriBuilder = new UriBuilder(BaseUri) {Port = port};
+            BaseUri = uriBuilder.Uri;
+            UserId = userId;
+            UserDirectory = userDirectory;
+            Certificates = certificateCollection;
+            if (!certificateValidation)
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            _isConfigured = true;
+        }
+
+        public void AsNtlmUserViaProxy(bool certificateValidation = true)
+        {
+            UseDefaultCredentials = true;
+            ConnectionType = RestClient.ConnectionType.NtlmUserViaProxy;
+            UserId = Environment.UserName;
+            UserDirectory = Environment.UserDomainName;
+            if (!certificateValidation)
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            _isConfigured = true;
+        }
+
+        public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
+        {
+            ConnectionType = RestClient.ConnectionType.StaticHeaderUserViaProxy;
+            UserId = userId;
+            UserDirectory = Environment.UserDomainName;
+            StaticHeaderName = headerName;
+            if (!certificateValidation)
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            _isConfigured = true;
+        }
+
+        public void Validate()
+        {
+            if (!_isConfigured)
+                throw new RestClient.ConnectionNotConfiguredException();
+            if (ConnectionType == RestClient.ConnectionType.DirectConnection && Certificates == null)
+                throw new RestClient.CertificatesNotLoadedException();
+        }
+    }
+
+    internal class SenseWebClient : WebClient
+    {
+        private readonly ConnectionSettings _connectionSettings;
+
+        public SenseWebClient(ConnectionSettings settings)
+        {
+            _connectionSettings = settings;
+        }
+
         protected override WebRequest GetWebRequest(Uri address)
         {
             var xrfkey = CreateXrfKey();
             var request = (HttpWebRequest) base.GetWebRequest(AddXrefKey(address, xrfkey));
             request.ContentType = "application/json";
             request.Headers.Add("X-Qlik-Xrfkey", xrfkey);
-            WebRequestTransform?.Invoke(request);
+            _connectionSettings.WebRequestTransform?.Invoke(request);
 
-            var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", _userDirectory, _userId);
-            switch (CurrentConnectionType)
+            var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", _connectionSettings.UserDirectory,
+                _connectionSettings.UserId);
+            switch (_connectionSettings.ConnectionType)
             {
-                case ConnectionType.NtlmUserViaProxy:
+                case RestClient.ConnectionType.NtlmUserViaProxy:
                     request.UseDefaultCredentials = true;
                     request.AllowAutoRedirect = true;
                     request.UserAgent = "Windows";
                     break;
-                case ConnectionType.DirectConnection:
+                case RestClient.ConnectionType.DirectConnection:
                     request.Headers.Add("X-Qlik-User", userHeaderValue);
-                    foreach (var certificate in _certificates)
+                    foreach (var certificate in _connectionSettings.Certificates)
                     {
                         request.ClientCertificates.Add(certificate);
                     }
 
                     break;
-                case ConnectionType.StaticHeaderUserViaProxy:
-                    request.Headers.Add(_staticHeaderName, _userId);
+                case RestClient.ConnectionType.StaticHeaderUserViaProxy:
+                    request.Headers.Add(_connectionSettings.StaticHeaderName, _connectionSettings.UserId);
                     break;
             }
 
-            request.CookieContainer = _cookieJar;
+            request.CookieContainer = _connectionSettings.CookieJar;
             return request;
         }
 
@@ -283,55 +416,5 @@ namespace Qlik.Sense.RestClient
             return sb.ToString();
         }
 
-
-        public class ConnectionNotConfiguredException : Exception
-        {
-        }
-
-        public class CertificatesNotLoadedException : Exception
-        {
-        }
-    }
-
-    public static class UriExtensions
-    {
-        public static Uri Append(this Uri uri, params string[] paths)
-        {
-            return new Uri(paths.Aggregate(uri.AbsoluteUri,
-                (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
-        }
-    }
-
-    /// <summary>
-    /// Highly experimental...
-    /// </summary>
-    public class WebRequestSetting : IDisposable
-    {
-        private readonly IRestClient _client;
-        private readonly Action<HttpWebRequest> _oldTransform;
-
-        public WebRequestSetting(IRestClient client, Action<HttpWebRequest> newTransform)
-        {
-            _client = client;
-            _oldTransform = client.WebRequestTransform;
-            client.WebRequestTransform = newTransform;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private bool _disposed = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                _disposed = true;
-                _client.WebRequestTransform = _oldTransform;
-            }
-        }
     }
 }
