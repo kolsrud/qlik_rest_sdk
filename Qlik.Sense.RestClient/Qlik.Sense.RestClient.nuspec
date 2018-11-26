@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>QlikSenseRestClient</id>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <title>Qlik.Sense.RestClient</title>
     <authors>Øystein Kolsrud</authors>
     <owners>Øystein Kolsrud</owners>
