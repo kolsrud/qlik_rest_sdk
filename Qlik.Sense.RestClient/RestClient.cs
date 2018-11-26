@@ -13,10 +13,17 @@ namespace Qlik.Sense.RestClient
     public class RestClient : IRestClient
     {
         internal static DebugConsole DebugConsole { private get; set; }
-        public string Url => ConnectionSettings.BaseUri.AbsoluteUri;
-        public Uri BaseUri => ConnectionSettings.BaseUri;
 
-        private readonly ConnectionSettings ConnectionSettings;
+        public static int MaximumConcurrentCalls
+        {
+            get => ServicePointManager.DefaultConnectionLimit;
+            set => ServicePointManager.DefaultConnectionLimit = value;
+        }
+
+        public string Url => _connectionSettings.BaseUri.AbsoluteUri;
+        public Uri BaseUri => _connectionSettings.BaseUri;
+
+        private readonly ConnectionSettings _connectionSettings;
 
         public ConnectionType? CurrentConnectionType { get; private set; }
 
@@ -27,12 +34,12 @@ namespace Qlik.Sense.RestClient
             DirectConnection
         }
 
-        private Pool<WebClient> clientPool;
+        private readonly Pool<WebClient> _clientPool;
 
         private RestClient(ConnectionSettings settings)
         {
-            ConnectionSettings = settings;
-            clientPool = new Pool<WebClient>(() => new SenseWebClient(ConnectionSettings.Clone()));
+            _connectionSettings = settings;
+            _clientPool = new Pool<WebClient>(() => new SenseWebClient(_connectionSettings.Clone()));
         }
 
         public RestClient(string uri) : this(new ConnectionSettings(uri))
@@ -46,8 +53,8 @@ namespace Qlik.Sense.RestClient
 
         public IRestClient WithWebTransform(Action<HttpWebRequest> transform)
         {
-            var client = new RestClient(ConnectionSettings.Clone());
-            client.ConnectionSettings.WebRequestTransform = transform;
+            var client = new RestClient(_connectionSettings.Clone());
+            client._connectionSettings.WebRequestTransform = transform;
             return client;
         }
 
@@ -61,18 +68,18 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
             bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
-            ConnectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation,
+            _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation,
                 certificateCollection);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
-            ConnectionSettings.AsNtlmUserViaProxy(certificateValidation);
+            _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
-            ConnectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
+            _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
         }
 
         public static X509Certificate2Collection LoadCertificateFromStore()
@@ -122,7 +129,7 @@ namespace Qlik.Sense.RestClient
 
         private Borrowed<WebClient> GetClient()
         {
-            return clientPool.Borrow();
+            return _clientPool.Borrow();
         }
 
         public string Get(string endpoint)
@@ -146,7 +153,7 @@ namespace Qlik.Sense.RestClient
         private string PerformUploadStringAccess(string method, string endpoint, string body)
         {
             ValidateConfiguration();
-            if (!ConnectionSettings.HasCookie)
+            if (!_connectionSettings.HasCookie)
                 CollectCookie();
             LogCall(method, endpoint);
             using (var client = GetClient())
@@ -158,7 +165,7 @@ namespace Qlik.Sense.RestClient
         private async Task<string> PerformUploadStringAccessAsync(string method, string endpoint, string body)
         {
             ValidateConfiguration();
-            if (!ConnectionSettings.HasCookie)
+            if (!_connectionSettings.HasCookie)
                 await CollectCookieAsync();
             LogCall(method, endpoint);
             using (var client = GetClient())
@@ -178,7 +185,7 @@ namespace Qlik.Sense.RestClient
         public byte[] Post(string endpoint, byte[] body)
         {
             ValidateConfiguration();
-            if (!ConnectionSettings.HasCookie)
+            if (!_connectionSettings.HasCookie)
                 CollectCookie();
             LogCall("POST", endpoint);
             using (var client = GetClient())
@@ -192,7 +199,7 @@ namespace Qlik.Sense.RestClient
         public async Task<byte[]> PostAsync(string endpoint, byte[] body)
         {
             ValidateConfiguration();
-            if (!ConnectionSettings.HasCookie)
+            if (!_connectionSettings.HasCookie)
                 CollectCookie();
             LogCall("POST", endpoint);
             using (var client = GetClient())
@@ -225,7 +232,7 @@ namespace Qlik.Sense.RestClient
 
         private void ValidateConfiguration()
         {
-            ConnectionSettings.Validate();
+            _connectionSettings.Validate();
         }
 
         private void CollectCookie()
@@ -256,7 +263,7 @@ namespace Qlik.Sense.RestClient
         }
     }
 
-    class ConnectionSettings
+    internal class ConnectionSettings : IConnectionConfigurator
     {
         public Uri BaseUri { get; set; }
 
@@ -298,6 +305,13 @@ namespace Qlik.Sense.RestClient
         public ConnectionSettings(string uri) : this()
         {
             BaseUri = new Uri(uri);
+        }
+
+        public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
+            X509Certificate2Collection certificateCollection = null)
+        {
+            AsDirectConnection(Environment.UserName, Environment.UserDomainName, port, certificateValidation,
+                certificateCollection);
         }
 
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,

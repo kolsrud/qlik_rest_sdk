@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugConsole.cs" />
+    <Compile Include="IConnectionConfigurator.cs" />
     <Compile Include="IRestClient.cs" />
     <Compile Include="Pool.cs" />
     <Compile Include="RestClient.cs">

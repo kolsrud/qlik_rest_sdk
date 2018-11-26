@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace Qlik.Sense.RestClient
 {
-    public interface IRestClient
+    public interface IRestClient : IConnectionConfigurator
     {
         string Url { get; }
         IRestClient WithWebTransform(Action<HttpWebRequest> transform);
 
-        void AsDirectConnection(int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
-        void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
-        void AsNtlmUserViaProxy(bool certificateValidation = true);
         string Get(string endpoint);
         Task<string> GetAsync(string endpoint);
         string Post(string endpoint, string body);
