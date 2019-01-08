@@ -18,8 +18,9 @@ namespace Qlik.Sense.RestClient
         public Uri BaseUri { get; set; }
 
         public CookieContainer CookieJar { get; set; }
+	    public bool IsAuthenticated { get; private set; }
 
-        private bool _isConfigured = false;
+		private bool _isConfigured = false;
         public ConnectionType ConnectionType;
         public string UserDirectory;
         public string UserId;
@@ -28,7 +29,6 @@ namespace Qlik.Sense.RestClient
         public X509Certificate2Collection Certificates;
         public Action<HttpWebRequest> WebRequestTransform { get; set; }
 
-        public bool IsAuthenticated => CookieJar.Count > 0;
 	    private Exception _authenticationException;
 
 	    public Func<Task> AuthenticationFunc { get; set; }
@@ -52,6 +52,7 @@ namespace Qlik.Sense.RestClient
 		    try
 		    {
 			    await AuthenticationFunc();
+			    IsAuthenticated = true;
 		    }
 		    catch (Exception e)
 		    {
@@ -68,7 +69,8 @@ namespace Qlik.Sense.RestClient
             return new ConnectionSettings()
             {
                 BaseUri = this.BaseUri,
-                CookieJar = this.CookieJar,
+				CookieJar = this.CookieJar,
+				IsAuthenticated = this.IsAuthenticated,
                 _isConfigured = this._isConfigured,
                 ConnectionType = this.ConnectionType,
                 UserDirectory = this.UserDirectory,
@@ -83,11 +85,11 @@ namespace Qlik.Sense.RestClient
 
         private ConnectionSettings()
         {
-            CookieJar = new CookieContainer();
         }
 
         public ConnectionSettings(string uri) : this()
         {
+			CookieJar = new CookieContainer();
             BaseUri = new Uri(uri);
         }
 
