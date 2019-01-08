@@ -26,12 +26,12 @@ namespace Qlik.Sense.RestClient
                 _connectionSettings.UserId);
             switch (_connectionSettings.ConnectionType)
             {
-                case RestClient.ConnectionType.NtlmUserViaProxy:
+                case ConnectionType.NtlmUserViaProxy:
                     request.UseDefaultCredentials = true;
                     request.AllowAutoRedirect = true;
                     request.UserAgent = "Windows";
                     break;
-                case RestClient.ConnectionType.DirectConnection:
+                case ConnectionType.DirectConnection:
                     request.Headers.Add("X-Qlik-User", userHeaderValue);
                     foreach (var certificate in _connectionSettings.Certificates)
                     {
@@ -39,7 +39,7 @@ namespace Qlik.Sense.RestClient
                     }
 
                     break;
-                case RestClient.ConnectionType.StaticHeaderUserViaProxy:
+                case ConnectionType.StaticHeaderUserViaProxy:
                     request.Headers.Add(_connectionSettings.StaticHeaderName, _connectionSettings.UserId);
                     break;
             }
