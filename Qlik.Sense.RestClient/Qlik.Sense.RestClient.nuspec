@@ -6,7 +6,8 @@
     <title>Qlik.Sense.RestClient</title>
     <authors>Øystein Kolsrud</authors>
     <owners>Øystein Kolsrud</owners>
-    <license src="licenses\LICENSE" />
+    <licenseUrl>https://github.com/kolsrud/qlik_rest_sdk/blob/master/LICENSE</licenseUrl>
+<!--    <license type="file" /> -->
     <projectUrl>https://github.com/kolsrud/qlik_rest_sdk</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This is a basic SDK for Qlik Sense REST access with authentication configuration built along the same line as the .Net SDK for the Engine API.</description>
@@ -16,6 +17,6 @@
   </metadata>
   <files>
     <file src="bin\Release\Qlik.Sense.RestClient.dll" target="lib\net471" />
-    <file src="..\LICENSE" target="licenses\LICENSE"
+<!--    <file src="..\LICENSE" target="licenses\LICENSE" /> -->
   </files>
 </package>
