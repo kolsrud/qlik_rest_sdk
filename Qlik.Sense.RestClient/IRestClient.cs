@@ -11,6 +11,8 @@ namespace Qlik.Sense.RestClient
         string Url { get; }
         IRestClient WithWebTransform(Action<HttpWebRequest> transform);
 
+	    bool Authenticate();
+
         string Get(string endpoint);
         Task<string> GetAsync(string endpoint);
         string Post(string endpoint, string body);
