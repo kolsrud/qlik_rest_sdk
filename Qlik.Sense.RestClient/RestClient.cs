@@ -265,9 +265,14 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.Validate();
         }
 
-        private Task CollectCookieAsync()
+        private async Task CollectCookieAsync()
         {
-            return GetAsync("/qrs/about");
+			DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
+	        using (var client = GetClient())
+	        {
+		        await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append("/qrs/about")));
+		        DebugConsole?.Log($"Authentication complete.");
+	        }
         }
 
         public class ConnectionNotConfiguredException : Exception
