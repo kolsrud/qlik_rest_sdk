@@ -83,8 +83,7 @@ namespace Qlik.Sense.RestClient
 		public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
-            AsDirectConnection(Environment.UserName, Environment.UserDomainName, port, certificateValidation,
-                certificateCollection);
+            _connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
         }
 
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
