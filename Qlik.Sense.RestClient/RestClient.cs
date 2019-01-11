@@ -211,7 +211,7 @@ namespace Qlik.Sense.RestClient
             return PerformUploadStringAccessAsync("POST", endpoint, body);
         }
 
-        public byte[] Post(string endpoint, byte[] body)
+        public string Post(string endpoint, byte[] body)
         {
             ValidateConfiguration();
             if (!Authenticate())
@@ -220,12 +220,13 @@ namespace Qlik.Sense.RestClient
             using (var client = GetClient())
             {
                 var data = client.It.UploadData(BaseUri.Append(endpoint), body);
-                LogReceive("<binary data>");
-                return data;
+                var rsp = System.Text.Encoding.Default.GetString(data);
+                LogReceive(rsp);
+                return rsp;
             }
         }
 
-        public async Task<byte[]> PostAsync(string endpoint, byte[] body)
+        public async Task<string> PostAsync(string endpoint, byte[] body)
         {
             ValidateConfiguration();
 	        if (!await AuthenticateAsync())
@@ -234,8 +235,9 @@ namespace Qlik.Sense.RestClient
             using (var client = GetClient())
             {
                 var data = await client.It.UploadDataTaskAsync(BaseUri.Append(endpoint), body);
-                LogReceive("<binary data>");
-                return data;
+                var rsp = System.Text.Encoding.Default.GetString(data);
+                LogReceive(rsp);
+                return rsp;
             }
         }
 
