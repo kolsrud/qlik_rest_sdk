@@ -24,7 +24,7 @@ namespace Qlik.Sense.RestClient
 
         private readonly ConnectionSettings _connectionSettings;
 
-	    public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
+        public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
         private readonly Pool<WebClient> _clientPool;
 
@@ -36,7 +36,7 @@ namespace Qlik.Sense.RestClient
 
         public RestClient(string uri) : this(new ConnectionSettings(uri))
         {
-	        _connectionSettings.AuthenticationFunc = CollectCookieAsync;
+            _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
         public IRestClient WithContentType(string contentType)
@@ -51,36 +51,36 @@ namespace Qlik.Sense.RestClient
             return client;
         }
 
-	    public bool Authenticate()
-	    {
-		    var t = AuthenticateAsync();
-		    t.ConfigureAwait(false);
-		    return t.Result;
-	    }
+        public bool Authenticate()
+        {
+            var t = AuthenticateAsync();
+            t.ConfigureAwait(false);
+            return t.Result;
+        }
 
-	    public async Task<bool> AuthenticateAsync()
-	    {
-		    if (_connectionSettings.IsAuthenticated)
-			    return true;
-			
-		    try
-		    {
-			    await _connectionSettings.PerformAuthentication();
-			    return true;
-		    }
-		    catch (AggregateException e)
-		    {
-			    DebugConsole?.Log("Authentication failed: " + e.InnerException?.Message);
-			    return false;
-		    }
-		    catch (Exception e)
-		    {
-			    DebugConsole?.Log("Authentication failed: " + e.Message);
-			    return false;
-		    }
-	    }
+        public async Task<bool> AuthenticateAsync()
+        {
+            if (_connectionSettings.IsAuthenticated)
+                return true;
 
-		public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
+            try
+            {
+                await _connectionSettings.PerformAuthentication();
+                return true;
+            }
+            catch (AggregateException e)
+            {
+                DebugConsole?.Log("Authentication failed: " + e.InnerException?.Message);
+                return false;
+            }
+            catch (Exception e)
+            {
+                DebugConsole?.Log("Authentication failed: " + e.Message);
+                return false;
+            }
+        }
+
+        public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
             _connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
@@ -156,8 +156,8 @@ namespace Qlik.Sense.RestClient
         public string Get(string endpoint)
         {
             ValidateConfiguration();
-	        if (!Authenticate())
-		        throw new AuthenticationException("Authentication failed.");
+            if (!Authenticate())
+                throw new AuthenticationException("Authentication failed.");
             LogCall("GET", endpoint);
             using (var client = GetClient())
             {
@@ -168,20 +168,20 @@ namespace Qlik.Sense.RestClient
         public async Task<string> GetAsync(string endpoint)
         {
             ValidateConfiguration();
-	        if (!await AuthenticateAsync())
-		        throw new AuthenticationException("Authentication failed.");
+            if (!await AuthenticateAsync())
+                throw new AuthenticationException("Authentication failed.");
             LogCall("GET", endpoint);
-	        using (var client = GetClient())
-	        {
-		        return await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append(endpoint)));
-	        }
+            using (var client = GetClient())
+            {
+                return await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append(endpoint)));
+            }
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)
         {
             ValidateConfiguration();
-	        if (!Authenticate())
-		        throw new AuthenticationException("Authentication failed.");
+            if (!Authenticate())
+                throw new AuthenticationException("Authentication failed.");
             LogCall(method, endpoint);
             using (var client = GetClient())
             {
@@ -193,12 +193,12 @@ namespace Qlik.Sense.RestClient
         {
             ValidateConfiguration();
             if (!await AuthenticateAsync())
-	            throw new AuthenticationException("Authentication failed.");
-			LogCall(method, endpoint);
-	        using (var client = GetClient())
-	        {
-		        return await LogReceive(client.It.UploadStringTaskAsync(BaseUri.Append(endpoint), method, body));
-	        }
+                throw new AuthenticationException("Authentication failed.");
+            LogCall(method, endpoint);
+            using (var client = GetClient())
+            {
+                return await LogReceive(client.It.UploadStringTaskAsync(BaseUri.Append(endpoint), method, body));
+            }
         }
 
         public string Post(string endpoint, string body)
@@ -229,8 +229,8 @@ namespace Qlik.Sense.RestClient
         public async Task<string> PostAsync(string endpoint, byte[] body)
         {
             ValidateConfiguration();
-	        if (!await AuthenticateAsync())
-		        throw new AuthenticationException("Authentication failed.");
+            if (!await AuthenticateAsync())
+                throw new AuthenticationException("Authentication failed.");
             LogCall("POST", endpoint);
             using (var client = GetClient())
             {
@@ -268,12 +268,12 @@ namespace Qlik.Sense.RestClient
 
         private async Task CollectCookieAsync()
         {
-			DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
-	        using (var client = GetClient())
-	        {
-		        await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append("/qrs/about")));
-		        DebugConsole?.Log($"Authentication complete.");
-	        }
+            DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
+            using (var client = GetClient())
+            {
+                await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append("/qrs/about")));
+                DebugConsole?.Log($"Authentication complete.");
+            }
         }
 
         public class ConnectionNotConfiguredException : Exception

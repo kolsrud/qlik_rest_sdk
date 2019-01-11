@@ -37,6 +37,7 @@ namespace Qlik.Sense.RestClient
         private bool _returned = false;
 
         private readonly T _it;
+
         public T It
         {
             get

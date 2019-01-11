@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace Qlik.Sense.RestClient
 {
-	public enum ConnectionType
-	{
-		NtlmUserViaProxy,
-		StaticHeaderUserViaProxy,
-		DirectConnection
-	}
+    public enum ConnectionType
+    {
+        NtlmUserViaProxy,
+        StaticHeaderUserViaProxy,
+        DirectConnection
+    }
 
-	internal class ConnectionSettings : IConnectionConfigurator
+    internal class ConnectionSettings : IConnectionConfigurator
     {
         public Uri BaseUri { get; set; }
 
         public CookieContainer CookieJar { get; set; }
-	    public bool IsAuthenticated { get; private set; }
+        public bool IsAuthenticated { get; private set; }
 
-		private bool _isConfigured = false;
+        private bool _isConfigured = false;
         public ConnectionType ConnectionType;
         public string UserDirectory;
         public string UserId;
@@ -29,48 +29,49 @@ namespace Qlik.Sense.RestClient
         public X509Certificate2Collection Certificates;
         public Action<HttpWebRequest> WebRequestTransform { get; set; }
 
-	    private Exception _authenticationException;
+        private Exception _authenticationException;
 
-	    public Func<Task> AuthenticationFunc { get; set; }
+        public Func<Task> AuthenticationFunc { get; set; }
 
-		private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1,1);
-	    public async Task PerformAuthentication()
-	    {
-		    await _semaphore.WaitAsync();
-		    if (IsAuthenticated)
-		    {
-			    _semaphore.Release();
-			    return;
-		    }
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-		    if (_authenticationException != null)
-		    {
-			    _semaphore.Release();
-			    throw _authenticationException;
-		    }
+        public async Task PerformAuthentication()
+        {
+            await _semaphore.WaitAsync();
+            if (IsAuthenticated)
+            {
+                _semaphore.Release();
+                return;
+            }
 
-		    try
-		    {
-			    await AuthenticationFunc();
-			    IsAuthenticated = true;
-		    }
-		    catch (Exception e)
-		    {
-			    _authenticationException = e;
-		    }
-		    finally
-		    {
-			    _semaphore.Release();
-			}
-		}
+            if (_authenticationException != null)
+            {
+                _semaphore.Release();
+                throw _authenticationException;
+            }
+
+            try
+            {
+                await AuthenticationFunc();
+                IsAuthenticated = true;
+            }
+            catch (Exception e)
+            {
+                _authenticationException = e;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
 
         public ConnectionSettings Clone()
         {
             return new ConnectionSettings()
             {
                 BaseUri = this.BaseUri,
-				CookieJar = this.CookieJar,
-				IsAuthenticated = this.IsAuthenticated,
+                CookieJar = this.CookieJar,
+                IsAuthenticated = this.IsAuthenticated,
                 _isConfigured = this._isConfigured,
                 ConnectionType = this.ConnectionType,
                 UserDirectory = this.UserDirectory,
@@ -79,7 +80,7 @@ namespace Qlik.Sense.RestClient
                 UseDefaultCredentials = this.UseDefaultCredentials,
                 Certificates = this.Certificates,
                 WebRequestTransform = this.WebRequestTransform,
-				AuthenticationFunc = this.AuthenticationFunc
+                AuthenticationFunc = this.AuthenticationFunc
             };
         }
 
@@ -89,7 +90,7 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionSettings(string uri) : this()
         {
-			CookieJar = new CookieContainer();
+            CookieJar = new CookieContainer();
             BaseUri = new Uri(uri);
         }
 
