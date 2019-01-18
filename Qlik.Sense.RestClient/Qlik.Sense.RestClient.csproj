@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Qlik.Sense.RestClient</RootNamespace>
     <AssemblyName>Qlik.Sense.RestClient</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -46,9 +46,7 @@
     <Compile Include="IConnectionConfigurator.cs" />
     <Compile Include="IRestClient.cs" />
     <Compile Include="Pool.cs" />
-    <Compile Include="RestClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="RestClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SenseWebClient.cs">
       <SubType>Component</SubType>
