@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>QlikSenseRestClient</id>
-    <version>0.4.1</version>
+    <version>0.5.0</version>
     <title>Qlik.Sense.RestClient</title>
     <authors>Øystein Kolsrud</authors>
     <owners>Øystein Kolsrud</owners>
@@ -16,7 +16,7 @@
     <tags>qlik sense rest</tags>
   </metadata>
   <files>
-    <file src="bin\Release\Qlik.Sense.RestClient.dll" target="lib\net471" />
+    <file src="bin\Release\Qlik.Sense.RestClient.dll" target="lib\net452" />
 <!--    <file src="..\LICENSE" target="licenses\LICENSE" /> -->
   </files>
 </package>
