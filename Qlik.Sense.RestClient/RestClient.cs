@@ -143,8 +143,12 @@ namespace Qlik.Sense.RestClient
             if (!Directory.Exists(path)) throw new DirectoryNotFoundException(path);
             if (!File.Exists(clientCertPath)) throw new FileNotFoundException(clientCertPath);
             var certificate = certificatePassword == null
-                ? new X509Certificate2(clientCertPath)
-                : new X509Certificate2(clientCertPath, certificatePassword);
+                //This is a fix for when using asp.net on some windows servers, where the X509Certificate2constructor
+                //tries to access the private key store for local user, even for .pfx file, and if the profile is not
+                //loaded in IIS (even some cases when it is loaded) throws an error. This tells the constructor
+                //to look at the Local Computer key store.
+                ? new X509Certificate2(clientCertPath, "", X509KeyStorageFlags.MachineKeySet)
+                : new X509Certificate2(clientCertPath, certificatePassword, X509KeyStorageFlags.MachineKeySet);
             return new X509Certificate2Collection(certificate);
         }
 
