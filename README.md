@@ -7,6 +7,9 @@ restClient.AsNtlmUserViaProxy();
 Console.WriteLine(restClient.Get("/qrs/about"));
 ```
 
-Currently only NTLM authentication and authentication using exported certificates are supported.
+The library currently supports the following authentication mechanisms:
+* Direct connection using certificates
+* NTLM authentication using default or custom credentials.
+* Static header authentication.
 
 The library is available for download from NuGet: https://www.nuget.org/packages/QlikSenseRestClient/
