@@ -25,7 +25,7 @@ namespace Qlik.Sense.RestClient
         public string UserDirectory;
         public string UserId;
         public string StaticHeaderName;
-	    public ICredentials CustomCredential;
+        public ICredentials CustomCredential;
         public X509Certificate2Collection Certificates;
         public Action<HttpWebRequest> WebRequestTransform { get; set; }
 
@@ -78,7 +78,7 @@ namespace Qlik.Sense.RestClient
                 UserId = this.UserId,
                 StaticHeaderName = this.StaticHeaderName,
                 Certificates = this.Certificates,
-				CustomCredential = this.CustomCredential,
+                CustomCredential = this.CustomCredential,
                 WebRequestTransform = this.WebRequestTransform,
                 AuthenticationFunc = this.AuthenticationFunc
             };
@@ -115,27 +115,27 @@ namespace Qlik.Sense.RestClient
             _isConfigured = true;
         }
 
-	    public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
-	    {
-		    ConnectionType = ConnectionType.NtlmUserViaProxy;
-		    UserId = credential?.UserName ?? Environment.UserName;
-		    UserDirectory = credential?.Domain ?? Environment.UserDomainName;
-		    if (credential != null)
-		    {
-				var credentialCache = new CredentialCache();
-				credentialCache.Add(this.BaseUri, "ntlm", credential);
-			    CustomCredential = credentialCache;
-		    }
+        public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
+        {
+            ConnectionType = ConnectionType.NtlmUserViaProxy;
+            UserId = credential?.UserName ?? Environment.UserName;
+            UserDirectory = credential?.Domain ?? Environment.UserDomainName;
+            if (credential != null)
+            {
+                var credentialCache = new CredentialCache();
+                credentialCache.Add(this.BaseUri, "ntlm", credential);
+                CustomCredential = credentialCache;
+            }
 
-		    if (!certificateValidation)
-			    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-		    _isConfigured = true;
-	    }
+            if (!certificateValidation)
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            _isConfigured = true;
+        }
 
-	    public void AsNtlmUserViaProxy(bool certificateValidation = true)
-	    {
-			AsNtlmUserViaProxy(null, certificateValidation);
-	    }
+        public void AsNtlmUserViaProxy(bool certificateValidation = true)
+        {
+            AsNtlmUserViaProxy(null, certificateValidation);
+        }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
