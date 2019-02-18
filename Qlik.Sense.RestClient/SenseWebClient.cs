@@ -18,33 +18,42 @@ namespace Qlik.Sense.RestClient
         {
             var xrfkey = CreateXrfKey();
             var request = (HttpWebRequest) base.GetWebRequest(AddXrefKey(address, xrfkey));
+	        // ReSharper disable once PossibleNullReferenceException
             request.ContentType = "application/json";
             request.Headers.Add("X-Qlik-Xrfkey", xrfkey);
             _connectionSettings.WebRequestTransform?.Invoke(request);
 
-            var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", _connectionSettings.UserDirectory,
-                _connectionSettings.UserId);
-            switch (_connectionSettings.ConnectionType)
-            {
-                case ConnectionType.NtlmUserViaProxy:
-                    request.UseDefaultCredentials = true;
-                    request.AllowAutoRedirect = true;
-                    request.UserAgent = "Windows";
-                    break;
-                case ConnectionType.DirectConnection:
-                    request.Headers.Add("X-Qlik-User", userHeaderValue);
-                    foreach (var certificate in _connectionSettings.Certificates)
-                    {
-                        request.ClientCertificates.Add(certificate);
-                    }
+	        switch (_connectionSettings.ConnectionType)
+	        {
+		        case ConnectionType.NtlmUserViaProxy:
+			        if (_connectionSettings.CustomCredential == null)
+				        request.UseDefaultCredentials = true;
+			        else
+			        {
+				        request.UseDefaultCredentials = false;
+				        request.Headers[HttpRequestHeader.Authorization] = "ntlm";
+				        request.Credentials = _connectionSettings.CustomCredential;
+			        }
+			        request.AllowAutoRedirect = true;
+			        request.UserAgent = "Windows";
+			        break;
+		        case ConnectionType.DirectConnection:
+			        var userHeaderValue = string.Format("UserDirectory={0};UserId={1}",
+				        _connectionSettings.UserDirectory,
+				        _connectionSettings.UserId);
+			        request.Headers.Add("X-Qlik-User", userHeaderValue);
+			        foreach (var certificate in _connectionSettings.Certificates)
+			        {
+				        request.ClientCertificates.Add(certificate);
+			        }
 
-                    break;
-                case ConnectionType.StaticHeaderUserViaProxy:
-                    request.Headers.Add(_connectionSettings.StaticHeaderName, _connectionSettings.UserId);
-                    break;
-            }
+			        break;
+		        case ConnectionType.StaticHeaderUserViaProxy:
+			        request.Headers.Add(_connectionSettings.StaticHeaderName, _connectionSettings.UserId);
+			        break;
+	        }
 
-            request.CookieContainer = _connectionSettings.CookieJar;
+	        request.CookieContainer = _connectionSettings.CookieJar;
             return request;
         }
 

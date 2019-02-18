@@ -93,10 +93,15 @@ namespace Qlik.Sense.RestClient
                 certificateCollection);
         }
 
-        public void AsNtlmUserViaProxy(bool certificateValidation = true)
+	    public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)
         {
-            _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
+            _connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
         }
+
+	    public void AsNtlmUserViaProxy(bool certificateValidation = true)
+	    {
+		    _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
+	    }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
@@ -269,11 +274,11 @@ namespace Qlik.Sense.RestClient
         private async Task CollectCookieAsync()
         {
             DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
-            using (var client = GetClient())
-            {
-                await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append("/qrs/about")));
-                DebugConsole?.Log($"Authentication complete.");
-            }
+	        using (var client = GetClient())
+	        {
+		        await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append("/qrs/about")));
+		        DebugConsole?.Log($"Authentication complete.");
+	        }
         }
 
         public class ConnectionNotConfiguredException : Exception
