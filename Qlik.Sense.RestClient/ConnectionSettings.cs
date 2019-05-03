@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,8 +28,11 @@ namespace Qlik.Sense.RestClient
         public string UserId;
         public string StaticHeaderName;
         public ICredentials CustomCredential;
+        public Dictionary<string, string> CustomHeaders { get; private set; }= new Dictionary<string, string>();
+
         public X509Certificate2Collection Certificates;
-        public Action<HttpWebRequest> WebRequestTransform { get; set; }
+        public Action<HttpClient> WebRequestTransform { get; set; }
+        public string ContentType { get; set; } = "application/json";
 
         private Exception _authenticationException;
 
@@ -79,7 +84,9 @@ namespace Qlik.Sense.RestClient
                 StaticHeaderName = this.StaticHeaderName,
                 Certificates = this.Certificates,
                 CustomCredential = this.CustomCredential,
+                CustomHeaders = new Dictionary<string, string>(this.CustomHeaders),
                 WebRequestTransform = this.WebRequestTransform,
+                ContentType = this.ContentType,
                 AuthenticationFunc = this.AuthenticationFunc
             };
         }

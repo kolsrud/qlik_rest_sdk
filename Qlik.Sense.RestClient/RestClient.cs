@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
@@ -26,12 +27,15 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
-        private readonly Pool<WebClient> _clientPool;
+        private readonly HttpClientHandler _clientHandler;
+        private Lazy<SenseHttpClient> _client;
 
         private RestClient(ConnectionSettings settings)
         {
             _connectionSettings = settings;
-            _clientPool = new Pool<WebClient>(() => new SenseWebClient(_connectionSettings.Clone()));
+            _clientHandler = new HttpClientHandler();
+            _clientHandler.CookieContainer = _connectionSettings.CookieJar;
+            _client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings, _clientHandler));
         }
 
         public RestClient(string uri) : this(new ConnectionSettings(uri))
@@ -41,13 +45,8 @@ namespace Qlik.Sense.RestClient
 
         public IRestClient WithContentType(string contentType)
         {
-            return WithWebTransform(req => req.ContentType = contentType);
-        }
-
-        public IRestClient WithWebTransform(Action<HttpWebRequest> transform)
-        {
             var client = new RestClient(_connectionSettings.Clone());
-            client._connectionSettings.WebRequestTransform = transform;
+            client._connectionSettings.ContentType = contentType;
             return client;
         }
 
@@ -95,12 +94,17 @@ namespace Qlik.Sense.RestClient
 
         public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)
         {
+            var credentialCache = new CredentialCache();
+            credentialCache.Add(this.BaseUri, "ntlm", credentials);
+            _clientHandler.Credentials = credentialCache;
+            _clientHandler.CookieContainer = _connectionSettings.CookieJar;
+            _connectionSettings.CustomHeaders.Add("User-Agent", "Windows");
             _connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
-            _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
+            AsNtlmUserViaProxy(CredentialCache.DefaultCredentials.GetCredential(this.BaseUri, "ntlm"), certificateValidation);
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
@@ -153,9 +157,9 @@ namespace Qlik.Sense.RestClient
             return new X509Certificate2Collection(certificate);
         }
 
-        private Borrowed<WebClient> GetClient()
+        private SenseHttpClient GetClient()
         {
-            return _clientPool.Borrow();
+            return _client.Value;
         }
 
         public string Get(string endpoint)
@@ -164,10 +168,10 @@ namespace Qlik.Sense.RestClient
             if (!Authenticate())
                 throw new AuthenticationException("Authentication failed.");
             LogCall("GET", endpoint);
-            using (var client = GetClient())
-            {
-                return LogReceive(client.It.DownloadString(BaseUri.Append(endpoint)));
-            }
+            var client = GetClient();
+            var task = client.GetStringAsync(BaseUri.Append(endpoint));
+            task.ConfigureAwait(false);
+            return LogReceive(task.Result);
         }
 
         public async Task<string> GetAsync(string endpoint)
@@ -176,22 +180,15 @@ namespace Qlik.Sense.RestClient
             if (!await AuthenticateAsync())
                 throw new AuthenticationException("Authentication failed.");
             LogCall("GET", endpoint);
-            using (var client = GetClient())
-            {
-                return await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append(endpoint)));
-            }
+            var client = GetClient();
+            return await LogReceive(client.GetStringAsync(BaseUri.Append(endpoint)));
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)
         {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall(method, endpoint);
-            using (var client = GetClient())
-            {
-                return LogReceive(client.It.UploadString(BaseUri.Append(endpoint), method, body));
-            }
+            var task = PerformUploadStringAccessAsync(method, endpoint, body);
+            task.ConfigureAwait(false);
+            return task.Result;
         }
 
         private async Task<string> PerformUploadStringAccessAsync(string method, string endpoint, string body)
@@ -200,15 +197,30 @@ namespace Qlik.Sense.RestClient
             if (!await AuthenticateAsync())
                 throw new AuthenticationException("Authentication failed.");
             LogCall(method, endpoint);
-            using (var client = GetClient())
+            var client = GetClient();
+            switch (method.ToUpper())
             {
-                return await LogReceive(client.It.UploadStringTaskAsync(BaseUri.Append(endpoint), method, body));
+                case "POST":
+                    return await LogReceive(client.PostStringAync(BaseUri.Append(endpoint), body));
+                case "PUT":
+                    return await LogReceive(client.PutStringAync(BaseUri.Append(endpoint), body));
+                case "DELETE":
+                    return await LogReceive(client.DeleteAync(BaseUri.Append(endpoint)));
             }
+
+            return await LogReceive(client.PostStringAync(BaseUri.Append(endpoint), body));
         }
 
         public string Post(string endpoint, string body)
         {
-            return PerformUploadStringAccess("POST", endpoint, body);
+            ValidateConfiguration();
+            if (!Authenticate())
+                throw new AuthenticationException("Authentication failed.");
+            LogCall("POST", endpoint);
+            var client = GetClient();
+            var task = client.PostStringAync(BaseUri.Append(endpoint), body);
+            task.ConfigureAwait(false);
+            return task.Result;
         }
 
         public Task<string> PostAsync(string endpoint, string body)
@@ -222,13 +234,10 @@ namespace Qlik.Sense.RestClient
             if (!Authenticate())
                 throw new AuthenticationException("Authentication failed.");
             LogCall("POST", endpoint);
-            using (var client = GetClient())
-            {
-                var data = client.It.UploadData(BaseUri.Append(endpoint), body);
-                var rsp = System.Text.Encoding.Default.GetString(data);
-                LogReceive(rsp);
-                return rsp;
-            }
+            var client = GetClient();
+            var task = client.PostDataAync(BaseUri.Append(endpoint), body);
+            task.ConfigureAwait(false);
+            return LogReceive(task).Result;
         }
 
         public async Task<string> PostAsync(string endpoint, byte[] body)
@@ -237,13 +246,8 @@ namespace Qlik.Sense.RestClient
             if (!await AuthenticateAsync())
                 throw new AuthenticationException("Authentication failed.");
             LogCall("POST", endpoint);
-            using (var client = GetClient())
-            {
-                var data = await client.It.UploadDataTaskAsync(BaseUri.Append(endpoint), body);
-                var rsp = System.Text.Encoding.Default.GetString(data);
-                LogReceive(rsp);
-                return rsp;
-            }
+            var client = GetClient();
+            return await LogReceive(client.PostDataAync(BaseUri.Append(endpoint), body));
         }
 
         public string Put(string endpoint, string body)
@@ -274,11 +278,9 @@ namespace Qlik.Sense.RestClient
         private async Task CollectCookieAsync()
         {
             DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
-            using (var client = GetClient())
-            {
-                await LogReceive(client.It.DownloadStringTaskAsync(BaseUri.Append("/qrs/about")));
-                DebugConsole?.Log($"Authentication complete.");
-            }
+            var client = GetClient();
+            await LogReceive(client.GetStringAsync(BaseUri.Append("/qrs/about")));
+            DebugConsole?.Log($"Authentication complete.");
         }
 
         public class ConnectionNotConfiguredException : Exception

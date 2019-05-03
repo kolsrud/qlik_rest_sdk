@@ -1,13 +1,10 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Qlik.Sense.RestClient
 {
     public interface IRestClient : IConnectionConfigurator
     {
         string Url { get; }
-        IRestClient WithWebTransform(Action<HttpWebRequest> transform);
 
         bool Authenticate();
 
