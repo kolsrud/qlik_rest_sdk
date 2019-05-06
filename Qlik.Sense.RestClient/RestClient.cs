@@ -24,11 +24,12 @@ namespace Qlik.Sense.RestClient
         public Uri BaseUri => _connectionSettings.BaseUri;
 
         private readonly ConnectionSettings _connectionSettings;
+        private bool _performCertificateValidation = true;
 
         public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
         private readonly HttpClientHandler _clientHandler;
-        private Lazy<SenseHttpClient> _client;
+        private readonly Lazy<SenseHttpClient> _client;
 
         private RestClient(ConnectionSettings settings)
         {
@@ -43,10 +44,22 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
+        private void DeactivateCertificateValidation()
+        {
+            _performCertificateValidation = false;
+#if (NETCOREAPP2_1)
+            _clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+#else
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+#endif
+        }
+
         public IRestClient WithContentType(string contentType)
         {
             var client = new RestClient(_connectionSettings.Clone());
             client._connectionSettings.ContentType = contentType;
+            if (!_performCertificateValidation)
+                client.DeactivateCertificateValidation();
             return client;
         }
 
@@ -82,24 +95,32 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
-            _connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
+            if (!certificateValidation)
+                DeactivateCertificateValidation();
+
+            _connectionSettings.AsDirectConnection(port, certificateCollection);
         }
 
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
             bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
-            _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation,
-                certificateCollection);
+            if (!certificateValidation)
+                DeactivateCertificateValidation();
+
+            _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateCollection);
         }
 
         public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)
         {
+            if (!certificateValidation)
+                DeactivateCertificateValidation();
+
             var credentialCache = new CredentialCache();
             credentialCache.Add(this.BaseUri, "ntlm", credentials);
             _clientHandler.Credentials = credentialCache;
             _clientHandler.CookieContainer = _connectionSettings.CookieJar;
             _connectionSettings.CustomHeaders.Add("User-Agent", "Windows");
-            _connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
+            _connectionSettings.AsNtlmUserViaProxy(credentials);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
@@ -109,7 +130,10 @@ namespace Qlik.Sense.RestClient
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
-            _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
+            if (!certificateValidation)
+                DeactivateCertificateValidation();
+
+            _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName);
         }
 
         public static X509Certificate2Collection LoadCertificateFromStore()

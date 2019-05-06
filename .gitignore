@@ -4,3 +4,4 @@
 **/*csproj.user
 **/*.nupkg
 **/packages
+Qlik.Sense.RestClient/Qlik.Sense.RestClient.nuspec

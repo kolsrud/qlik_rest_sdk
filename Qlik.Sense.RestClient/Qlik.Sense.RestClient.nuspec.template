@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>QlikSenseRestClient</id>
+    <version>***</version>
+    <title>Qlik.Sense.RestClient</title>
+    <authors>Øystein Kolsrud</authors>
+    <owners>Øystein Kolsrud</owners>
+    <licenseUrl>https://github.com/kolsrud/qlik_rest_sdk/blob/master/LICENSE</licenseUrl>
+<!--    <license type="file" /> -->
+    <projectUrl>https://github.com/kolsrud/qlik_rest_sdk</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is a basic SDK for Qlik Sense REST access with authentication configuration built along the same line as the .Net SDK for the Engine API.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>qlik sense rest</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\net452\Qlik.Sense.RestClient.dll" target="lib\net452" />
+    <file src="bin\Release\netcoreapp2.1\Qlik.Sense.RestClient.dll" target="lib\netcoreapp2.1" />
+<!--    <file src="..\LICENSE" target="licenses\LICENSE" /> -->
+  </files>
+</package>

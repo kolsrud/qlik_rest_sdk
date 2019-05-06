@@ -2,7 +2,7 @@
 
 namespace Qlik.Sense.RestClient
 {
-    public interface IRestClient : IConnectionConfigurator
+    public interface IRestClient
     {
         string Url { get; }
 

@@ -101,15 +101,12 @@ namespace Qlik.Sense.RestClient
             BaseUri = new Uri(uri);
         }
 
-        public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
-            X509Certificate2Collection certificateCollection = null)
+        public void AsDirectConnection(int port = 4242, X509Certificate2Collection certificateCollection = null)
         {
-            AsDirectConnection(Environment.UserDomainName, Environment.UserName, port, certificateValidation,
-                certificateCollection);
+            AsDirectConnection(Environment.UserDomainName, Environment.UserName, port, certificateCollection);
         }
 
-        public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
-            bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
+        public void AsDirectConnection(string userDirectory, string userId, int port = 4242, X509Certificate2Collection certificateCollection = null)
         {
             ConnectionType = ConnectionType.DirectConnection;
             var uriBuilder = new UriBuilder(BaseUri) {Port = port};
@@ -117,12 +114,10 @@ namespace Qlik.Sense.RestClient
             UserId = userId;
             UserDirectory = userDirectory;
             Certificates = certificateCollection;
-            if (!certificateValidation)
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             _isConfigured = true;
         }
 
-        public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
+        public void AsNtlmUserViaProxy(NetworkCredential credential)
         {
             ConnectionType = ConnectionType.NtlmUserViaProxy;
             UserId = credential?.UserName ?? Environment.UserName;
@@ -134,24 +129,20 @@ namespace Qlik.Sense.RestClient
                 CustomCredential = credentialCache;
             }
 
-            if (!certificateValidation)
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             _isConfigured = true;
         }
 
-        public void AsNtlmUserViaProxy(bool certificateValidation = true)
+        public void AsNtlmUserViaProxy()
         {
-            AsNtlmUserViaProxy(null, certificateValidation);
+            AsNtlmUserViaProxy(null);
         }
 
-        public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
+        public void AsStaticHeaderUserViaProxy(string userId, string headerName)
         {
             ConnectionType = ConnectionType.StaticHeaderUserViaProxy;
             UserId = userId;
             UserDirectory = Environment.UserDomainName;
             StaticHeaderName = headerName;
-            if (!certificateValidation)
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
             _isConfigured = true;
         }
 
