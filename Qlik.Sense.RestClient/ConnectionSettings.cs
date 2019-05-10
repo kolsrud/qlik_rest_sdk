@@ -114,6 +114,8 @@ namespace Qlik.Sense.RestClient
             UserId = userId;
             UserDirectory = userDirectory;
             Certificates = certificateCollection;
+            var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
+            CustomHeaders.Add("X-Qlik-User", userHeaderValue);
             _isConfigured = true;
         }
 
@@ -128,7 +130,7 @@ namespace Qlik.Sense.RestClient
                 credentialCache.Add(this.BaseUri, "ntlm", credential);
                 CustomCredential = credentialCache;
             }
-
+            CustomHeaders.Add("User-Agent", "Windows");
             _isConfigured = true;
         }
 

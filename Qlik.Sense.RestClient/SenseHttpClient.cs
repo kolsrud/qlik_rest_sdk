@@ -39,41 +39,66 @@ namespace Qlik.Sense.RestClient
         {
             var client = _client.Value;
             var rsp = await client.GetAsync(AddXrefKey(uri, _xrfkey));
-            return await rsp.Content.ReadAsStringAsync();
+            if (rsp.IsSuccessStatusCode)
+            {
+                return await rsp.Content.ReadAsStringAsync();
+            }
+            
+            throw new HttpRequestException((int) rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
-        public async Task<string> PostStringAync(Uri uri, string body)
+        public async Task<string> PostStringAsync(Uri uri, string body)
         {
             var client = _client.Value;
             var rbody = new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
             var rsp = await client.PostAsync(AddXrefKey(uri, _xrfkey), rbody);
-            return await rsp.Content.ReadAsStringAsync();
+            if (rsp.IsSuccessStatusCode)
+            {
+                return await rsp.Content.ReadAsStringAsync();
+            }
+
+            throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
-        public async Task<string> PutStringAync(Uri uri, string body)
+        public async Task<string> PutStringAsync(Uri uri, string body)
         {
             var client = _client.Value;
             var rbody = new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
             var rsp = await client.PutAsync(AddXrefKey(uri, _xrfkey), rbody);
-            return await rsp.Content.ReadAsStringAsync();
+            if (rsp.IsSuccessStatusCode)
+            {
+                return await rsp.Content.ReadAsStringAsync();
+            }
+
+            throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
-        public async Task<string> PostDataAync(Uri uri, byte[] body)
+        public async Task<string> PostDataAsync(Uri uri, byte[] body)
         {
             var client = _client.Value;
             var rbody = new ByteArrayContent(body);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
             var rsp = await client.PostAsync(AddXrefKey(uri, _xrfkey), rbody);
-            return await rsp.Content.ReadAsStringAsync();
+            if (rsp.IsSuccessStatusCode)
+            {
+                return await rsp.Content.ReadAsStringAsync();
+            }
+
+            throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
-        public async Task<string> DeleteAync(Uri uri)
+        public async Task<string> DeleteAsync(Uri uri)
         {
             var client = _client.Value;
             var rsp = await client.DeleteAsync(AddXrefKey(uri, _xrfkey));
-            return await rsp.Content.ReadAsStringAsync();
+            if (rsp.IsSuccessStatusCode)
+            {
+                return await rsp.Content.ReadAsStringAsync();
+            }
+
+            throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
         public HttpClient GetClient()
