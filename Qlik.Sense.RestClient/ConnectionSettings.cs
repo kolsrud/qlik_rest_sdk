@@ -145,6 +145,7 @@ namespace Qlik.Sense.RestClient
             UserId = userId;
             UserDirectory = Environment.UserDomainName;
             StaticHeaderName = headerName;
+            CustomHeaders.Add(headerName, userId);
             _isConfigured = true;
         }
 
