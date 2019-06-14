@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -19,6 +20,13 @@ namespace Qlik.Sense.RestClient
             get => ServicePointManager.DefaultConnectionLimit;
             set => ServicePointManager.DefaultConnectionLimit = value;
         }
+
+        public TimeSpan Timeout
+        {
+            get => _connectionSettings.Timeout;
+            set => _connectionSettings.Timeout = value;
+        }
+        public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
 
         public string Url => _connectionSettings.BaseUri.AbsoluteUri;
         public Uri BaseUri => _connectionSettings.BaseUri;

@@ -28,6 +28,7 @@ namespace Qlik.Sense.RestClient
         public string UserId;
         public string StaticHeaderName;
         public ICredentials CustomCredential;
+        public TimeSpan Timeout;
         public Dictionary<string, string> CustomHeaders { get; private set; }= new Dictionary<string, string>();
 
         public X509Certificate2Collection Certificates;
@@ -84,6 +85,7 @@ namespace Qlik.Sense.RestClient
                 StaticHeaderName = this.StaticHeaderName,
                 Certificates = this.Certificates,
                 CustomCredential = this.CustomCredential,
+                Timeout = this.Timeout,
                 CustomHeaders = new Dictionary<string, string>(this.CustomHeaders),
                 WebRequestTransform = this.WebRequestTransform,
                 ContentType = this.ContentType,
@@ -97,6 +99,7 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionSettings(string uri) : this()
         {
+            Timeout = System.Threading.Timeout.InfiniteTimeSpan;
             CookieJar = new CookieContainer();
             BaseUri = new Uri(uri);
         }
