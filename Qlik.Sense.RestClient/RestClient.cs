@@ -256,12 +256,12 @@ namespace Qlik.Sense.RestClient
             return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body));
         }
 
-        public string Post(string endpoint, string body)
+        public string Post(string endpoint, string body = "")
         {
             return PerformUploadStringAccess("POST", endpoint, body);
         }
 
-        public Task<string> PostAsync(string endpoint, string body)
+        public Task<string> PostAsync(string endpoint, string body = "")
         {
             return PerformUploadStringAccessAsync("POST", endpoint, body);
         }
