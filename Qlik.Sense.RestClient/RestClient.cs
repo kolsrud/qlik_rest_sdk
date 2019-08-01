@@ -258,14 +258,7 @@ namespace Qlik.Sense.RestClient
 
         public string Post(string endpoint, string body)
         {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("POST", endpoint);
-            var client = GetClient();
-            var task = client.PostStringAsync(BaseUri.Append(endpoint), body);
-            task.ConfigureAwait(false);
-            return task.Result;
+            return PerformUploadStringAccess("POST", endpoint, body);
         }
 
         public Task<string> PostAsync(string endpoint, string body)
@@ -275,14 +268,9 @@ namespace Qlik.Sense.RestClient
 
         public string Post(string endpoint, byte[] body)
         {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("POST", endpoint);
-            var client = GetClient();
-            var task = client.PostDataAsync(BaseUri.Append(endpoint), body);
+            var task = PostAsync(endpoint, body);
             task.ConfigureAwait(false);
-            return LogReceive(task).Result;
+            return task.Result;
         }
 
         public async Task<string> PostAsync(string endpoint, byte[] body)
