@@ -36,23 +36,12 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
-#if (NETCOREAPP2_1)
-        private readonly HttpClientHandler _clientHandler;
-#else
-        private readonly WebRequestHandler _clientHandler;
-#endif
         private readonly Lazy<SenseHttpClient> _client;
 
         private RestClient(ConnectionSettings settings)
         {
             _connectionSettings = settings;
-#if (NETCOREAPP2_1)
-            _clientHandler = new HttpClientHandler();
-#else
-            _clientHandler = new WebRequestHandler();
-#endif
-            _clientHandler.CookieContainer = _connectionSettings.CookieJar;
-            _client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings, _clientHandler));
+            _client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
         }
 
         public RestClient(string uri) : this(new ConnectionSettings(uri))
@@ -60,22 +49,10 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
-        private void DeactivateCertificateValidation()
-        {
-            _performCertificateValidation = false;
-#if (NETCOREAPP2_1)
-            _clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-#else
-            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-#endif
-        }
-
         public IRestClient WithContentType(string contentType)
         {
             var client = new RestClient(_connectionSettings.Clone());
             client._connectionSettings.ContentType = contentType;
-            if (!_performCertificateValidation)
-                client.DeactivateCertificateValidation();
             return client;
         }
 
@@ -111,37 +88,18 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
-            if (!certificateValidation)
-                DeactivateCertificateValidation();
-
-            if (certificateCollection != null)
-                _clientHandler.ClientCertificates.AddRange(certificateCollection);
-
-            _connectionSettings.AsDirectConnection(port, certificateCollection);
+            _connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
         }
 
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
             bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
-            if (!certificateValidation)
-                DeactivateCertificateValidation();
-
-            if (certificateCollection != null)
-                _clientHandler.ClientCertificates.AddRange(certificateCollection);
-
-            _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateCollection);
+            _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation, certificateCollection);
         }
 
         public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)
         {
-            if (!certificateValidation)
-                DeactivateCertificateValidation();
-
-            var credentialCache = new CredentialCache();
-            credentialCache.Add(this.BaseUri, "ntlm", credentials);
-            _clientHandler.Credentials = credentialCache;
-            _clientHandler.CookieContainer = _connectionSettings.CookieJar;
-            _connectionSettings.AsNtlmUserViaProxy(credentials);
+            _connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
@@ -151,10 +109,7 @@ namespace Qlik.Sense.RestClient
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
-            if (!certificateValidation)
-                DeactivateCertificateValidation();
-
-            _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName);
+            _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
         }
 
         public static X509Certificate2Collection LoadCertificateFromStore()

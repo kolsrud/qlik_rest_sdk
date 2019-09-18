@@ -31,7 +31,9 @@ namespace Qlik.Sense.RestClient
         public TimeSpan Timeout;
         public Dictionary<string, string> CustomHeaders { get; private set; }= new Dictionary<string, string>();
 
+        public bool CertificateValidation = true;
         public X509Certificate2Collection Certificates;
+        // TODO: Remove this member?
         public Action<HttpClient> WebRequestTransform { get; set; }
         public string ContentType { get; set; } = "application/json";
 
@@ -83,6 +85,7 @@ namespace Qlik.Sense.RestClient
                 UserDirectory = this.UserDirectory,
                 UserId = this.UserId,
                 StaticHeaderName = this.StaticHeaderName,
+                CertificateValidation = this.CertificateValidation,
                 Certificates = this.Certificates,
                 CustomCredential = this.CustomCredential,
                 Timeout = this.Timeout,
@@ -104,29 +107,33 @@ namespace Qlik.Sense.RestClient
             BaseUri = new Uri(uri);
         }
 
-        public void AsDirectConnection(int port = 4242, X509Certificate2Collection certificateCollection = null)
+        public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
+            X509Certificate2Collection certificateCollection = null)
         {
-            AsDirectConnection(Environment.UserDomainName, Environment.UserName, port, certificateCollection);
+            AsDirectConnection(Environment.UserDomainName, Environment.UserName, port, certificateValidation, certificateCollection);
         }
 
-        public void AsDirectConnection(string userDirectory, string userId, int port = 4242, X509Certificate2Collection certificateCollection = null)
+        public void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true,
+            X509Certificate2Collection certificateCollection = null)
         {
             ConnectionType = ConnectionType.DirectConnection;
             var uriBuilder = new UriBuilder(BaseUri) {Port = port};
             BaseUri = uriBuilder.Uri;
             UserId = userId;
             UserDirectory = userDirectory;
+            CertificateValidation = certificateValidation;
             Certificates = certificateCollection;
             var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
             CustomHeaders.Add("X-Qlik-User", userHeaderValue);
             _isConfigured = true;
         }
 
-        public void AsNtlmUserViaProxy(NetworkCredential credential)
+        public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
         {
             ConnectionType = ConnectionType.NtlmUserViaProxy;
             UserId = credential?.UserName ?? Environment.UserName;
             UserDirectory = credential?.Domain ?? Environment.UserDomainName;
+            CertificateValidation = certificateValidation;
             if (credential != null)
             {
                 var credentialCache = new CredentialCache();
@@ -137,12 +144,7 @@ namespace Qlik.Sense.RestClient
             _isConfigured = true;
         }
 
-        public void AsNtlmUserViaProxy()
-        {
-            AsNtlmUserViaProxy(null);
-        }
-
-        public void AsStaticHeaderUserViaProxy(string userId, string headerName)
+        public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation)
         {
             ConnectionType = ConnectionType.StaticHeaderUserViaProxy;
             UserId = userId;
