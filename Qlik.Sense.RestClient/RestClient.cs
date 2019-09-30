@@ -145,16 +145,27 @@ namespace Qlik.Sense.RestClient
             return message;
         }
 
-        public static X509Certificate2Collection LoadCertificateFromDirectory(string path,
-            SecureString certificatePassword = null)
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
+        {
+            return LoadCertificateFromDirectory(path, p => new X509Certificate2(p));
+        }
+
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword)
+        {
+            return LoadCertificateFromDirectory(path, p => new X509Certificate2(p, certificatePassword));
+        }
+
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword, X509KeyStorageFlags keyStorageFlags)
+        {
+            return LoadCertificateFromDirectory(path, p => new X509Certificate2(p, certificatePassword, keyStorageFlags));
+        }
+
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path, Func<string, X509Certificate2> f)
         {
             var clientCertPath = Path.Combine(path, "client.pfx");
             if (!Directory.Exists(path)) throw new DirectoryNotFoundException(path);
             if (!File.Exists(clientCertPath)) throw new FileNotFoundException(clientCertPath);
-            var certificate = certificatePassword == null
-                ? new X509Certificate2(clientCertPath)
-                : new X509Certificate2(clientCertPath, certificatePassword);
-            return new X509Certificate2Collection(certificate);
+            return new X509Certificate2Collection(f(clientCertPath));
         }
 
         private SenseHttpClient GetClient()
