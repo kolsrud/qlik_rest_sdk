@@ -128,11 +128,16 @@ namespace Qlik.Sense.RestClient
             _isConfigured = true;
         }
 
+        public void AsNtlmUserViaProxy(bool certificateValidation = true)
+        {
+            UserId = Environment.UserName;
+            UserDirectory = Environment.UserDomainName;
+            AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
+        }
+
         public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
         {
             ConnectionType = ConnectionType.NtlmUserViaProxy;
-            UserId = credential?.UserName ?? Environment.UserName;
-            UserDirectory = credential?.Domain ?? Environment.UserDomainName;
             CertificateValidation = certificateValidation;
             if (credential != null)
             {

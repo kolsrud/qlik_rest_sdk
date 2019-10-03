@@ -5,6 +5,8 @@ namespace Qlik.Sense.RestClient
     public interface IRestClient
     {
         string Url { get; }
+        string UserId { get; }
+        string UserDirectory { get; }
 
         bool Authenticate();
 

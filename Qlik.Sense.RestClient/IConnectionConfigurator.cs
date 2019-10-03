@@ -10,6 +10,8 @@ namespace Qlik.Sense.RestClient
 
         void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
 
+        void AsNtlmUserViaProxy(bool certificateValidation = true);
+
         void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true);
 
         void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true);

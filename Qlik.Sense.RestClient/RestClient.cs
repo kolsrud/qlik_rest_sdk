@@ -29,6 +29,9 @@ namespace Qlik.Sense.RestClient
         public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
 
         public string Url => _connectionSettings.BaseUri.AbsoluteUri;
+        public string UserId => _connectionSettings.UserId;
+        public string UserDirectory => _connectionSettings.UserDirectory;
+
         public Uri BaseUri => _connectionSettings.BaseUri;
 
         private readonly ConnectionSettings _connectionSettings;
@@ -104,7 +107,7 @@ namespace Qlik.Sense.RestClient
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
-            AsNtlmUserViaProxy(CredentialCache.DefaultCredentials.GetCredential(this.BaseUri, "ntlm"), certificateValidation);
+            _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
