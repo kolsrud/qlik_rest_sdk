@@ -35,8 +35,6 @@ namespace Qlik.Sense.RestClient
 
         public bool CertificateValidation = true;
         public X509Certificate2Collection Certificates;
-        // TODO: Remove this member?
-        public Action<HttpClient> WebRequestTransform { get; set; }
         public string ContentType { get; set; } = "application/json";
 
         private Exception _authenticationException;
@@ -93,7 +91,6 @@ namespace Qlik.Sense.RestClient
                 Timeout = this.Timeout,
                 Xrfkey = this.Xrfkey,
                 CustomHeaders = new Dictionary<string, string>(this.CustomHeaders),
-                WebRequestTransform = this.WebRequestTransform,
                 ContentType = this.ContentType,
                 AuthenticationFunc = this.AuthenticationFunc
             };

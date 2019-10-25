@@ -48,7 +48,6 @@ namespace Qlik.Sense.RestClient
 #endif
         }
 
-
         private HttpClient InitializeClient()
         {
             if (_connectionSettings.CertificateValidation == false)
@@ -61,7 +60,6 @@ namespace Qlik.Sense.RestClient
             }
             _xrfkey = _connectionSettings.Xrfkey ?? CreateXrfKey();
             client.DefaultRequestHeaders.Add("X-Qlik-Xrfkey", _xrfkey);
-            _connectionSettings.WebRequestTransform?.Invoke(client);
             client.Timeout = _connectionSettings.Timeout;
 
             return client;
