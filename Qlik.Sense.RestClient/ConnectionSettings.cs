@@ -45,7 +45,7 @@ namespace Qlik.Sense.RestClient
 
         public async Task PerformAuthentication()
         {
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             if (IsAuthenticated)
             {
                 _semaphore.Release();
@@ -60,7 +60,7 @@ namespace Qlik.Sense.RestClient
 
             try
             {
-                await AuthenticationFunc();
+                await AuthenticationFunc().ConfigureAwait(false);
                 IsAuthenticated = true;
             }
             catch (Exception e)

@@ -73,7 +73,7 @@ namespace Qlik.Sense.RestClient
 
             try
             {
-                await _connectionSettings.PerformAuthentication();
+                await _connectionSettings.PerformAuthentication().ConfigureAwait(false);
                 return true;
             }
             catch (AggregateException e)
@@ -143,7 +143,7 @@ namespace Qlik.Sense.RestClient
 
         private static async Task<string> LogReceive(Task<string> messageTask)
         {
-            var message = await messageTask;
+            var message = await messageTask.ConfigureAwait(false);
             DebugConsole?.Log($"Recieving:\t{message}");
             return message;
         }
@@ -191,11 +191,11 @@ namespace Qlik.Sense.RestClient
         public async Task<string> GetAsync(string endpoint)
         {
             ValidateConfiguration();
-            if (!await AuthenticateAsync())
+            if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
             LogCall("GET", endpoint);
             var client = GetClient();
-            return await LogReceive(client.GetStringAsync(BaseUri.Append(endpoint)));
+            return await LogReceive(client.GetStringAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)
@@ -215,14 +215,14 @@ namespace Qlik.Sense.RestClient
             switch (method.ToUpper())
             {
                 case "POST":
-                    return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body));
+                    return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
                 case "PUT":
-                    return await LogReceive(client.PutStringAsync(BaseUri.Append(endpoint), body));
+                    return await LogReceive(client.PutStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
                 case "DELETE":
-                    return await LogReceive(client.DeleteAsync(BaseUri.Append(endpoint)));
+                    return await LogReceive(client.DeleteAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
             }
 
-            return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body));
+            return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
         }
 
         public string Post(string endpoint, string body = "")
@@ -245,11 +245,11 @@ namespace Qlik.Sense.RestClient
         public async Task<string> PostAsync(string endpoint, byte[] body)
         {
             ValidateConfiguration();
-            if (!await AuthenticateAsync())
+            if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
             LogCall("POST", endpoint);
             var client = GetClient();
-            return await LogReceive(client.PostDataAsync(BaseUri.Append(endpoint), body));
+            return await LogReceive(client.PostDataAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
         }
 
         public string Put(string endpoint, string body)
@@ -281,7 +281,7 @@ namespace Qlik.Sense.RestClient
         {
             DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
             var client = GetClient();
-            await LogReceive(client.GetStringAsync(BaseUri.Append("/qrs/about")));
+            await LogReceive(client.GetStringAsync(BaseUri.Append("/qrs/about"))).ConfigureAwait(false);
             DebugConsole?.Log($"Authentication complete.");
         }
 
