@@ -59,7 +59,7 @@ namespace Qlik.Sense.RestClient
             {
                 client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
-            _xrfkey = CreateXrfKey();
+            _xrfkey = _connectionSettings.Xrfkey ?? CreateXrfKey();
             client.DefaultRequestHeaders.Add("X-Qlik-Xrfkey", _xrfkey);
             _connectionSettings.WebRequestTransform?.Invoke(client);
             client.Timeout = _connectionSettings.Timeout;

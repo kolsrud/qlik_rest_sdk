@@ -52,6 +52,13 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
+        public IRestClient WithXrfkey(string xrfkey)
+        {
+            var client = new RestClient(_connectionSettings.Clone());
+            client._connectionSettings.SetXrfKey(xrfkey);
+            return client;
+        }
+
         public IRestClient WithContentType(string contentType)
         {
             var client = new RestClient(_connectionSettings.Clone());

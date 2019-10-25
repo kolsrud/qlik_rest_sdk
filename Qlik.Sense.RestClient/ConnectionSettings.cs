@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +30,7 @@ namespace Qlik.Sense.RestClient
         public string StaticHeaderName;
         public ICredentials CustomCredential;
         public TimeSpan Timeout;
+        public string Xrfkey;
         public Dictionary<string, string> CustomHeaders { get; private set; }= new Dictionary<string, string>();
 
         public bool CertificateValidation = true;
@@ -89,6 +91,7 @@ namespace Qlik.Sense.RestClient
                 Certificates = this.Certificates,
                 CustomCredential = this.CustomCredential,
                 Timeout = this.Timeout,
+                Xrfkey = this.Xrfkey,
                 CustomHeaders = new Dictionary<string, string>(this.CustomHeaders),
                 WebRequestTransform = this.WebRequestTransform,
                 ContentType = this.ContentType,
@@ -98,6 +101,14 @@ namespace Qlik.Sense.RestClient
 
         private ConnectionSettings()
         {
+        }
+
+        public void SetXrfKey(string xrfkey)
+        {
+            if (xrfkey.Length != 16) throw new ArgumentException("Xrfkey must be of length 16.", nameof(xrfkey));
+            var r = new Regex("^[a-zA-Z0-9]*$");
+            if (!r.IsMatch(xrfkey)) throw new ArgumentException("Xrfkey contains illegal character.", nameof(xrfkey));
+            Xrfkey = xrfkey;
         }
 
         public ConnectionSettings(string uri) : this()
