@@ -52,6 +52,20 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
+        public IRestClient ConnectAsQmc()
+        {
+            var client = new RestClient(_connectionSettings.Clone());
+            client.CustomHeaders["X-Qlik-Security"] = "Context=ManagementAccess";
+            return client;
+        }
+
+        public IRestClient ConnectAsHub()
+        {
+            var client = new RestClient(_connectionSettings.Clone());
+            client.CustomHeaders["X-Qlik-Security"] = "Context=AppAccess";
+            return client;
+        }
+
         public IRestClient WithXrfkey(string xrfkey)
         {
             var client = new RestClient(_connectionSettings.Clone());
