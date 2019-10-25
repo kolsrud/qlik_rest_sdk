@@ -10,6 +10,11 @@ namespace Qlik.Sense.RestClient
 
         bool Authenticate();
 
+        IRestClient ConnectAsQmc();
+        IRestClient ConnectAsHub();
+        IRestClient WithXrfkey(string xrfkey);
+        IRestClient WithContentType(string contentType);
+
         string Get(string endpoint);
         Task<string> GetAsync(string endpoint);
         string Post(string endpoint, string body = "");
