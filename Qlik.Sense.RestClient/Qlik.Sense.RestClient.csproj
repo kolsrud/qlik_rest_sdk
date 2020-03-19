@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp2.1</TargetFrameworks>
@@ -20,6 +20,10 @@
       <None Remove="Qlik.Sense.RestClient.nuspec" />
       <None Remove="Qlik.Sense.RestClient.nuspec.template" />
       <None Remove="*.nupkg" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     </ItemGroup>
 
     <ItemGroup>

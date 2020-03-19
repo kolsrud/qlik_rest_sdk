@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
@@ -35,7 +34,6 @@ namespace Qlik.Sense.RestClient
         public Uri BaseUri => _connectionSettings.BaseUri;
 
         private readonly ConnectionSettings _connectionSettings;
-        private bool _performCertificateValidation = true;
 
         public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
