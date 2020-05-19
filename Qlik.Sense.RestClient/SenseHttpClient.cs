@@ -50,6 +50,9 @@ namespace Qlik.Sense.RestClient
 
         private HttpClient InitializeClient()
         {
+#if (NET452)
+            ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+#endif
             if (_connectionSettings.CertificateValidation == false)
                 DeactivateCertificateValidation();
 
