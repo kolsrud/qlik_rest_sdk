@@ -13,7 +13,8 @@ namespace Qlik.Sense.RestClient
     {
         NtlmUserViaProxy,
         StaticHeaderUserViaProxy,
-        DirectConnection
+        DirectConnection,
+        JwtTokenViaQcs
     }
 
     internal class ConnectionSettings : IConnectionConfigurator
@@ -134,6 +135,14 @@ namespace Qlik.Sense.RestClient
             var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
             CustomHeaders.Add("X-Qlik-User", userHeaderValue);
             _isConfigured = true;
+        }
+
+        public void AsJwtTokenViaQcs(string key)
+        {
+            ConnectionType = ConnectionType.JwtTokenViaQcs;
+            CustomHeaders.Add("Authorization", "Bearer " + key);
+            _isConfigured = true;
+            IsAuthenticated = true;
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)

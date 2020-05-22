@@ -56,22 +56,38 @@ namespace Qlik.Sense.RestClient
             if (_connectionSettings.CertificateValidation == false)
                 DeactivateCertificateValidation();
 
+            if (_connectionSettings.ConnectionType == ConnectionType.JwtTokenViaQcs)
+            {
+                _clientHandler.AllowAutoRedirect = false;
+            }
+
             var client = new HttpClient(_clientHandler);
             foreach (var header in _connectionSettings.CustomHeaders)
             {
                 client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
-            _xrfkey = _connectionSettings.Xrfkey ?? CreateXrfKey();
-            client.DefaultRequestHeaders.Add("X-Qlik-Xrfkey", _xrfkey);
+
+            if (UseXrfKey)
+            {
+                _xrfkey = _connectionSettings.Xrfkey ?? CreateXrfKey();
+                client.DefaultRequestHeaders.Add("X-Qlik-Xrfkey", _xrfkey);
+            }
+
             client.Timeout = _connectionSettings.Timeout;
 
             return client;
         }
 
+        private bool UseXrfKey => _connectionSettings.ConnectionType != ConnectionType.JwtTokenViaQcs;
+
         public async Task<string> GetStringAsync(Uri uri)
         {
             var client = _client.Value;
-            var rsp = await client.GetAsync(AddXrefKey(uri, _xrfkey)).ConfigureAwait(false);
+            var rsp = await client.GetAsync(AddXrefKey(UseXrfKey, uri, _xrfkey)).ConfigureAwait(false);
+            if (rsp.StatusCode == HttpStatusCode.MovedPermanently)
+            {
+                rsp = await client.GetAsync(rsp.Headers.Location).ConfigureAwait(false);
+            }
             if (rsp.IsSuccessStatusCode)
             {
                 return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -85,7 +101,7 @@ namespace Qlik.Sense.RestClient
             var client = _client.Value;
             var rbody = new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
-            var rsp = await client.PostAsync(AddXrefKey(uri, _xrfkey), rbody).ConfigureAwait(false);
+            var rsp = await client.PostAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), rbody).ConfigureAwait(false);
             if (rsp.IsSuccessStatusCode)
             {
                 return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -99,7 +115,7 @@ namespace Qlik.Sense.RestClient
             var client = _client.Value;
             var rbody = new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
-            var rsp = await client.PutAsync(AddXrefKey(uri, _xrfkey), rbody).ConfigureAwait(false);
+            var rsp = await client.PutAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), rbody).ConfigureAwait(false);
             if (rsp.IsSuccessStatusCode)
             {
                 return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -113,7 +129,7 @@ namespace Qlik.Sense.RestClient
             var client = _client.Value;
             var rbody = new ByteArrayContent(body);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
-            var rsp = await client.PostAsync(AddXrefKey(uri, _xrfkey), rbody).ConfigureAwait(false);
+            var rsp = await client.PostAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), rbody).ConfigureAwait(false);
             if (rsp.IsSuccessStatusCode)
             {
                 return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -125,7 +141,7 @@ namespace Qlik.Sense.RestClient
         public async Task<string> DeleteAsync(Uri uri)
         {
             var client = _client.Value;
-            var rsp = await client.DeleteAsync(AddXrefKey(uri, _xrfkey)).ConfigureAwait(false);
+            var rsp = await client.DeleteAsync(AddXrefKey(UseXrfKey, uri, _xrfkey)).ConfigureAwait(false);
             if (rsp.IsSuccessStatusCode)
             {
                 return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -139,8 +155,11 @@ namespace Qlik.Sense.RestClient
             return _client.Value;
         }
 
-        private static Uri AddXrefKey(Uri uri, string xrfkey)
+        private static Uri AddXrefKey(bool addXrfKey, Uri uri, string xrfkey)
         {
+            if (!addXrfKey)
+                return uri;
+
             var sb = new StringBuilder(uri.Query.TrimStart('?'));
             if (sb.Length > 0)
                 sb.Append('&');
