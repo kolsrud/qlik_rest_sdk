@@ -146,8 +146,9 @@ namespace Qlik.Sense.RestClient
             IsAuthenticated = true;
         }
 
-        public void AsJwtTokenViaProxy(string key)
+        public void AsJwtTokenViaProxy(string key, bool certificateValidation)
         {
+            CertificateValidation = certificateValidation;
             AsJwtToken(key, ConnectionType.JwtTokenViaProxy);
         }
 

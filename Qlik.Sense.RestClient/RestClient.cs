@@ -119,9 +119,9 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation, certificateCollection);
         }
 
-        public void AsJwtTokenViaProxy(string key)
+        public void AsJwtTokenViaProxy(string key, bool certificateValidation = true)
         {
-            _connectionSettings.AsJwtTokenViaProxy(key);
+            _connectionSettings.AsJwtTokenViaProxy(key, certificateValidation);
         }
 
         public void AsJwtTokenViaQcs(string key)
