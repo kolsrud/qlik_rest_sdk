@@ -119,14 +119,26 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation, certificateCollection);
         }
 
-        public void AsJwtTokenViaProxy(string key, bool certificateValidation = true)
+        public void AsJwtViaProxy(string key, bool certificateValidation = true)
         {
-            _connectionSettings.AsJwtTokenViaProxy(key, certificateValidation);
+            _connectionSettings.AsJwtViaProxy(key, certificateValidation);
         }
 
+        [Obsolete("Use method AsJwtViaProxy.")] // Obsolete since June 2020 
+        public void AsJwtTokenViaProxy(string key, bool certificateValidation = true)
+        {
+            AsJwtViaProxy(key, certificateValidation);
+        }
+
+        public void AsJwtViaQcs(string key)
+        {
+            _connectionSettings.AsJwtViaQcs(key);
+        }
+
+        [Obsolete("Use method AsJwtViaQcs.")] // Obsolete since May 2020
         public void AsJwtTokenViaQcs(string key)
         {
-            _connectionSettings.AsJwtTokenViaQcs(key);
+            AsJwtViaQcs(key);
         }
 
         public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)

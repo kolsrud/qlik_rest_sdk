@@ -1,5 +1,10 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.1.0
+
+* **NEW FEATURE:** Added User constructor User(string usr).
+* **DEPRECATED:** Deprecated methods `AsJwtTokenViaProxy` and `AsJwtTokenViaQcs`. Renamed to `AsJwtViaProxy` and `AsJwtViaQcs`.
+
 ## v1.0.0
 
 * **NEW FEATURE:** Support for JWT Authentication towards both QSEfW and QCS.
