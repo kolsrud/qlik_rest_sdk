@@ -39,5 +39,10 @@ namespace Qlik.Sense.RestClient
         {
             return JsonConvert.DeserializeObject<List<User>>(AdminClient.Get("/qrs/user")).Where(u => u.Directory != "INTERNAL");
         }
+
+        public void ClearRuleCache()
+        {
+            AdminClient.Post("/qrs/systemrule/security/resetcache");
+        }
     }
 }
