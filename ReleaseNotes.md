@@ -1,7 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
-## v1.1.1
+## v1.2.0
 
+* **NEw FEATURE:** Added endpoint `ClientFactory.ClearRuleCache`.
 * **BUGFIX:** Static header connection did not respect the certificatValidation argument.
 
 ## v1.1.0

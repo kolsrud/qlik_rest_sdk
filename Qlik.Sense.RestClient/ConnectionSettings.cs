@@ -181,6 +181,7 @@ namespace Qlik.Sense.RestClient
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation)
         {
             ConnectionType = ConnectionType.StaticHeaderUserViaProxy;
+            CertificateValidation = certificateValidation;
             UserId = userId;
             UserDirectory = Environment.UserDomainName;
             StaticHeaderName = headerName;
