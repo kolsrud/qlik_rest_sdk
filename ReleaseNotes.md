@@ -1,5 +1,9 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.1.1
+
+* **BUGFIX:** Static header connection did not respect the certificatValidation argument.
+
 ## v1.1.0
 
 * **NEW FEATURE:** Added User constructor User(string usr).
