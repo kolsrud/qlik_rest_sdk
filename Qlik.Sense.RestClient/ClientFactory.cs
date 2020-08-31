@@ -37,7 +37,7 @@ namespace Qlik.Sense.RestClient
 
         public IEnumerable<User> GetAllUsers()
         {
-            return JsonConvert.DeserializeObject<List<User>>(AdminClient.Get("/qrs/user")).Where(u => u.Directory != "INTERNAL");
+            return AdminClient.Get<List<User>>("/qrs/user?filter=userDirectory ne 'INTERNAL'");
         }
 
         public void ClearRuleCache()

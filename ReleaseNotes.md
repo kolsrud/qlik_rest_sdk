@@ -1,8 +1,13 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.3.0
+
+* **NEW FEATURE:** Added `Post` and `Put` endpoints that accepts JToken objects as body.
+* **NEW FEATURE:** Added `Get`, `Post` and `Put` endpoints that return generic types based on JSON deserialization.
+
 ## v1.2.0
 
-* **NEw FEATURE:** Added endpoint `ClientFactory.ClearRuleCache`.
+* **NEW FEATURE:** Added endpoint `ClientFactory.ClearRuleCache`.
 * **BUGFIX:** Static header connection did not respect the certificatValidation argument.
 
 ## v1.1.0

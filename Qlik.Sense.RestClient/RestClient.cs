@@ -7,6 +7,8 @@ using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Qlik.Sense.RestClient
 {
@@ -229,6 +231,11 @@ namespace Qlik.Sense.RestClient
             return LogReceive(task.Result);
         }
 
+        public T Get<T>(string endpoint)
+        {
+            return JsonConvert.DeserializeObject<T>(Get(endpoint));
+        }
+
         public async Task<string> GetAsync(string endpoint)
         {
             ValidateConfiguration();
@@ -237,6 +244,11 @@ namespace Qlik.Sense.RestClient
             LogCall("GET", endpoint);
             var client = GetClient();
             return await LogReceive(client.GetStringAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
+        }
+
+        public Task<T> GetAsync<T>(string endpoint)
+        {
+            return GetAsync(endpoint).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)
@@ -271,9 +283,39 @@ namespace Qlik.Sense.RestClient
             return PerformUploadStringAccess("POST", endpoint, body);
         }
 
+        public string Post(string endpoint, JToken body)
+        {
+            return Post(endpoint, body.ToString(Formatting.None));
+        }
+
+        public T Post<T>(string endpoint, string body = "")
+        {
+            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
+        }
+
+        public T Post<T>(string endpoint, JToken body)
+        {
+            return Post<T>(endpoint, body.ToString(Formatting.None));
+        }
+
         public Task<string> PostAsync(string endpoint, string body = "")
         {
             return PerformUploadStringAccessAsync("POST", endpoint, body);
+        }
+
+        public Task<string> PostAsync(string endpoint, JToken body)
+        {
+            return PostAsync(endpoint, body.ToString(Formatting.None));
+        }
+
+        public Task<T> PostAsync<T>(string endpoint, string body)
+        {
+            return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+        }
+
+        public Task<T> PostAsync<T>(string endpoint, JToken body)
+        {
+            return PostAsync<T>(endpoint, body.ToString(Formatting.None));
         }
 
         public string Post(string endpoint, byte[] body)
@@ -281,6 +323,11 @@ namespace Qlik.Sense.RestClient
             var task = PostAsync(endpoint, body);
             task.ConfigureAwait(false);
             return task.Result;
+        }
+
+        public T Post<T>(string endpoint, byte[] body)
+        {
+            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
         }
 
         public async Task<string> PostAsync(string endpoint, byte[] body)
@@ -293,14 +340,49 @@ namespace Qlik.Sense.RestClient
             return await LogReceive(client.PostDataAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
         }
 
+        public Task<T> PostAsync<T>(string endpoint, byte[] body)
+        {
+            return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+        }
+
         public string Put(string endpoint, string body)
         {
             return PerformUploadStringAccess("PUT", endpoint, body);
         }
 
+        public string Put(string endpoint, JToken body)
+        {
+            return Put(endpoint, body.ToString(Formatting.None));
+        }
+
+        public T Put<T>(string endpoint, string body)
+        {
+            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
+        }
+
+        public T Put<T>(string endpoint, JToken body)
+        {
+            return Put<T>(endpoint, body.ToString(Formatting.None));
+        }
+
         public Task<string> PutAsync(string endpoint, string body)
         {
             return PerformUploadStringAccessAsync("PUT", endpoint, body);
+        }
+
+        public Task<string> PutAsync(string endpoint, JToken body)
+        {
+            return PutAsync(endpoint, body.ToString(Formatting.None));
+        }
+
+        public Task<T> PutAsync<T>(string endpoint, string body)
+        {
+            return PutAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+        }
+
+        public Task<T> PutAsync<T>(string endpoint, JToken body)
+        {
+            return PutAsync<T>(endpoint, body.ToString(Formatting.None));
         }
 
         public string Delete(string endpoint)
