@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Qlik.Sense.RestClient.Qrs;
 
 namespace Qlik.Sense.RestClient
 {
     public interface IRestClient
     {
+        User User { get; }
         string Url { get; }
         string UserId { get; }
         string UserDirectory { get; }

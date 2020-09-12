@@ -4,6 +4,7 @@
 
 * **NEW FEATURE:** Added `Post` and `Put` endpoints that accepts JToken objects as body.
 * **NEW FEATURE:** Added `Get`, `Post` and `Put` endpoints that return generic types based on JSON deserialization.
+* **NEW FEATURE:** Added endpoint `IRestClient.User`.
 
 ## v1.2.0
 

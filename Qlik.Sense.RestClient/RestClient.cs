@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Qlik.Sense.RestClient.Qrs;
 
 namespace Qlik.Sense.RestClient
 {
@@ -29,6 +30,8 @@ namespace Qlik.Sense.RestClient
         }
         public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
 
+        private User _user;
+        public User User => _user ?? (_user = new User{Directory = UserDirectory, Id = UserId});
         public string Url => _connectionSettings.BaseUri.AbsoluteUri;
         public string UserId => _connectionSettings.UserId;
         public string UserDirectory => _connectionSettings.UserDirectory;
