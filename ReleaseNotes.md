@@ -5,6 +5,7 @@
 * **NEW FEATURE:** Added `Post` and `Put` endpoints that accepts JToken objects as body.
 * **NEW FEATURE:** Added `Get`, `Post` and `Put` endpoints that return generic types based on JSON deserialization.
 * **NEW FEATURE:** Added endpoint `IRestClient.User`.
+* **NEW FEATURE:** Added endpoints `IRestClient.GetBytes` and `IRestClient.GetBytesAsync` for downloading binary data.
 
 ## v1.2.0
 

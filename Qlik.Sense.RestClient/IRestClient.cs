@@ -23,6 +23,9 @@ namespace Qlik.Sense.RestClient
         Task<string> GetAsync(string endpoint);
         Task<T> GetAsync<T>(string endpoint);
 
+        byte[] GetBytes(string endpoint);
+        Task<byte[]> GetBytesAsync(string endpoint);
+
         string Post(string endpoint, string body = "");
         string Post(string endpoint, JToken body);
         T Post<T>(string endpoint, string body = "");

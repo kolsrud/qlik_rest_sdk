@@ -183,15 +183,28 @@ namespace Qlik.Sense.RestClient
 
         private static string LogReceive(string message)
         {
-            DebugConsole?.Log($"Recieving:\t{message}");
+            DebugConsole?.Log($"Receiving:\t{message}");
             return message;
+        }
+
+        private static byte[] LogReceive(byte[] data)
+        {
+            DebugConsole?.Log($"Receiving binary data of size {data.Length}");
+            return data;
         }
 
         private static async Task<string> LogReceive(Task<string> messageTask)
         {
             var message = await messageTask.ConfigureAwait(false);
-            DebugConsole?.Log($"Recieving:\t{message}");
+            DebugConsole?.Log($"Receiving:\t{message}");
             return message;
+        }
+
+        private static async Task<byte[]> LogReceive(Task<byte[]> messageTask)
+        {
+            var data = await messageTask.ConfigureAwait(false);
+            DebugConsole?.Log($"Receiving binary data of size {data.Length}");
+            return data;
         }
 
         public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
@@ -252,6 +265,28 @@ namespace Qlik.Sense.RestClient
         public Task<T> GetAsync<T>(string endpoint)
         {
             return GetAsync(endpoint).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+        }
+
+        public byte[] GetBytes(string endpoint)
+        {
+            ValidateConfiguration();
+            if (!Authenticate())
+                throw new AuthenticationException("Authentication failed.");
+            LogCall("GET", endpoint);
+            var client = GetClient();
+            var task = client.GetBytesAsync(BaseUri.Append(endpoint));
+            task.ConfigureAwait(false);
+            return LogReceive(task.Result);
+        }
+
+        public async Task<byte[]> GetBytesAsync(string endpoint)
+        {
+            ValidateConfiguration();
+            if (!await AuthenticateAsync().ConfigureAwait(false))
+                throw new AuthenticationException("Authentication failed.");
+            LogCall("GET", endpoint);
+            var client = GetClient();
+            return await LogReceive(client.GetBytesAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)

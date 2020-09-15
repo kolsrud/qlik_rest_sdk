@@ -80,7 +80,7 @@ namespace Qlik.Sense.RestClient
 
         private bool UseXrfKey => _connectionSettings.ConnectionType != ConnectionType.JwtTokenViaQcs;
 
-        public async Task<string> GetStringAsync(Uri uri)
+        private async Task<HttpResponseMessage> GetAsync(Uri uri)
         {
             var client = _client.Value;
             var rsp = await client.GetAsync(AddXrefKey(UseXrfKey, uri, _xrfkey)).ConfigureAwait(false);
@@ -88,12 +88,25 @@ namespace Qlik.Sense.RestClient
             {
                 rsp = await client.GetAsync(rsp.Headers.Location).ConfigureAwait(false);
             }
+
             if (rsp.IsSuccessStatusCode)
             {
-                return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return rsp;
             }
-            
-            throw new HttpRequestException((int) rsp.StatusCode + ": " + rsp.ReasonPhrase);
+
+            throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
+        }
+
+        public async Task<string> GetStringAsync(Uri uri)
+        {
+            var rsp = await GetAsync(uri).ConfigureAwait(false);
+            return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
+
+        public async Task<byte[]> GetBytesAsync(Uri uri)
+        {
+            var rsp = await GetAsync(uri).ConfigureAwait(false);
+            return await rsp.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
         public async Task<string> PostStringAsync(Uri uri, string body)
