@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
@@ -44,10 +46,25 @@ namespace Qlik.Sense.RestClient
 
         private readonly Lazy<SenseHttpClient> _client;
 
+        private RestClient(ConnectionSettings settings, Statistics stats) : this(settings)
+        {
+            _stats = stats;
+        }
+
         private RestClient(ConnectionSettings settings)
         {
             _connectionSettings = settings;
             _client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
+        }
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="stats"></param>
+        public RestClient(string uri, Statistics stats) : this(uri)
+        {
+            _stats = stats;
         }
 
         public RestClient(string uri) : this(new ConnectionSettings(uri))
@@ -57,28 +74,28 @@ namespace Qlik.Sense.RestClient
 
         public IRestClient ConnectAsQmc()
         {
-            var client = new RestClient(_connectionSettings.Clone());
+            var client = new RestClient(_connectionSettings.Clone(), _stats);
             client.CustomHeaders["X-Qlik-Security"] = "Context=ManagementAccess";
             return client;
         }
 
         public IRestClient ConnectAsHub()
         {
-            var client = new RestClient(_connectionSettings.Clone());
+            var client = new RestClient(_connectionSettings.Clone(), _stats);
             client.CustomHeaders["X-Qlik-Security"] = "Context=AppAccess";
             return client;
         }
 
         public IRestClient WithXrfkey(string xrfkey)
         {
-            var client = new RestClient(_connectionSettings.Clone());
+            var client = new RestClient(_connectionSettings.Clone(), _stats);
             client._connectionSettings.SetXrfKey(xrfkey);
             return client;
         }
 
         public IRestClient WithContentType(string contentType)
         {
-            var client = new RestClient(_connectionSettings.Clone());
+            var client = new RestClient(_connectionSettings.Clone(), _stats);
             client._connectionSettings.ContentType = contentType;
             return client;
         }
@@ -245,6 +262,35 @@ namespace Qlik.Sense.RestClient
             var task = client.GetStringAsync(BaseUri.Append(endpoint));
             task.ConfigureAwait(false);
             return LogReceive(task.Result);
+        }
+
+        private readonly Statistics _stats = new Statistics();
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        public void PrintStats()
+        {
+            Console.WriteLine(_stats);
+        }
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
+        public Result GetEx(string endpoint)
+        {
+            ValidateConfiguration();
+            if (!Authenticate())
+                throw new AuthenticationException("Authentication failed.");
+            LogCall("GET", endpoint);
+            var client = GetClient();
+            var task = Result.CreateAsync(() => client.GetAsync(BaseUri.Append(endpoint), false), _stats.Add);
+            task.ConfigureAwait(false); 
+            var rsp = task.Result;
+            LogReceive(rsp.Body);
+            return rsp;
         }
 
         public T Get<T>(string endpoint)
@@ -461,6 +507,164 @@ namespace Qlik.Sense.RestClient
         {
             return new Uri(paths.Aggregate(uri.AbsoluteUri,
                 (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+        }
+    }
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public class Statistics
+    {
+        public int Cnt;
+        public int CntWithBody;
+        public Dictionary<HttpStatusCode, int> CntPerStatusCode = new Dictionary<HttpStatusCode, int>();
+        public TimeSpan TotalDuration = TimeSpan.Zero;
+        public int TotalSize;
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        public void Reset()
+        {
+            lock (this)
+            {
+                Cnt = 0;
+                CntWithBody = 0;
+                CntPerStatusCode = new Dictionary<HttpStatusCode, int>();
+                TotalDuration = TimeSpan.Zero;
+                TotalSize = 0;
+            }
+        }
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="result"></param>
+        public void Add(Result result)
+        {
+            lock (this)
+            {
+                Cnt++;
+                if (CntPerStatusCode.ContainsKey(result.ReturnCode))
+                    CntPerStatusCode[result.ReturnCode]++;
+                else
+                    CntPerStatusCode[result.ReturnCode] = 1;
+                TotalDuration += result.Duration;
+                if (result.Body != null)
+                {
+                    CntWithBody++;
+                    TotalSize = result.Body.Length;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            var avgDuration = TimeSpan.FromTicks(TotalDuration.Ticks/Cnt);
+            var strs = new List<string>
+            {
+                $"Total cnt:      {Cnt}"
+            };
+            if (Cnt > 0)
+            {
+                strs.AddRange(CntPerStatusCode.Select(kv =>
+                    $"  |- Count for status code {kv.Key} : {kv.Value} ({CalcPercentage(kv.Value, Cnt)})"));
+                strs.AddRange(new[]
+                {
+                    $"Total duration: {TotalDuration}",
+                    $"Total size:     {TotalSize}{Result.PrintFormat(TotalSize)}",
+                    $"Avg duration:   {avgDuration}",
+                });
+            }
+
+            if (CntWithBody > 0)
+            {
+                var avgSize = (int)TotalSize / CntWithBody;
+                strs.Add($"Avg size:       {avgSize}{Result.PrintFormat(avgSize)}");
+            }
+
+            return string.Join(Environment.NewLine, strs);
+        }
+
+        private static string CalcPercentage(int argValue, int cnt)
+        {
+            return $"{(double)argValue/cnt:P2}";
+        }
+    }
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public class Result
+    {
+        public string Body { get; private set; }
+        public HttpStatusCode ReturnCode { get; private set; }
+        public bool IsStatusSuccessCode => (int) ReturnCode >= 200 && (int) ReturnCode < 300;
+        public TimeSpan TimeToResponse { get; private set; }
+        public TimeSpan Duration { get; private set; }
+
+        private Result()
+        {
+        }
+
+        public override string ToString()
+        {
+            return ToString(true);
+        }
+
+        public string ToString(bool includeBody, Formatting formatting = Formatting.Indented)
+        {
+            var strs = new List<string>
+            {
+                $"IsSuccess:        {IsStatusSuccessCode}",
+                $"Return code:      {ReturnCode} ({(int) ReturnCode})",
+                $"Time to response: {TimeToResponse}",
+                $"Time to download: {Duration-TimeToResponse}",
+                $"Total duration:   {Duration}",
+            };
+            if (IsStatusSuccessCode)
+                strs.Add($"Response size:    {Body.Length}{PrintFormat(Body.Length)}");
+            if (includeBody && IsStatusSuccessCode)
+            {
+                strs.Add("--- Body ---");
+                strs.Add(formatting == Formatting.None ? Body : JToken.Parse(Body).ToString());
+            }
+
+            return string.Join(Environment.NewLine, strs);
+        }
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static string PrintFormat(int n)
+        {
+            if (n < 1024)
+                return "";
+            if (n > 1024 * 1024)
+                return " (" + (n / (1024 * 1024)).ToString("N") + " MB)";
+            return " (" + (n / 1024).ToString("N") + " KB)";
+        }
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="statisticsCollector"></param>
+        /// <returns></returns>
+        public static async Task<Result> CreateAsync(Func<Task<HttpResponseMessage>> f, Action<Result> statisticsCollector)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var rsp = await f().ConfigureAwait(false);
+            var result = new Result {ReturnCode = rsp.StatusCode, TimeToResponse = sw.Elapsed};
+            if (rsp.IsSuccessStatusCode)
+                result.Body = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+            sw.Stop();
+            result.Duration = sw.Elapsed;
+            statisticsCollector(result);
+            return result;
         }
     }
 }

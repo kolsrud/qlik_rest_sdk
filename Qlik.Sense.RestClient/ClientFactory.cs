@@ -11,6 +11,12 @@ namespace Qlik.Sense.RestClient
         private readonly string _url;
         private readonly X509Certificate2Collection _certs;
         private readonly bool _connectAsQmc;
+        private readonly Statistics _stats = new Statistics();
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        public Statistics Statistics => _stats;
 
         public ClientFactory(string url, X509Certificate2Collection certs, bool connectAsQmc = true)
         {
@@ -30,7 +36,7 @@ namespace Qlik.Sense.RestClient
 
         public IRestClient GetClient(string userDirectory, string userId)
         {
-            var client = new RestClient(_url);
+            var client = new RestClient(_url, _stats);
             client.AsDirectConnection(userDirectory, userId, 4242, false, _certs);
             return _connectAsQmc ? client.ConnectAsQmc() : client.ConnectAsHub();
         }
