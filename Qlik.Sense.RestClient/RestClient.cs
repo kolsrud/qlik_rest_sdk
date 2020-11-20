@@ -560,7 +560,6 @@ namespace Qlik.Sense.RestClient
 
         public override string ToString()
         {
-            var avgDuration = TimeSpan.FromTicks(TotalDuration.Ticks/Cnt);
             var strs = new List<string>
             {
                 $"Total cnt:      {Cnt}"
@@ -569,12 +568,10 @@ namespace Qlik.Sense.RestClient
             {
                 strs.AddRange(CntPerStatusCode.Select(kv =>
                     $"  |- Count for status code {kv.Key} : {kv.Value} ({CalcPercentage(kv.Value, Cnt)})"));
-                strs.AddRange(new[]
-                {
-                    $"Total duration: {TotalDuration}",
-                    $"Total size:     {TotalSize}{Result.PrintFormat(TotalSize)}",
-                    $"Avg duration:   {avgDuration}",
-                });
+                strs.Add($"Total duration: {TotalDuration}");
+                strs.Add($"Total size:     {TotalSize}{Result.PrintFormat(TotalSize)}");
+                var avgDuration = TimeSpan.FromTicks(TotalDuration.Ticks / Cnt);
+                strs.Add($"Avg duration:   {avgDuration}");
             }
 
             if (CntWithBody > 0)
