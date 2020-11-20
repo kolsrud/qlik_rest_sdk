@@ -1,5 +1,9 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.3.1
+
+* **NEW FEATURE:** Added experimental feature for collecting request statistics.
+
 ## v1.3.0
 
 * **NEW FEATURE:** Added `Post` and `Put` endpoints that accepts JToken objects as body.
