@@ -4,7 +4,7 @@ namespace Qlik.Sense.RestClient
 {
     public class DebugConsole : IDisposable
     {
-#if (NETCOREAPP2_1)
+#if (NETSTANDARD2_0)
         private const string dotnet_version = ".NET Core 2.1";
 #else
         private const string dotnet_version = ".NET Framework 4.5.2";
