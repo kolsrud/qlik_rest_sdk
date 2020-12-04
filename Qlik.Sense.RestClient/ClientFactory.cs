@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using Newtonsoft.Json;
 using Qlik.Sense.RestClient.Qrs;
 
 namespace Qlik.Sense.RestClient
@@ -27,7 +25,7 @@ namespace Qlik.Sense.RestClient
 
         private IRestClient _adminClient = null;
 
-        public IRestClient AdminClient => _adminClient ?? (_adminClient = GetClient("INTERNAL", "sa_api"));
+        public IRestClient AdminClient => _adminClient ??= GetClient("INTERNAL", "sa_api");
 
         public IRestClient GetClient(User user) 
         {
