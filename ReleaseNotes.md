@@ -1,5 +1,9 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.4.0
+
+* **NEW FEATURE:** Added overload RestClient.LoadCertificateFromDirectory(string path, string certificatePassword)
+
 ## v1.3.1
 
 * **NEW FEATURE:** Added experimental feature for collecting request statistics.

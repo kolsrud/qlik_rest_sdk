@@ -229,6 +229,13 @@ namespace Qlik.Sense.RestClient
             return LoadCertificateFromDirectory(path, p => new X509Certificate2(p));
         }
 
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path, string certificatePassword)
+        {
+            var pwd = new SecureString();
+            certificatePassword.ToList().ForEach(pwd.AppendChar);
+            return LoadCertificateFromDirectory(path, p => new X509Certificate2(p, pwd));
+        }
+
         public static X509Certificate2Collection LoadCertificateFromDirectory(string path, SecureString certificatePassword)
         {
             return LoadCertificateFromDirectory(path, p => new X509Certificate2(p, certificatePassword));
