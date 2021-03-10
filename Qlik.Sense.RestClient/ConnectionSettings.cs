@@ -10,9 +10,10 @@ namespace Qlik.Sense.RestClient
 {
     public enum ConnectionType
     {
+        DirectConnection,
         NtlmUserViaProxy,
         StaticHeaderUserViaProxy,
-        DirectConnection,
+        AnonymousViaProxy,
         JwtTokenViaProxy,
         JwtTokenViaQcs
     }
@@ -165,6 +166,14 @@ namespace Qlik.Sense.RestClient
             UserId = Environment.UserName;
             UserDirectory = Environment.UserDomainName;
             AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
+        }
+
+        public void AsAnonymousUserViaProxy(bool certificateValidation = true)
+        {
+            ConnectionType = ConnectionType.AnonymousViaProxy;
+            CertificateValidation = certificateValidation;
+            _isConfigured = true;
+            IsAuthenticated = true;
         }
 
         public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
