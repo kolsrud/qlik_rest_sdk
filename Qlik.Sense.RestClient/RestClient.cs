@@ -67,9 +67,13 @@ namespace Qlik.Sense.RestClient
             _stats = stats;
         }
 
-        public RestClient(string uri) : this(new ConnectionSettings(uri))
+        public RestClient(Uri uri) : this(new ConnectionSettings(uri))
         {
             _connectionSettings.AuthenticationFunc = CollectCookieAsync;
+        }
+
+        public RestClient(string uri) : this(new Uri(uri))
+        {
         }
 
         public IRestClient ConnectAsQmc()

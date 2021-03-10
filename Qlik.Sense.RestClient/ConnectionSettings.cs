@@ -109,11 +109,15 @@ namespace Qlik.Sense.RestClient
             Xrfkey = xrfkey;
         }
 
-        public ConnectionSettings(string uri) : this()
+        public ConnectionSettings(Uri uri) : this()
         {
             Timeout = System.Threading.Timeout.InfiniteTimeSpan;
             CookieJar = new CookieContainer();
-            BaseUri = new Uri(uri);
+            BaseUri = uri;
+        }
+
+        public ConnectionSettings(string uri) : this(new Uri(uri))
+        {
         }
 
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
