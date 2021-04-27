@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -85,10 +86,10 @@ namespace Qlik.Sense.RestClient
         /// </summary>
         /// <param name="uri"></param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> GetAsync(Uri uri, bool throwOnFailure = true)
+        public async Task<HttpResponseMessage> GetAsync(Uri uri, bool throwOnFailure = true, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
         {
             var client = _client.Value;
-            var rsp = await client.GetAsync(AddXrefKey(UseXrfKey, uri, _xrfkey)).ConfigureAwait(false);
+            var rsp = await client.GetAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), completionOption).ConfigureAwait(false);
             if (rsp.StatusCode == HttpStatusCode.MovedPermanently)
             {
                 rsp = await client.GetAsync(rsp.Headers.Location).ConfigureAwait(false);
@@ -120,6 +121,12 @@ namespace Qlik.Sense.RestClient
         {
             var rsp = await GetAsync(uri).ConfigureAwait(false);
             return await rsp.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+        }
+
+        public async Task<Stream> GetStreamAsync(Uri uri)
+        {
+            var rsp = await GetAsync(uri, completionOption: HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            return await rsp.Content.ReadAsStreamAsync();
         }
 
         public async Task<string> PostStringAsync(Uri uri, string body)

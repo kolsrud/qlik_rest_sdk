@@ -219,6 +219,12 @@ namespace Qlik.Sense.RestClient
             return data;
         }
 
+        private static Stream LogReceive(Stream stream)
+        {
+            DebugConsole?.Log($"Receiving data stream");
+            return stream;
+        }
+
         private static async Task<string> LogReceive(Task<string> messageTask)
         {
             var message = await messageTask.ConfigureAwait(false);
@@ -231,6 +237,13 @@ namespace Qlik.Sense.RestClient
             var data = await messageTask.ConfigureAwait(false);
             DebugConsole?.Log($"Receiving binary data of size {data.Length}");
             return data;
+        }
+
+        private static async Task<Stream> LogReceive(Task<Stream> streamTask)
+        {
+            var stream = await streamTask.ConfigureAwait(false);
+            DebugConsole?.Log($"Receiving data stream");
+            return stream;
         }
 
         public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
@@ -349,6 +362,28 @@ namespace Qlik.Sense.RestClient
             LogCall("GET", endpoint);
             var client = GetClient();
             return await LogReceive(client.GetBytesAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
+        }
+
+        public Stream GetStream(string endpoint)
+        {
+            ValidateConfiguration();
+            if (!Authenticate())
+                throw new AuthenticationException("Authentication failed.");
+            LogCall("GET", endpoint);
+            var client = GetClient();
+            var task = client.GetStreamAsync(BaseUri.Append(endpoint));
+            task.ConfigureAwait(false);
+            return LogReceive(task.Result);
+        }
+
+        public async Task<Stream> GetStreamAsync(string endpoint)
+        {
+            ValidateConfiguration();
+            if (!await AuthenticateAsync().ConfigureAwait(false))
+                throw new AuthenticationException("Authentication failed.");
+            LogCall("GET", endpoint);
+            var client = GetClient();
+            return await LogReceive(client.GetStreamAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
         }
 
         private string PerformUploadStringAccess(string method, string endpoint, string body)

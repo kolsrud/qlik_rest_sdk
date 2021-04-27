@@ -1,5 +1,14 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.6.0
+
+* **NEW FEATURE:** Added endpoints `IRestClient.GetStream` and `IRestClient.GetStreamAsync`.
+
+## v1.5.0
+
+* **NEW FEATURE:** Added access type `AsAnonymousUserViaProxy`.
+* **NEW FEATURE:** Added constructor `RestClient(Uri uri)`.
+
 ## v1.4.0
 
 * **NEW FEATURE:** Added overload RestClient.LoadCertificateFromDirectory(string path, string certificatePassword)

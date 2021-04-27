@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient.Qrs;
 
@@ -25,6 +26,9 @@ namespace Qlik.Sense.RestClient
 
         byte[] GetBytes(string endpoint);
         Task<byte[]> GetBytesAsync(string endpoint);
+
+        Stream GetStream(string endpoint);
+        Task<Stream> GetStreamAsync(string endpoint);
 
         /// <summary>
         /// Experimental

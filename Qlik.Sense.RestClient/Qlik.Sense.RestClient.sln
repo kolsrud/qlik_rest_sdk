@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.489
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qlik.Sense.RestClient", "Qlik.Sense.RestClient.csproj", "{C15D790A-BED6-4653-A565-D635EC711182}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicConnection", "Examples\BasicConnection\BasicConnection.csproj", "{F0F38B93-3D5D-460F-9071-34DC56E49B5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasicConnection", "Examples\BasicConnection\BasicConnection.csproj", "{F0F38B93-3D5D-460F-9071-34DC56E49B5D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppUpload", "Examples\AppUpload\AppUpload.csproj", "{64D9ECEC-691E-4BC3-BA76-1875A68203D3}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateStream", "Examples\CreateStream\CreateStream.csproj", "{4D99463D-8107-437E-ABC7-9FA4202BCA4C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishApp", "Examples\PublishApp\PublishApp.csproj", "{D1AAB621-E576-4A8D-8126-85B74B12C810}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppExport", "Examples\AppExport\AppExport.csproj", "{C3D330AE-824E-42EE-BA1A-1EB63E726696}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{D1AAB621-E576-4A8D-8126-85B74B12C810}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1AAB621-E576-4A8D-8126-85B74B12C810}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1AAB621-E576-4A8D-8126-85B74B12C810}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3D330AE-824E-42EE-BA1A-1EB63E726696}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3D330AE-824E-42EE-BA1A-1EB63E726696}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3D330AE-824E-42EE-BA1A-1EB63E726696}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3D330AE-824E-42EE-BA1A-1EB63E726696}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +70,7 @@ Global
 		{3A3A5F3E-BE02-4F05-9A13-30FF8453E41C} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{4D99463D-8107-437E-ABC7-9FA4202BCA4C} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{D1AAB621-E576-4A8D-8126-85B74B12C810} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
+		{C3D330AE-824E-42EE-BA1A-1EB63E726696} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62407092-C20D-43DF-A754-AB8F1BC671F5}
