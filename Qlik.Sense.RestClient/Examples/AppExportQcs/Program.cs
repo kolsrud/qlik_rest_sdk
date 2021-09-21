@@ -9,14 +9,9 @@ namespace AppExportQcs
 	{
 		static void Main(string[] args)
 		{
-            // var appId = "<appId>";
-            // var url = "<url>";
-            // var apiKey = "<apiKey>";
-
-            var appId = "0db23c0a-e67f-4bea-9cf3-0fc4498b0252";
-            // var appId = "0db23c0a-e67f-4bea-9cf3-0fc4498b0253";
-            var url = "https://yko.eu.qlikcloud.com/";
-            var apiKey = "eyJhbGciOiJFUzM4NCIsImtpZCI6IjQ5NjYyMzMxLTViZDEtNGMwNi1iNDgwLTUwYTZlYTY5MDhkYiIsInR5cCI6IkpXVCJ9.eyJzdWJUeXBlIjoidXNlciIsInRlbmFudElkIjoiYWNaNGdFUE1nd3lOZm1lV0lpeElpWTNCY29FejllZjciLCJqdGkiOiI0OTY2MjMzMS01YmQxLTRjMDYtYjQ4MC01MGE2ZWE2OTA4ZGIiLCJhdWQiOiJxbGlrLmFwaSIsImlzcyI6InFsaWsuYXBpL2FwaS1rZXlzIiwic3ViIjoicmxuZTlYT2pTWkVQV2h3M241NF9BUkxzTWFqZjFoOFIifQ.fQroaAhGeYxB73OV0QfCeEA44aLfPMq_0O-X7dHk9BIw0_XNV5inZ0kAXkaQB005QYKl0dDaLx21PlpKj0aNAkIdtAJZRZPEWSF37-QE972a0S4Lo7poo3uJx3D26Q_U";
+            var appId = "<appId>";
+            var url = "<url>";
+            var apiKey = "<apiKey>";
 
             var outputFile = "myapp.qvf";
 
