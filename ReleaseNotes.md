@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.7.0
+* **NEW FEATURE:** Added methods IRestClient.GetHttpAsync and IRestClient.PostHttpAsync.
+
 ## v1.6.0
 
 * **NEW FEATURE:** Added endpoints `IRestClient.GetStream` and `IRestClient.GetStreamAsync`.
