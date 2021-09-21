@@ -11,7 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This is a basic SDK for Qlik Sense REST access with authentication configuration built along the same line as the .Net SDK for the Engine API.</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright © 2018-2020 Øystein Kolsrud</copyright>
+    <copyright>Copyright © 2018-2021 Øystein Kolsrud</copyright>
     <tags>qlik sense rest</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="11.0.1" />
