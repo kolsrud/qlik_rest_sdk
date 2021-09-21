@@ -81,12 +81,12 @@ namespace Qlik.Sense.RestClient
 
         private bool UseXrfKey => _connectionSettings.ConnectionType != ConnectionType.JwtTokenViaQcs;
 
-        /// <summary>
-        /// Experimental
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> GetAsync(Uri uri, bool throwOnFailure = true, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
+        public Task<HttpResponseMessage> GetHttpAsync(Uri uri, bool throwOnFailure = true)
+        {
+            return GetHttpAsync(uri, throwOnFailure, HttpCompletionOption.ResponseContentRead);
+        }
+
+        private async Task<HttpResponseMessage> GetHttpAsync(Uri uri, bool throwOnFailure, HttpCompletionOption completionOption)
         {
             var client = _client.Value;
             var rsp = await client.GetAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), completionOption).ConfigureAwait(false);
@@ -100,7 +100,7 @@ namespace Qlik.Sense.RestClient
                 return rsp;
             }
 
-            var message = (int)rsp.StatusCode + ": " + rsp.ReasonPhrase;
+            var message = $"{(int)rsp.StatusCode} ({rsp.StatusCode}): {rsp.ReasonPhrase}";
             try
             {
                 var reason = await rsp.Content.ReadAsStringAsync();
@@ -113,22 +113,49 @@ namespace Qlik.Sense.RestClient
 
         public async Task<string> GetStringAsync(Uri uri)
         {
-            var rsp = await GetAsync(uri).ConfigureAwait(false);
+            var rsp = await GetHttpAsync(uri).ConfigureAwait(false);
             return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         public async Task<byte[]> GetBytesAsync(Uri uri)
         {
-            var rsp = await GetAsync(uri).ConfigureAwait(false);
+            var rsp = await GetHttpAsync(uri).ConfigureAwait(false);
             return await rsp.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
         }
 
         public async Task<Stream> GetStreamAsync(Uri uri)
         {
-            var rsp = await GetAsync(uri, completionOption: HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            var rsp = await GetHttpAsync(uri, true, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             return await rsp.Content.ReadAsStreamAsync();
         }
 
+        public Task<HttpResponseMessage> PostHttpAsync(Uri uri, string body, bool throwOnFailure = true)
+        {
+            return PostHttpAsync(uri, new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType), throwOnFailure);
+        }
+
+        private async Task<HttpResponseMessage> PostHttpAsync(Uri uri, HttpContent body, bool throwOnFailure = true)
+        {
+            var client = _client.Value;
+            body.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
+            var rsp = await client.PostAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), body).ConfigureAwait(false);
+
+            if (rsp.IsSuccessStatusCode || !throwOnFailure)
+            {
+                return rsp;
+            }
+
+            var message = (int)rsp.StatusCode + ": " + rsp.ReasonPhrase;
+            try
+            {
+                var reason = await rsp.Content.ReadAsStringAsync();
+                message += ", " + reason;
+            }
+            catch { }
+
+            throw new HttpRequestException(message);
+        }
+        
         public async Task<string> PostStringAsync(Uri uri, string body)
         {
             var client = _client.Value;

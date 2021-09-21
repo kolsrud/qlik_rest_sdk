@@ -156,12 +156,18 @@ namespace Qlik.Sense.RestClient
             AsJwtViaProxy(key, certificateValidation);
         }
 
+        public void AsApiKeyViaQcs(string apiKey)
+        {
+            _connectionSettings.AsJwtViaQcs(apiKey);
+        }
+
+        [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
         public void AsJwtViaQcs(string key)
         {
             _connectionSettings.AsJwtViaQcs(key);
         }
 
-        [Obsolete("Use method AsJwtViaQcs.")] // Obsolete since May 2020
+        [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since May 2020
         public void AsJwtTokenViaQcs(string key)
         {
             AsJwtViaQcs(key);
@@ -315,7 +321,7 @@ namespace Qlik.Sense.RestClient
                 throw new AuthenticationException("Authentication failed.");
             LogCall("GET", endpoint);
             var client = GetClient();
-            var task = Result.CreateAsync(() => client.GetAsync(BaseUri.Append(endpoint), false), _stats.Add);
+            var task = Result.CreateAsync(() => client.GetHttpAsync(BaseUri.Append(endpoint), false), _stats.Add);
             task.ConfigureAwait(false); 
             var rsp = task.Result;
             LogReceive(rsp.Body);
@@ -340,6 +346,12 @@ namespace Qlik.Sense.RestClient
         public Task<T> GetAsync<T>(string endpoint)
         {
             return GetAsync(endpoint).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+        }
+
+        public Task<HttpResponseMessage> GetHttpAsync(string endpoint, bool throwOnFailure = true)
+        {
+            var client = GetClient();
+            return client.GetHttpAsync(BaseUri.Append(endpoint), throwOnFailure);
         }
 
         public byte[] GetBytes(string endpoint)
@@ -451,6 +463,12 @@ namespace Qlik.Sense.RestClient
         public Task<T> PostAsync<T>(string endpoint, JToken body)
         {
             return PostAsync<T>(endpoint, body.ToString(Formatting.None));
+        }
+
+        public Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true)
+        {
+            var client = GetClient();
+            return client.PostHttpAsync(BaseUri.Append(endpoint), body, throwOnFailure);
         }
 
         public string Post(string endpoint, byte[] body)

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient.Qrs;
@@ -23,12 +24,11 @@ namespace Qlik.Sense.RestClient
         T Get<T>(string endpoint);
         Task<string> GetAsync(string endpoint);
         Task<T> GetAsync<T>(string endpoint);
-
         byte[] GetBytes(string endpoint);
         Task<byte[]> GetBytesAsync(string endpoint);
-
         Stream GetStream(string endpoint);
         Task<Stream> GetStreamAsync(string endpoint);
+        Task<HttpResponseMessage> GetHttpAsync(string endpoint, bool throwOnFailure = true);
 
         /// <summary>
         /// Experimental
@@ -45,6 +45,7 @@ namespace Qlik.Sense.RestClient
         Task<string> PostAsync(string endpoint, JToken body);
         Task<T> PostAsync<T>(string endpoint, string body = "");
         Task<T> PostAsync<T>(string endpoint, JToken body);
+        Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true);
 
         string Post(string endpoint, byte[] body);
         T Post<T>(string endpoint, byte[] body);
