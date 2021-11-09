@@ -15,7 +15,8 @@ namespace Qlik.Sense.RestClient
         StaticHeaderUserViaProxy,
         AnonymousViaProxy,
         JwtTokenViaProxy,
-        JwtTokenViaQcs
+        JwtTokenViaQcs,
+        ExistingSessionViaProxy
     }
 
     internal class ConnectionSettings : IConnectionConfigurator
@@ -203,6 +204,15 @@ namespace Qlik.Sense.RestClient
             _isConfigured = true;
         }
 
+        public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
+        {
+            ConnectionType = ConnectionType.ExistingSessionViaProxy;
+            CertificateValidation = certificateValidation;
+            CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
+            _isConfigured = true;
+            IsAuthenticated = true;
+        }
+
         public void Validate()
         {
             if (!_isConfigured)
@@ -210,5 +220,6 @@ namespace Qlik.Sense.RestClient
             if (ConnectionType == ConnectionType.DirectConnection && Certificates == null)
                 throw new RestClient.CertificatesNotLoadedException();
         }
+
     }
 }

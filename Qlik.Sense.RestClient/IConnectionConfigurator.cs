@@ -15,5 +15,7 @@ namespace Qlik.Sense.RestClient
         void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true);
 
         void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true);
+
+        void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true);
     }
 }
