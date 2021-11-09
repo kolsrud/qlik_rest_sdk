@@ -193,6 +193,11 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
         }
 
+        public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
+        {
+            _connectionSettings.AsExistingSessionViaProxy(sessionId, cookieHeaderName, proxyUsesSsl, certificateValidation);
+        }
+
         public static X509Certificate2Collection LoadCertificateFromStore()
         {
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
