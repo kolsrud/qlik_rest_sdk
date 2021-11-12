@@ -15,7 +15,7 @@ This library currently supports the following authentication mechanisms:
 * Direct connection using certificates
 * NTLM authentication using default or custom credentials.
 * Static header authentication.
-* JWT Authentication for Qlik Sense Enterprise for Windows
-* JWT Authentication for QCS
+* JWT authentication for Qlik Sense Enterprise for Windows
+* API Key authentication for QCS
 
 The library is available for download from NuGet: https://www.nuget.org/packages/QlikSenseRestClient/

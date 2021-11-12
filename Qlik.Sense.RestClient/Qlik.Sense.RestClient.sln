@@ -21,7 +21,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PublishApp", "Examples\Publ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppExport", "Examples\AppExport\AppExport.csproj", "{C3D330AE-824E-42EE-BA1A-1EB63E726696}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppExportQcs", "Examples\AppExportQcs\AppExportQcs.csproj", "{811603AA-7F79-418F-9D45-0C435DF60C63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppExportQcs", "Examples\AppExportQcs\AppExportQcs.csproj", "{811603AA-7F79-418F-9D45-0C435DF60C63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02E270F2-0394-4024-8292-37EA17436C07}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+		..\ReleaseNotes.md = ..\ReleaseNotes.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

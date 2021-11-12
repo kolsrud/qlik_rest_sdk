@@ -1,6 +1,11 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.8.0
+
+* **NEW FEATURE:** It is now possible to configure the proxy to use for REST connections through the property `RestClient.Proxy`.
+
 ## v1.7.0
+
 * **NEW FEATURE:** Added methods IRestClient.GetHttpAsync and IRestClient.PostHttpAsync.
 
 ## v1.6.0
