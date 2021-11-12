@@ -30,6 +30,7 @@ namespace Qlik.Sense.RestClient
             _clientHandler = new WebRequestHandler();
 #endif
             _clientHandler.CookieContainer = _connectionSettings.CookieJar;
+            _clientHandler.Proxy = _connectionSettings.Proxy;
             if (_connectionSettings.Certificates != null)
                 _clientHandler.ClientCertificates.AddRange(_connectionSettings.Certificates);
             if (connectionSettings.CustomCredential != null)

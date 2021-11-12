@@ -30,6 +30,13 @@ namespace Qlik.Sense.RestClient
             get => _connectionSettings.Timeout;
             set => _connectionSettings.Timeout = value;
         }
+
+        public IWebProxy Proxy
+        {
+            get => _connectionSettings.Proxy;
+            set => _connectionSettings.Proxy = value;
+        }
+
         public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
 
         private User _user;

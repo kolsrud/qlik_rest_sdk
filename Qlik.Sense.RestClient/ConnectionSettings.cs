@@ -33,6 +33,7 @@ namespace Qlik.Sense.RestClient
         public ICredentials CustomCredential;
         public TimeSpan Timeout;
         public string Xrfkey;
+        public IWebProxy Proxy { get; set; }
         public Dictionary<string, string> CustomHeaders { get; private set; }= new Dictionary<string, string>();
 
         public bool CertificateValidation = true;
@@ -92,6 +93,7 @@ namespace Qlik.Sense.RestClient
                 CustomCredential = this.CustomCredential,
                 Timeout = this.Timeout,
                 Xrfkey = this.Xrfkey,
+                Proxy = this.Proxy,
                 CustomHeaders = new Dictionary<string, string>(this.CustomHeaders),
                 ContentType = this.ContentType,
                 AuthenticationFunc = this.AuthenticationFunc
