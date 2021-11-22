@@ -104,7 +104,7 @@ namespace Qlik.Sense.RestClient
             var message = $"{(int)rsp.StatusCode} ({rsp.StatusCode}): {rsp.ReasonPhrase}";
             try
             {
-                var reason = await rsp.Content.ReadAsStringAsync();
+                var reason = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
                 message += ", " + reason;
             }
             catch {}
@@ -127,7 +127,7 @@ namespace Qlik.Sense.RestClient
         public async Task<Stream> GetStreamAsync(Uri uri)
         {
             var rsp = await GetHttpAsync(uri, true, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-            return await rsp.Content.ReadAsStreamAsync();
+            return await rsp.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
         public Task<HttpResponseMessage> PostHttpAsync(Uri uri, string body, bool throwOnFailure = true)
@@ -149,7 +149,7 @@ namespace Qlik.Sense.RestClient
             var message = (int)rsp.StatusCode + ": " + rsp.ReasonPhrase;
             try
             {
-                var reason = await rsp.Content.ReadAsStringAsync();
+                var reason = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
                 message += ", " + reason;
             }
             catch { }

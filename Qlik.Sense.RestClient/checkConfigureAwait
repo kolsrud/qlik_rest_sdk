@@ -1,0 +1,10 @@
+#!/bin/bash
+
+RESULT=`find . -type f -name "*.cs"  | grep -v Tests | grep -v Examples | xargs grep await | grep -v "ConfigureAwait(false)"`
+if [ -n "$RESULT" ]; then
+    echo "ConfigureAwait missing!"
+    echo $RESULT
+    exit 1
+else
+    echo "Found no missing ConfigureAwaits."
+fi;

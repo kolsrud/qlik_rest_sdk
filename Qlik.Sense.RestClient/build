@@ -2,6 +2,10 @@
 VERSION=`git describe --tags | sed 's|-.*-|-|'`
 VERSION="${VERSION:1}"
 echo "Inferred version: $VERSION"
+echo "Checking configure await..."
+if ! ./checkConfigureAwait; then
+    exit 1
+fi
 cp Qlik.Sense.RestClient.nuspec.template Qlik.Sense.RestClient.nuspec
 sed -i "s|<version>.*</version>|<version>$VERSION</version>|" Qlik.Sense.RestClient.nuspec
 nuget restore

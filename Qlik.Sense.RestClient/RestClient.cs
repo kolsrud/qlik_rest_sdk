@@ -415,7 +415,7 @@ namespace Qlik.Sense.RestClient
         private async Task<string> PerformUploadStringAccessAsync(string method, string endpoint, string body)
         {
             ValidateConfiguration();
-            if (!await AuthenticateAsync())
+            if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
             LogCall(method, endpoint);
             var client = GetClient();
