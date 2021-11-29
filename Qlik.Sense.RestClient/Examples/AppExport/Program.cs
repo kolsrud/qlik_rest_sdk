@@ -6,9 +6,9 @@ using Qlik.Sense.RestClient;
 
 namespace AppExport
 {
-	class Program
-	{
-		static void Main(string[] args)
+    class Program
+    {
+        static void Main(string[] args)
         {
             var appId = "<appId>";
             var url = "<url>";
@@ -33,5 +33,5 @@ namespace AppExport
             Console.WriteLine("Done.");
             Console.WriteLine($"App export complete. Output file: {appName} ({new FileInfo(appName).Length} bytes)");
         }
-	}
+    }
 }

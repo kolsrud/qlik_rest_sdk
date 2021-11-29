@@ -5,10 +5,10 @@ using Qlik.Sense.RestClient;
 
 namespace AppExportQcs
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
+    class Program
+    {
+        static void Main(string[] args)
+        {
             var appId = "<appId>";
             var url = "<url>";
             var apiKey = "<apiKey>";
@@ -16,7 +16,7 @@ namespace AppExportQcs
             var outputFile = "myapp.qvf";
 
             var restClient = new RestClient(url);
-			restClient.AsApiKeyViaQcs(apiKey);
+            restClient.AsApiKeyViaQcs(apiKey);
 
             var rsp = restClient.PostHttpAsync($"/api/v1/apps/{appId}/export", throwOnFailure: false).Result;
             Console.WriteLine($"Request returned status code: {(int)rsp.StatusCode} ({rsp.StatusCode})");
@@ -32,10 +32,10 @@ namespace AppExportQcs
                 {
                     stream.CopyTo(fileStream);
                 }
-                
+
                 Console.WriteLine("Done.");
                 Console.WriteLine($"App export complete. Output file: {outputFile} ({new FileInfo(outputFile).Length} bytes)");
             }
         }
-	}
+    }
 }
