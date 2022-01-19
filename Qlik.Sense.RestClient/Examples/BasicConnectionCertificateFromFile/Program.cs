@@ -20,7 +20,7 @@ namespace BasicConnectionCertificateFromFile
 
             var certs = RestClient.LoadCertificateFromDirectory("path/to/certs", securePassword);
             restClient.AsDirectConnection(4242, false, certs);
-            using (new DebugConsole())
+            using (new RestClientDebugConsole())
                 restClient.Get("/qrs/about");
         }
     }

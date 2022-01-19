@@ -2,7 +2,7 @@
 
 namespace Qlik.Sense.RestClient
 {
-    public class DebugConsole : IDisposable
+    public class RestClientDebugConsole : IDisposable
     {
 #if (NETCOREAPP2_1)
         private const string dotnet_version = ".NET Core 2.1";
@@ -10,9 +10,9 @@ namespace Qlik.Sense.RestClient
         private const string dotnet_version = ".NET Framework 4.5.2";
 #endif
 
-        public DebugConsole()
+        public RestClientDebugConsole()
         {
-            RestClient.DebugConsole = this;
+            RestClient.RestClientDebugConsole = this;
             Log("Debug console activated (" + dotnet_version + ")");
         }
 
@@ -31,8 +31,17 @@ namespace Qlik.Sense.RestClient
         {
             if (disposing)
             {
-                RestClient.DebugConsole = null;
+                RestClient.RestClientDebugConsole = null;
             }
+        }
+    }
+
+    [Obsolete("Class deprecated due to name clash with Qlik Sense .NET SDK. Use class RestClientDebugConsole instead.")]
+    public class DebugConsole : RestClientDebugConsole
+    {
+        [Obsolete("Class deprecated due to name clash with Qlik Sense .NET SDK. Use class RestClientDebugConsole instead.")]
+        public DebugConsole() : base()
+        {
         }
     }
 }

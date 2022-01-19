@@ -11,7 +11,7 @@ namespace BasicConnection
             var senseServerUrl = args.Any() ? args[0] : "https://my.server.url";
             var restClient = new RestClient(senseServerUrl);
             restClient.AsNtlmUserViaProxy();
-            using (new DebugConsole())
+            using (new RestClientDebugConsole())
                 restClient.Get("/qrs/about");
         }
     }

@@ -16,7 +16,7 @@ namespace PublishApp
             restClient.AsNtlmUserViaProxy();
             var appId = "app-identifer";
             var streamId = "stream-identifier";
-            using (new DebugConsole())
+            using (new RestClientDebugConsole())
                 restClient.Put(string.Format("/qrs/app/{0}/publish?stream={1}", appId, streamId), "");
         }
     }

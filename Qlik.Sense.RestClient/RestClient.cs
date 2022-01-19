@@ -17,7 +17,7 @@ namespace Qlik.Sense.RestClient
 {
     public class RestClient : IRestClient
     {
-        internal static DebugConsole DebugConsole { private get; set; }
+        internal static RestClientDebugConsole RestClientDebugConsole { private get; set; }
 
         public static int MaximumConcurrentCalls
         {
@@ -130,12 +130,12 @@ namespace Qlik.Sense.RestClient
             }
             catch (AggregateException e)
             {
-                DebugConsole?.Log("Authentication failed: " + e.InnerException?.Message);
+                RestClientDebugConsole?.Log("Authentication failed: " + e.InnerException?.Message);
                 return false;
             }
             catch (Exception e)
             {
-                DebugConsole?.Log("Authentication failed: " + e.Message);
+                RestClientDebugConsole?.Log("Authentication failed: " + e.Message);
                 return false;
             }
         }
@@ -222,45 +222,45 @@ namespace Qlik.Sense.RestClient
 
         private static void LogCall(string method, string endpoint)
         {
-            DebugConsole?.Log($"Calling:\t{method} {endpoint}");
+            RestClientDebugConsole?.Log($"Calling:\t{method} {endpoint}");
         }
 
         private static string LogReceive(string message)
         {
-            DebugConsole?.Log($"Receiving:\t{message}");
+            RestClientDebugConsole?.Log($"Receiving:\t{message}");
             return message;
         }
 
         private static byte[] LogReceive(byte[] data)
         {
-            DebugConsole?.Log($"Receiving binary data of size {data.Length}");
+            RestClientDebugConsole?.Log($"Receiving binary data of size {data.Length}");
             return data;
         }
 
         private static Stream LogReceive(Stream stream)
         {
-            DebugConsole?.Log($"Receiving data stream");
+            RestClientDebugConsole?.Log($"Receiving data stream");
             return stream;
         }
 
         private static async Task<string> LogReceive(Task<string> messageTask)
         {
             var message = await messageTask.ConfigureAwait(false);
-            DebugConsole?.Log($"Receiving:\t{message}");
+            RestClientDebugConsole?.Log($"Receiving:\t{message}");
             return message;
         }
 
         private static async Task<byte[]> LogReceive(Task<byte[]> messageTask)
         {
             var data = await messageTask.ConfigureAwait(false);
-            DebugConsole?.Log($"Receiving binary data of size {data.Length}");
+            RestClientDebugConsole?.Log($"Receiving binary data of size {data.Length}");
             return data;
         }
 
         private static async Task<Stream> LogReceive(Task<Stream> streamTask)
         {
             var stream = await streamTask.ConfigureAwait(false);
-            DebugConsole?.Log($"Receiving data stream");
+            RestClientDebugConsole?.Log($"Receiving data stream");
             return stream;
         }
 
@@ -567,10 +567,10 @@ namespace Qlik.Sense.RestClient
 
         private async Task CollectCookieAsync()
         {
-            DebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
+            RestClientDebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
             var client = GetClient();
             await LogReceive(client.GetStringAsync(BaseUri.Append("/qrs/about"))).ConfigureAwait(false);
-            DebugConsole?.Log($"Authentication complete.");
+            RestClientDebugConsole?.Log($"Authentication complete.");
         }
 
         public class ConnectionNotConfiguredException : Exception

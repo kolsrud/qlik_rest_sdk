@@ -3,6 +3,8 @@
 ## v1.8.0
 
 * **NEW FEATURE:** It is now possible to configure the proxy to use for REST connections through the property `RestClient.Proxy`.
+* **NEW FEATURE:** Added connection type `AsExistingSessionViaProxy`.
+* **DEPRECATED:** Deprecated class `DebugConsole`. Use new class `RestClientDebugConsole` instead. Name switch performed to avoid name clash with Qlik Sense .NET SDK.
 
 ## v1.7.0
 
