@@ -12,10 +12,13 @@ Supported .NET versions are .NET Framework 4.5.2 and .NET Core 2.1.
 
 #### Supported authentication mechanisms ####
 This library currently supports the following authentication mechanisms:
-* Direct connection using certificates
-* NTLM authentication using default or custom credentials.
-* Static header authentication.
-* JWT authentication for Qlik Sense Enterprise for Windows
-* API Key authentication for QCS
+
+* Qlik Sense Enterprise for Windows (QSEfW)
+  * Direct connection using certificates
+  * NTLM authentication using default or custom credentials.
+  * Static header authentication.
+  * JWT authentication
+* Qlik Cloud Services (QCS)
+  * API Key authentication
 
 The library is available for download from NuGet: https://www.nuget.org/packages/QlikSenseRestClient/
