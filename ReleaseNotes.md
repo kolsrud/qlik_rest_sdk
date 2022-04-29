@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.9.0
+* **DEPRECATED:** Deprecated support for .NET Framework 4.5.2 and .NET Core 2.1. Minimum supported versions are .NET Framework 4.6.2 and .NET Core 3.1.
+
 ## v1.8.0
 
 * **NEW FEATURE:** It is now possible to configure the proxy to use for REST connections through the property `RestClient.Proxy`.

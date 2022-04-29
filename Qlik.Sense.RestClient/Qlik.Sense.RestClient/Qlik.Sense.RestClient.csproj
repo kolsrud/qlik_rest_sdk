@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net452;net462;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
     <ItemGroup>
@@ -29,7 +29,8 @@
     <ItemGroup>
       <Reference Include="System.Net.Http" />
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
-        <Reference Include="System.Net.Http.WebRequest" />
+    <ItemGroup>
+        <Reference Include="System.Net.Http.WebRequest" Condition="'$(TargetFramework)' == 'net452'"/>
+        <Reference Include="System.Net.Http.WebRequest" Condition="'$(TargetFramework)' == 'net462'"/>
     </ItemGroup>
 </Project>

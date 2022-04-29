@@ -8,7 +8,7 @@ Console.WriteLine(restClient.Get("/qrs/about"));
 ```
 
 #### Supported .NET versions ####
-Supported .NET versions are .NET Framework 4.5.2 and .NET Core 2.1.
+Supported .NET versions are .NET Framework 4.6.2 and .NET Core 3.1 and .NET releases compatible with those two versions that are officially supported by Microsoft. 
 
 #### Supported authentication mechanisms ####
 This library currently supports the following authentication mechanisms:
