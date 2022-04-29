@@ -40,10 +40,10 @@ namespace Qlik.Sense.RestClient
         }
     }
 
-    [Obsolete("Class deprecated due to name clash with Qlik Sense .NET SDK. Use class RestClientDebugConsole instead.")]
+    [Obsolete("Class deprecated due to name clash with Qlik Sense .NET SDK. Use class RestClientDebugConsole instead.")] // Obsolete since January 2022
     public class DebugConsole : RestClientDebugConsole
     {
-        [Obsolete("Class deprecated due to name clash with Qlik Sense .NET SDK. Use class RestClientDebugConsole instead.")]
+        [Obsolete("Class deprecated due to name clash with Qlik Sense .NET SDK. Use class RestClientDebugConsole instead.")] // Obsolete since January 2022
         public DebugConsole() : base()
         {
         }
