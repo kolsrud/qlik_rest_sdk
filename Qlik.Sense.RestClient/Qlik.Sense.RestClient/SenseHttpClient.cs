@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,6 +12,8 @@ namespace Qlik.Sense.RestClient
 {
     public class SenseHttpClient
     {
+        internal const string CSRF_TOKEN_ID = "qlik-csrf-token";
+
         private readonly ConnectionSettings _connectionSettings;
 #if (NETCOREAPP)
         private readonly HttpClientHandler _clientHandler;
@@ -58,7 +61,7 @@ namespace Qlik.Sense.RestClient
             if (_connectionSettings.CertificateValidation == false)
                 DeactivateCertificateValidation();
 
-            if (_connectionSettings.ConnectionType == ConnectionType.JwtTokenViaQcs)
+            if (_connectionSettings.ConnectionType == ConnectionType.ApiKeyViaQcs)
             {
                 _clientHandler.AllowAutoRedirect = false;
             }
@@ -80,7 +83,13 @@ namespace Qlik.Sense.RestClient
             return client;
         }
 
-        private bool UseXrfKey => _connectionSettings.ConnectionType != ConnectionType.JwtTokenViaQcs;
+        internal void AddDefaultHeader(string name, string value)
+        {
+            var client = _client.Value;
+            client.DefaultRequestHeaders.Add(name, value);
+        }
+
+        private bool UseXrfKey => !new[] { ConnectionType.JwtTokenViaQcs, ConnectionType.ApiKeyViaQcs }.Contains(_connectionSettings.ConnectionType);
 
         public Task<HttpResponseMessage> GetHttpAsync(Uri uri, bool throwOnFailure = true)
         {
@@ -90,7 +99,7 @@ namespace Qlik.Sense.RestClient
         private async Task<HttpResponseMessage> GetHttpAsync(Uri uri, bool throwOnFailure, HttpCompletionOption completionOption)
         {
             var client = _client.Value;
-            var rsp = await client.GetAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), completionOption).ConfigureAwait(false);
+            var rsp = await client.GetAsync(AddDefaultArguments(uri, true), completionOption).ConfigureAwait(false);
             if (rsp.StatusCode == HttpStatusCode.MovedPermanently)
             {
                 rsp = await client.GetAsync(rsp.Headers.Location).ConfigureAwait(false);
@@ -107,7 +116,7 @@ namespace Qlik.Sense.RestClient
                 var reason = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
                 message += ", " + reason;
             }
-            catch {}
+            catch { }
 
             throw new HttpRequestException(message);
         }
@@ -139,7 +148,7 @@ namespace Qlik.Sense.RestClient
         {
             var client = _client.Value;
             body.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
-            var rsp = await client.PostAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), body).ConfigureAwait(false);
+            var rsp = await client.PostAsync(AddDefaultArguments(uri), body).ConfigureAwait(false);
 
             if (rsp.IsSuccessStatusCode || !throwOnFailure)
             {
@@ -156,13 +165,29 @@ namespace Qlik.Sense.RestClient
 
             throw new HttpRequestException(message);
         }
-        
+
+        private Uri AddDefaultArguments(Uri uri, bool isGetRequest = false)
+        {
+            if (UseXrfKey)
+                return AddXrefKey(true, uri, _xrfkey);
+
+            var argsToAdd = isGetRequest ? 
+                    string.Join("&", _connectionSettings.DefaultArguments.Where(kv => kv.Key != CSRF_TOKEN_ID).Select(kv => kv.Key + '=' + kv.Value)) :
+                    string.Join("&", _connectionSettings.DefaultArguments.Select(kv => kv.Key + '=' + kv.Value));
+            var uriBuilder = new UriBuilder(uri);
+            if (string.IsNullOrEmpty(uriBuilder.Query))
+                uriBuilder.Query = argsToAdd;
+            else
+                uriBuilder.Query += "&" + argsToAdd; 
+            return uriBuilder.Uri;
+        }
+
         public async Task<string> PostStringAsync(Uri uri, string body)
         {
             var client = _client.Value;
             var rbody = new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType);
             rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
-            var rsp = await client.PostAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), rbody).ConfigureAwait(false);
+            var rsp = await client.PostAsync(AddDefaultArguments(uri), rbody).ConfigureAwait(false);
             if (rsp.IsSuccessStatusCode)
             {
                 return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);

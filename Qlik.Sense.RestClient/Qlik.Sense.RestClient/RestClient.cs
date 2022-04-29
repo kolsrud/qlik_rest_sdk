@@ -40,7 +40,7 @@ namespace Qlik.Sense.RestClient
         public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
 
         private User _user;
-        public User User => _user ?? (_user = new User{Directory = UserDirectory, Id = UserId});
+        public User User => _user ?? (_user = new User { Directory = UserDirectory, Id = UserId });
         public string Url => _connectionSettings.BaseUri.AbsoluteUri;
         public string UserId => _connectionSettings.UserId;
         public string UserDirectory => _connectionSettings.UserDirectory;
@@ -165,13 +165,19 @@ namespace Qlik.Sense.RestClient
 
         public void AsApiKeyViaQcs(string apiKey)
         {
-            _connectionSettings.AsJwtViaQcs(apiKey);
+            _connectionSettings.AsApiKeyViaQcs(apiKey);
+        }
+
+        public void AsJsonWebTokenViaQcs(string key)
+        {
+            _connectionSettings.AsJwtViaQcs(key);
+            _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
         }
 
         [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
         public void AsJwtViaQcs(string key)
         {
-            _connectionSettings.AsJwtViaQcs(key);
+            _connectionSettings.AsApiKeyViaQcs(key);
         }
 
         [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since May 2020
@@ -334,7 +340,7 @@ namespace Qlik.Sense.RestClient
             LogCall("GET", endpoint);
             var client = GetClient();
             var task = Result.CreateAsync(() => client.GetHttpAsync(BaseUri.Append(endpoint), false), _stats.Add);
-            task.ConfigureAwait(false); 
+            task.ConfigureAwait(false);
             var rsp = task.Result;
             LogReceive(rsp.Body);
             return rsp;
@@ -573,6 +579,23 @@ namespace Qlik.Sense.RestClient
             RestClientDebugConsole?.Log($"Authentication complete.");
         }
 
+        private async Task CollectCookieJwtViaQcsAsync()
+        {
+            RestClientDebugConsole?.Log($"Authenticating (calling POST /login/jwt-session)");
+            var client = GetClient();
+            await LogReceive(client.PostStringAsync(BaseUri.Append("/login/jwt-session"), "")).ConfigureAwait(false);
+            
+            var csrfToken = _connectionSettings.GetCookie("_csrfToken").Value;
+            if (csrfToken == null)
+            {
+                throw new AuthenticationException("Call to /login/jwt-session did not return a csrf token cookie.");
+            }
+
+            _connectionSettings.DefaultArguments[SenseHttpClient.CSRF_TOKEN_ID] = csrfToken;
+            client.AddDefaultHeader(SenseHttpClient.CSRF_TOKEN_ID, csrfToken);
+            RestClientDebugConsole?.Log($"Authentication complete.");
+        }
+
         public class ConnectionNotConfiguredException : Exception
         {
         }
@@ -666,7 +689,7 @@ namespace Qlik.Sense.RestClient
 
         private static string CalcPercentage(int argValue, int cnt)
         {
-            return $"{(double)argValue/cnt:P2}";
+            return $"{(double)argValue / cnt:P2}";
         }
     }
 
@@ -677,7 +700,7 @@ namespace Qlik.Sense.RestClient
     {
         public string Body { get; private set; }
         public HttpStatusCode ReturnCode { get; private set; }
-        public bool IsStatusSuccessCode => (int) ReturnCode >= 200 && (int) ReturnCode < 300;
+        public bool IsStatusSuccessCode => (int)ReturnCode >= 200 && (int)ReturnCode < 300;
         public TimeSpan TimeToResponse { get; private set; }
         public TimeSpan Duration { get; private set; }
 
@@ -736,7 +759,7 @@ namespace Qlik.Sense.RestClient
             var sw = new Stopwatch();
             sw.Start();
             var rsp = await f().ConfigureAwait(false);
-            var result = new Result {ReturnCode = rsp.StatusCode, TimeToResponse = sw.Elapsed};
+            var result = new Result { ReturnCode = rsp.StatusCode, TimeToResponse = sw.Elapsed };
             if (rsp.IsSuccessStatusCode)
                 result.Body = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
             sw.Stop();

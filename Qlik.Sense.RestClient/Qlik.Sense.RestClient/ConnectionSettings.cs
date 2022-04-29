@@ -16,6 +16,7 @@ namespace Qlik.Sense.RestClient
         AnonymousViaProxy,
         JwtTokenViaProxy,
         JwtTokenViaQcs,
+        ApiKeyViaQcs,
         ExistingSessionViaProxy
     }
 
@@ -35,7 +36,9 @@ namespace Qlik.Sense.RestClient
         public TimeSpan Timeout;
         public string Xrfkey;
         public IWebProxy Proxy { get; set; }
-        public Dictionary<string, string> CustomHeaders { get; private set; }= new Dictionary<string, string>();
+        public Dictionary<string, string> CustomHeaders { get; private set; } = new Dictionary<string, string>();
+
+        public Dictionary<string, string> DefaultArguments { get; } = new Dictionary<string, string>();
 
         public bool CertificateValidation = true;
         public X509Certificate2Collection Certificates;
@@ -134,7 +137,7 @@ namespace Qlik.Sense.RestClient
             X509Certificate2Collection certificateCollection = null)
         {
             ConnectionType = ConnectionType.DirectConnection;
-            var uriBuilder = new UriBuilder(BaseUri) {Port = port};
+            var uriBuilder = new UriBuilder(BaseUri) { Port = port };
             BaseUri = uriBuilder.Uri;
             UserId = userId;
             UserDirectory = userDirectory;
@@ -150,13 +153,19 @@ namespace Qlik.Sense.RestClient
             ConnectionType = type;
             CustomHeaders.Add("Authorization", "Bearer " + key);
             _isConfigured = true;
-            IsAuthenticated = true;
+            IsAuthenticated = false;
         }
 
         public void AsJwtViaProxy(string key, bool certificateValidation)
         {
             CertificateValidation = certificateValidation;
             AsJwtToken(key, ConnectionType.JwtTokenViaProxy);
+        }
+
+        public void AsApiKeyViaQcs(string key)
+        {
+            AsJwtToken(key, ConnectionType.ApiKeyViaQcs);
+            IsAuthenticated = true;
         }
 
         public void AsJwtViaQcs(string key)
@@ -221,5 +230,9 @@ namespace Qlik.Sense.RestClient
                 throw new RestClient.CertificatesNotLoadedException();
         }
 
+        internal Cookie GetCookie(string name)
+        {
+            return CookieJar.GetCookies(BaseUri)[name];
+        }
     }
 }
