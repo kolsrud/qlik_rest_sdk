@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Qlik.Sense.RestClient.csproj" />
+    <ProjectReference Include="..\..\Qlik.Sense.RestClient\Qlik.Sense.RestClient.csproj" />
   </ItemGroup>
 
 </Project>

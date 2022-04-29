@@ -12,7 +12,7 @@ namespace Qlik.Sense.RestClient
     public class SenseHttpClient
     {
         private readonly ConnectionSettings _connectionSettings;
-#if (NETCOREAPP2_1)
+#if (NETCOREAPP)
         private readonly HttpClientHandler _clientHandler;
 #else
         private readonly WebRequestHandler _clientHandler;
@@ -24,7 +24,7 @@ namespace Qlik.Sense.RestClient
         internal SenseHttpClient(ConnectionSettings connectionSettings)
         {
             _connectionSettings = connectionSettings;
-#if (NETCOREAPP2_1)
+#if (NETCOREAPP)
             _clientHandler = new HttpClientHandler();
 #else
             _clientHandler = new WebRequestHandler();
@@ -43,7 +43,7 @@ namespace Qlik.Sense.RestClient
 
         private void DeactivateCertificateValidation()
         {
-#if (NETCOREAPP2_1)
+#if (NETCOREAPP)
             _clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 #else
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
@@ -52,7 +52,7 @@ namespace Qlik.Sense.RestClient
 
         private HttpClient InitializeClient()
         {
-#if (NET452)
+#if (NET452 || NET462)
             ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 #endif
             if (_connectionSettings.CertificateValidation == false)

@@ -6,8 +6,12 @@ namespace Qlik.Sense.RestClient
     {
 #if (NETCOREAPP2_1)
         private const string dotnet_version = ".NET Core 2.1";
-#else
+#elif (NETCOREAPP3_1)
+        private const string dotnet_version = ".NET Core 3.1";
+#elif (NET452)
         private const string dotnet_version = ".NET Framework 4.5.2";
+#elif (NET462)
+        private const string dotnet_version = ".NET Framework 4.6.2";
 #endif
 
         public RestClientDebugConsole()
