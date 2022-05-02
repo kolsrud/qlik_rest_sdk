@@ -2,6 +2,7 @@
 
 ## v1.9.0
 * **NEW FEATURE:** Added connection type `AsJsonWebTokenViaQcs`.
+* **NEW FEATURE:** Added dll `Qlik.Sense.Jwt` containing the class `QcsJwtFactory` for producing JSON Web Tokens. Only available for .NET Core 3.1.
 * **DEPRECATED:** Deprecated support for .NET Framework 4.5.2 and .NET Core 2.1. Minimum supported versions are .NET Framework 4.6.2 and .NET Core 3.1.
 
 ## v1.8.0

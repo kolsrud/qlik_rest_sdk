@@ -22,6 +22,7 @@
     <file src="Qlik.Sense.RestClient\bin\Release\net462\Qlik.Sense.RestClient.dll" target="lib\net462" />
     <file src="Qlik.Sense.RestClient\bin\Release\netcoreapp2.1\Qlik.Sense.RestClient.dll" target="lib\netcoreapp2.1" />
     <file src="Qlik.Sense.RestClient\bin\Release\netcoreapp3.1\Qlik.Sense.RestClient.dll" target="lib\netcoreapp3.1" />
+    <file src="Qlik.Sense.Jwt\bin\Release\netcoreapp3.1\Qlik.Sense.Jwt.dll" target="lib\netcoreapp3.1" />
 <!--    <file src="..\LICENSE" target="licenses\LICENSE" /> -->
   </files>
 </package>
