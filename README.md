@@ -20,5 +20,6 @@ This library currently supports the following authentication mechanisms:
   * JWT authentication
 * Qlik Cloud Services (QCS)
   * API Key authentication
+  * JWT authentication
 
 The library is available for download from NuGet: https://www.nuget.org/packages/QlikSenseRestClient/
