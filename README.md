@@ -18,6 +18,7 @@ This library currently supports the following authentication mechanisms:
   * NTLM authentication using default or custom credentials.
   * Static header authentication.
   * JWT authentication
+  * Connection to existing session.
 * Qlik Cloud Services (QCS)
   * API Key authentication
   * JWT authentication
