@@ -33,9 +33,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qlik.Sense.RestClient", "Ql
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qlik.Sense.Jwt", "Qlik.Sense.Jwt\Qlik.Sense.Jwt.csproj", "{1368BB65-C47A-4F07-B7BF-E8BD499526B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectQcsApiKey", "Examples\ConnectQcsApiKey\ConnectQcsApiKey.csproj", "{55A8AE74-0A52-4FF8-BB44-77F3D66E787A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectQcsApiKey", "Examples\ConnectQcsApiKey\ConnectQcsApiKey.csproj", "{55A8AE74-0A52-4FF8-BB44-77F3D66E787A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectQcsJwt", "Examples\ConnectQcsJwt\ConnectQcsJwt.csproj", "{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectQcsJwt", "Examples\ConnectQcsJwt\ConnectQcsJwt.csproj", "{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListAppsInAllStreams", "Examples\ListAppsInAllStreams\ListAppsInAllStreams.csproj", "{1B0976A8-9280-4403-8B01-828C17313A10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,10 @@ Global
 		{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B0976A8-9280-4403-8B01-828C17313A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B0976A8-9280-4403-8B01-828C17313A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B0976A8-9280-4403-8B01-828C17313A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B0976A8-9280-4403-8B01-828C17313A10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +112,7 @@ Global
 		{811603AA-7F79-418F-9D45-0C435DF60C63} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{55A8AE74-0A52-4FF8-BB44-77F3D66E787A} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
+		{1B0976A8-9280-4403-8B01-828C17313A10} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62407092-C20D-43DF-A754-AB8F1BC671F5}
