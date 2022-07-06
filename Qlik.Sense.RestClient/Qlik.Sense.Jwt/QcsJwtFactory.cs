@@ -51,7 +51,7 @@ namespace Qlik.Sense.Jwt
             rsa.ImportRSAPrivateKey(Convert.FromBase64String(pemFileKey), out _);
             return rsa;
         }
-        
+
         /// <summary>
         /// Produce a JWT that can be used to connect to QCS as a specific user.
         /// </summary>
@@ -62,8 +62,19 @@ namespace Qlik.Sense.Jwt
         {
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                // Required claims according to https://qlik.dev/tutorials/create-signed-tokens-for-jwt-authorization
+                // {
+                //     "jti": "k5bU_cFI4_-vFfpJ3DjDsIZK-ZhJGRbBfusUWZ0ifBI",
+                //     "sub": "SomeSampleSeedValue", //e.g. 0hEhiPyhMBdtOCv2UZKoLo4G24p-7R6eeGdZUQHF0-c
+                //     "subType": "user",
+                //     "name": "Hardcore Harry",
+                //     "email": "harry@example.com",
+                //     "email_verified": true,
+                //     "groups": ["Administrators", "Sales", "Marketing"]
+                // }
                 Claims = new Dictionary<string, object>()
                 {
+                    {"jti", Guid.NewGuid().ToString()},
                     {"sub", subject},
                     {"name", name},
                 },
