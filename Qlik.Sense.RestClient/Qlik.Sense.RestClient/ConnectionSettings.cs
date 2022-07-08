@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
@@ -17,7 +18,8 @@ namespace Qlik.Sense.RestClient
         JwtTokenViaProxy,
         JwtTokenViaQcs,
         ApiKeyViaQcs,
-        ExistingSessionViaProxy
+        ExistingSessionViaProxy,
+        ExistingSessionViaQcs
     }
 
     internal class ConnectionSettings : IConnectionConfigurator
@@ -222,6 +224,23 @@ namespace Qlik.Sense.RestClient
             IsAuthenticated = true;
         }
 
+        public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
+        {
+            ConnectionType = ConnectionType.ExistingSessionViaQcs;
+            CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
+            CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
+            DefaultArguments[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
+            CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
+
+            _isConfigured = true;
+        }
+
+        public QcsSessionInfo SessionInfo => new QcsSessionInfo(
+            GetCookie("eas.sid")?.Value,
+            GetCookie("eas.sid.sig")?.Value,
+            GetCookie("_csrfToken")?.Value
+        );
+
         public void Validate()
         {
             if (!_isConfigured)
@@ -233,6 +252,20 @@ namespace Qlik.Sense.RestClient
         internal Cookie GetCookie(string name)
         {
             return CookieJar.GetCookies(BaseUri)[name];
+        }
+    }
+
+    public class QcsSessionInfo
+    {
+        public string EasSid { get; }
+        public string EasSidSig { get; }
+        public string SessionToken { get; }
+
+        public QcsSessionInfo(string easSid, string easSidSig, string sessionToken)
+        {
+            EasSid = easSid;
+            EasSidSig = easSidSig;
+            SessionToken = sessionToken;
         }
     }
 }

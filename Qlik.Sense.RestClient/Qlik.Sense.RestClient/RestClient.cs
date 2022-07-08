@@ -45,6 +45,8 @@ namespace Qlik.Sense.RestClient
         public string UserId => _connectionSettings.UserId;
         public string UserDirectory => _connectionSettings.UserDirectory;
 
+        public QcsSessionInfo QcsSessionInfo => _connectionSettings.SessionInfo;
+
         public Uri BaseUri => _connectionSettings.BaseUri;
 
         private readonly ConnectionSettings _connectionSettings;
@@ -172,6 +174,11 @@ namespace Qlik.Sense.RestClient
         {
             _connectionSettings.AsJwtViaQcs(key);
             _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
+        }
+
+        public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
+        {
+            _connectionSettings.AsExistingSessionViaQcs(sessionInfo);
         }
 
         [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021

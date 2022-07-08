@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.10.0
+* **NEW FEATURE:** Added connection type `AsExistingSessionViaQcs`.
+
 ## v1.9.0
 * **NEW FEATURE:** Added connection type `AsJsonWebTokenViaQcs`.
 * **NEW FEATURE:** Added dll `Qlik.Sense.Jwt` containing the class `QcsJwtFactory` for producing JSON Web Tokens. Only available for .NET Core 3.1.
