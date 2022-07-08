@@ -2,6 +2,7 @@
 
 ## v1.10.0
 * **NEW FEATURE:** Added connection type `AsExistingSessionViaQcs`.
+* **BUG FIX:** Fixed issue with set of claims used for generating JWTs.
 
 ## v1.9.0
 * **NEW FEATURE:** Added connection type `AsJsonWebTokenViaQcs`.
@@ -37,7 +38,7 @@
 
 ## v1.2.0
 * **NEW FEATURE:** Added endpoint `ClientFactory.ClearRuleCache`.
-* **BUGFIX:** Static header connection did not respect the certificatValidation argument.
+* **BUG FIX:** Static header connection did not respect the certificatValidation argument.
 
 ## v1.1.0
 * **NEW FEATURE:** Added User constructor User(string usr).
