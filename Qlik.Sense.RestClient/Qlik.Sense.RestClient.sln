@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectQcsApiKey", "Example
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectQcsJwt", "Examples\ConnectQcsJwt\ConnectQcsJwt.csproj", "{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListAppsInAllStreams", "Examples\ListAppsInAllStreams\ListAppsInAllStreams.csproj", "{1B0976A8-9280-4403-8B01-828C17313A10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListAppsInAllStreams", "Examples\ListAppsInAllStreams\ListAppsInAllStreams.csproj", "{1B0976A8-9280-4403-8B01-828C17313A10}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsExportExcel", "Examples\QcsExportExcel\QcsExportExcel.csproj", "{74E19033-AAFE-4550-BE32-62C7EB51C939}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,10 @@ Global
 		{1B0976A8-9280-4403-8B01-828C17313A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B0976A8-9280-4403-8B01-828C17313A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B0976A8-9280-4403-8B01-828C17313A10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74E19033-AAFE-4550-BE32-62C7EB51C939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74E19033-AAFE-4550-BE32-62C7EB51C939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74E19033-AAFE-4550-BE32-62C7EB51C939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74E19033-AAFE-4550-BE32-62C7EB51C939}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{55A8AE74-0A52-4FF8-BB44-77F3D66E787A} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{32D169D9-AE61-4D8B-BE2C-C4D3B4EC192D} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{1B0976A8-9280-4403-8B01-828C17313A10} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
+		{74E19033-AAFE-4550-BE32-62C7EB51C939} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62407092-C20D-43DF-A754-AB8F1BC671F5}
