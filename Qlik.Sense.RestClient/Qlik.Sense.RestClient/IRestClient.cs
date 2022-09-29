@@ -12,6 +12,7 @@ namespace Qlik.Sense.RestClient
         string Url { get; }
         string UserId { get; }
         string UserDirectory { get; }
+        QcsSessionInfo QcsSessionInfo { get; }
 
         bool Authenticate();
 
@@ -46,6 +47,7 @@ namespace Qlik.Sense.RestClient
         Task<T> PostAsync<T>(string endpoint, string body = "");
         Task<T> PostAsync<T>(string endpoint, JToken body);
         Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true);
+        Task<HttpResponseMessage> PostHttpAsync(string endpoint, JToken body, bool throwOnFailure = true);
 
         string Post(string endpoint, byte[] body);
         T Post<T>(string endpoint, byte[] body);
