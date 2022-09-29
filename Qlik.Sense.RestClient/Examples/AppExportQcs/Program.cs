@@ -9,9 +9,9 @@ namespace AppExportQcs
     {
         static void Main(string[] args)
         {
-            var appId = "<appId>";
             var url = "<url>";
             var apiKey = "<apiKey>";
+            var appId = "<appId>";
 
             var outputFile = "myapp.qvf";
 
