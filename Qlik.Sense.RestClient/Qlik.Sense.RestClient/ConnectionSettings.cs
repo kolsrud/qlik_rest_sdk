@@ -229,7 +229,6 @@ namespace Qlik.Sense.RestClient
             ConnectionType = ConnectionType.ExistingSessionViaQcs;
             CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
             CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
-            DefaultArguments[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
             CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
 
             _isConfigured = true;

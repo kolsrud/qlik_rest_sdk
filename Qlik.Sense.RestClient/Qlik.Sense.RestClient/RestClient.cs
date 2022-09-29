@@ -606,7 +606,6 @@ namespace Qlik.Sense.RestClient
                 throw new AuthenticationException("Call to /login/jwt-session did not return a csrf token cookie.");
             }
 
-            _connectionSettings.DefaultArguments[SenseHttpClient.CSRF_TOKEN_ID] = csrfToken;
             client.AddDefaultHeader(SenseHttpClient.CSRF_TOKEN_ID, csrfToken);
             RestClientDebugConsole?.Log($"Authentication complete.");
         }

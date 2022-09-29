@@ -4,6 +4,7 @@
 * **NEW FEATURE:** Property `RestClient.QcsSessionClient` is now exposed through interface `IRestClient`.
 * **NEW FEATURE:** Method `RestClient.PostHttpAsync` overload with `JToken` body is now exposed through interface `IRestClient`.
 * **BUG FIX:** Authentication is now performed automatically also when calling `PostHttpAsync` as first endpoint.
+* **BUG FIX:** The csrf-token should not be provided as argument for REST calls to QCS.
 
 ## v1.10.0
 * **NEW FEATURE:** Added connection type `AsExistingSessionViaQcs`.

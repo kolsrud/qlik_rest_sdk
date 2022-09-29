@@ -171,14 +171,15 @@ namespace Qlik.Sense.RestClient
             if (UseXrfKey)
                 return AddXrefKey(true, uri, _xrfkey);
 
-            var argsToAdd = isGetRequest ? 
-                    string.Join("&", _connectionSettings.DefaultArguments.Where(kv => kv.Key != CSRF_TOKEN_ID).Select(kv => kv.Key + '=' + kv.Value)) :
-                    string.Join("&", _connectionSettings.DefaultArguments.Select(kv => kv.Key + '=' + kv.Value));
+            var argsToAdd = string.Join("&", _connectionSettings.DefaultArguments.Select(kv => kv.Key + '=' + kv.Value));
             var uriBuilder = new UriBuilder(uri);
-            if (string.IsNullOrEmpty(uriBuilder.Query))
-                uriBuilder.Query = argsToAdd;
-            else
-                uriBuilder.Query += "&" + argsToAdd; 
+            if (!string.IsNullOrWhiteSpace(argsToAdd))
+            {
+                if (string.IsNullOrEmpty(uriBuilder.Query))
+                    uriBuilder.Query = argsToAdd;
+                else
+                    uriBuilder.Query += "&" + argsToAdd;
+            }
             return uriBuilder.Uri;
         }
 
