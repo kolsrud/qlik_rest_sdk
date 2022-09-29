@@ -1,5 +1,10 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.11.0
+* **NEW FEATURE:** Property `RestClient.QcsSessionClient` is now exposed through interface `IRestClient`.
+* **NEW FEATURE:** Method `RestClient.PostHttpAsync` overload with `JToken` body is now exposed through interface `IRestClient`.
+* **BUG FIX:** Authentication is now performed automatically also when calling `PostHttpAsync` as first endpoint.
+
 ## v1.10.0
 * **NEW FEATURE:** Added connection type `AsExistingSessionViaQcs`.
 * **BUG FIX:** Fixed issue with set of claims used for generating JWTs.
