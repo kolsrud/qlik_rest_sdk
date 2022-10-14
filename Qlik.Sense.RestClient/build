@@ -8,6 +8,7 @@ if ! ./checkConfigureAwait; then
 fi
 cp Qlik.Sense.RestClient.nuspec.template Qlik.Sense.RestClient.nuspec
 sed -i "s|<version>.*</version>|<version>$VERSION</version>|" Qlik.Sense.RestClient.nuspec
+sed "s|@VERSION|$VERSION|g" VersionAssemblyInfo.template > VersionAssemblyInfo.cs
 nuget restore
 build.bat
 mkNugetPkg

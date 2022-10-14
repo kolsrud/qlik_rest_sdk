@@ -1,7 +1,9 @@
+*~
 */.vs
 **/obj
 **/bin
 **/*csproj.user
 **/*.nupkg
 **/packages
+Qlik.Sense.RestClient/VersionAssemblyInfo.cs
 Qlik.Sense.RestClient/Qlik.Sense.RestClient.nuspec
