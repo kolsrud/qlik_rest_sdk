@@ -13,6 +13,7 @@ namespace Qlik.Sense.RestClient
     public class SenseHttpClient
     {
         internal const string CSRF_TOKEN_ID = "qlik-csrf-token";
+        private readonly string _userAgent;
 
         private readonly ConnectionSettings _connectionSettings;
 #if (NETCOREAPP)
@@ -26,6 +27,9 @@ namespace Qlik.Sense.RestClient
 
         internal SenseHttpClient(ConnectionSettings connectionSettings)
         {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            _userAgent = $"QlikSenseRestClient/{fvi.FileVersion}";
             _connectionSettings = connectionSettings;
 #if (NETCOREAPP)
             _clientHandler = new HttpClientHandler();
@@ -69,9 +73,10 @@ namespace Qlik.Sense.RestClient
             var client = new HttpClient(_clientHandler);
             foreach (var header in _connectionSettings.CustomHeaders)
             {
-                client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                client.DefaultRequestHeaders.Add(header.Key.ToLower(), header.Value);
             }
-
+            client.DefaultRequestHeaders.Add("user-agent", _userAgent);
+            
             if (UseXrfKey)
             {
                 _xrfkey = _connectionSettings.Xrfkey ?? CreateXrfKey();
