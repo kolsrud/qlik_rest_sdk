@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.12.0
+* **NEW FEATURE:** Added property `RestClient.CustomUserAgent` to configure HTTP user-agent header to use for application.
+
 ## v1.11.0
 * **NEW FEATURE:** Property `RestClient.QcsSessionClient` is now exposed through interface `IRestClient`.
 * **NEW FEATURE:** Method `RestClient.PostHttpAsync` overload with `JToken` body is now exposed through interface `IRestClient`.

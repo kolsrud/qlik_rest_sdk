@@ -39,6 +39,14 @@ namespace Qlik.Sense.RestClient
 
         public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
 
+        /// <summary>
+        /// Custom HTTP user-agent header for identifying application.
+        /// </summary>
+        public string CustomUserAgent
+        {
+            get => _connectionSettings.CustomUserAgent;
+            set => _connectionSettings.CustomUserAgent = value;
+        }
         private User _user;
         public User User => _user ?? (_user = new User { Directory = UserDirectory, Id = UserId });
         public string Url => _connectionSettings.BaseUri.AbsoluteUri;

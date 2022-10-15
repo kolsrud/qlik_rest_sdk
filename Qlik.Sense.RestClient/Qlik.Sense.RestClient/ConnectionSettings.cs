@@ -39,6 +39,7 @@ namespace Qlik.Sense.RestClient
         public string Xrfkey;
         public IWebProxy Proxy { get; set; }
         public Dictionary<string, string> CustomHeaders { get; private set; } = new Dictionary<string, string>();
+        public string CustomUserAgent { get; set; }
 
         public Dictionary<string, string> DefaultArguments { get; } = new Dictionary<string, string>();
 

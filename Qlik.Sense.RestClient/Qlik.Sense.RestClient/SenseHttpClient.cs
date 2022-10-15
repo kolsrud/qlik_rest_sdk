@@ -75,6 +75,8 @@ namespace Qlik.Sense.RestClient
             {
                 client.DefaultRequestHeaders.Add(header.Key.ToLower(), header.Value);
             }
+            if (!string.IsNullOrWhiteSpace(_connectionSettings.CustomUserAgent))
+                client.DefaultRequestHeaders.Add("user-agent", _connectionSettings.CustomUserAgent);
             client.DefaultRequestHeaders.Add("user-agent", _userAgent);
             
             if (UseXrfKey)
