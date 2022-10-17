@@ -5,5 +5,6 @@
 **/*csproj.user
 **/*.nupkg
 **/packages
+SystemConstants.cs
 Qlik.Sense.RestClient/VersionAssemblyInfo.cs
 Qlik.Sense.RestClient/Qlik.Sense.RestClient.nuspec

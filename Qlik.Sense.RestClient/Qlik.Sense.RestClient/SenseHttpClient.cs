@@ -27,9 +27,7 @@ namespace Qlik.Sense.RestClient
 
         internal SenseHttpClient(ConnectionSettings connectionSettings)
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-            _userAgent = $"QlikSenseRestClient/{fvi.FileVersion}";
+            _userAgent = $"{SystemConstants.LIBRARY_IDENTIFIER}/{SystemConstants.LIBRARY_VERSION}";
             _connectionSettings = connectionSettings;
 #if (NETCOREAPP)
             _clientHandler = new HttpClientHandler();
