@@ -65,7 +65,9 @@ namespace Qlik.Sense.RestClient
             if (_connectionSettings.CertificateValidation == false)
                 DeactivateCertificateValidation();
 
-            if (_connectionSettings.ConnectionType == ConnectionType.ApiKeyViaQcs)
+            if (_connectionSettings.ConnectionType == ConnectionType.ApiKeyViaQcs
+                || _connectionSettings.ConnectionType == ConnectionType.ClientCredentialsViaQcs
+                )
             {
                 _clientHandler.AllowAutoRedirect = false;
             }
@@ -96,7 +98,7 @@ namespace Qlik.Sense.RestClient
             client.DefaultRequestHeaders.Add(name, value);
         }
 
-        private bool UseXrfKey => !new[] { ConnectionType.JwtTokenViaQcs, ConnectionType.ApiKeyViaQcs }.Contains(_connectionSettings.ConnectionType);
+        private bool UseXrfKey => !new[] { ConnectionType.JwtTokenViaQcs, ConnectionType.ApiKeyViaQcs, ConnectionType.ClientCredentialsViaQcs }.Contains(_connectionSettings.ConnectionType);
 
         public Task<HttpResponseMessage> GetHttpAsync(Uri uri, bool throwOnFailure = true)
         {
@@ -148,7 +150,7 @@ namespace Qlik.Sense.RestClient
 
         public Task<HttpResponseMessage> PostHttpAsync(Uri uri, string body, bool throwOnFailure = true)
         {
-            return PostHttpAsync(uri, new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType), throwOnFailure);
+            return PostHttpAsync(uri, new StringContent(body, Encoding.UTF8, _connectionSettings.ContentType), throwOnFailure);
         }
 
         private async Task<HttpResponseMessage> PostHttpAsync(Uri uri, HttpContent body, bool throwOnFailure = true)

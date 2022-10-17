@@ -184,6 +184,12 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
         }
 
+        public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
+        {
+            _connectionSettings.AsClientCredentialsViaQcs(clientId, clientSecret);
+            _connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
+        }
+
         public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
         {
             _connectionSettings.AsExistingSessionViaQcs(sessionInfo);
@@ -618,6 +624,37 @@ namespace Qlik.Sense.RestClient
             RestClientDebugConsole?.Log($"Authentication complete.");
         }
 
+        private async Task CollectAccessTokenViaOauthAsync()
+        {
+            var token = await GetAccessTokenAsync().ConfigureAwait(false);
+            _connectionSettings.AsApiKeyViaQcs(token);
+            RestClientDebugConsole?.Log($"Authentication complete.");
+        }
+
+        private async Task<string> GetAccessTokenAsync()
+        {
+            var endpoint = "/oauth/token";
+            RestClientDebugConsole?.Log($"Authenticating (calling POST {endpoint})");
+            var body = JToken.FromObject(new
+            {
+                scope = "user_default",
+                grant_type = "client_credentials"
+            });
+
+            var client = new SenseHttpClient(_connectionSettings.Clone());
+            client.AddDefaultHeader("Authorization", "Basic " + _connectionSettings.ClientCredentialsEncoded);
+            try
+            {
+                var rsp = await client.PostStringAsync(BaseUri.Append(endpoint), body.ToString(Formatting.None)).ConfigureAwait(false);
+                var rspJson = JObject.Parse(rsp);
+                return rspJson["access_token"].Value<string>();
+            }
+            catch (Exception e)
+            {
+                throw new AuthenticationException("Failed to retrieve access token.", e);
+            }
+        }
+        
         public class ConnectionNotConfiguredException : Exception
         {
         }

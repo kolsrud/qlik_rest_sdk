@@ -18,6 +18,7 @@ namespace Qlik.Sense.RestClient
         JwtTokenViaProxy,
         JwtTokenViaQcs,
         ApiKeyViaQcs,
+        ClientCredentialsViaQcs,
         ExistingSessionViaProxy,
         ExistingSessionViaQcs
     }
@@ -34,6 +35,7 @@ namespace Qlik.Sense.RestClient
         public string UserDirectory;
         public string UserId;
         public string StaticHeaderName;
+        public string ClientCredentialsEncoded;
         public ICredentials CustomCredential;
         public TimeSpan Timeout;
         public string Xrfkey;
@@ -76,6 +78,7 @@ namespace Qlik.Sense.RestClient
             catch (Exception e)
             {
                 _authenticationException = e;
+                throw;
             }
             finally
             {
@@ -153,7 +156,8 @@ namespace Qlik.Sense.RestClient
 
         private void AsJwtToken(string key, ConnectionType type)
         {
-            ConnectionType = type;
+            if (!_isConfigured)
+                ConnectionType = type;
             CustomHeaders.Add("Authorization", "Bearer " + key);
             _isConfigured = true;
             IsAuthenticated = false;
@@ -174,6 +178,20 @@ namespace Qlik.Sense.RestClient
         public void AsJwtViaQcs(string key)
         {
             AsJwtToken(key, ConnectionType.JwtTokenViaQcs);
+        }
+
+        public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
+        {
+            ConnectionType = ConnectionType.ClientCredentialsViaQcs;
+            ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
+            _isConfigured = true;
+            IsAuthenticated = false;
+        }
+
+        private static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)

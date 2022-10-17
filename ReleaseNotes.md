@@ -1,6 +1,7 @@
 # Release Notes for Qlik Sense Rest Client
 
 ## v1.12.0
+* **NEW FEATURE:** Added connection type `AsClientCredentialsViaQcs`.
 * **NEW FEATURE:** Added property `RestClient.CustomUserAgent` to configure an HTTP user-agent header to use for application.
 * **ENVIRONMENTAL:** Dll properties including version information is now set correctly.
 
