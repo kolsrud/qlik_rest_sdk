@@ -3,6 +3,7 @@
 ## v1.13.0
 * **NEW FEATURE:** Added overloads for `IRestClient.Post` and `IRestClient.PostAsync` that takes as argument an instance of `HttpContent`.
 * **EXAMPLE:** Added example `QcsImportExtension` that illustrates how to import an extension to QCS.
+* **EXAMPLE:** Renamed examples `AppExportQcs`, `ConnectQcsApiKey` and `ConnectQcsJwt` to use `Qcs` as prefix.
 
 ## v1.12.1
 * **NEW FEATURE:** Added connection type `AsClientCredentialsViaQcs`.

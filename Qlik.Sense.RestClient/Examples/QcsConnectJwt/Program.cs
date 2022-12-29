@@ -3,9 +3,9 @@ using Newtonsoft.Json.Linq;
 using Qlik.Sense.Jwt;
 using Qlik.Sense.RestClient;
 
-namespace ConnectQcsJwt
+namespace QcsConnectJwt
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {

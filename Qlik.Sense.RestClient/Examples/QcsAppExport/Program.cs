@@ -3,9 +3,9 @@ using System.IO;
 using System.Net;
 using Qlik.Sense.RestClient;
 
-namespace AppExportQcs
+namespace QcsAppExport
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {

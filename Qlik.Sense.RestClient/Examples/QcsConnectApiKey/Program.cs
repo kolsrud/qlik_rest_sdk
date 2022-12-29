@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
-namespace ConnectQcsApiKey
+namespace QcsConnectApiKey
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
