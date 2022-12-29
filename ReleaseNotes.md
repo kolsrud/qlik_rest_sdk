@@ -1,5 +1,9 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.13.0
+* **NEW FEATURE:** Added overloads for `IRestClient.Post` and `IRestClient.PostAsync` that takes as argument an instance of `HttpContent`.
+* **EXAMPLE:** Added example `QcsImportExtension` that illustrates how to import an extension to QCS.
+
 ## v1.12.1
 * **NEW FEATURE:** Added connection type `AsClientCredentialsViaQcs`.
 * **NEW FEATURE:** Added property `RestClient.CustomUserAgent` to configure an HTTP user-agent header to use for application.

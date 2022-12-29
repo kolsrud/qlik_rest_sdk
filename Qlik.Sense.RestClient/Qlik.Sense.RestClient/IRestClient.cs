@@ -42,10 +42,12 @@ namespace Qlik.Sense.RestClient
         string Post(string endpoint, JToken body);
         T Post<T>(string endpoint, string body = "");
         T Post<T>(string endpoint, JToken body);
+        T Post<T>(string endpoint, HttpContent content);
         Task<string> PostAsync(string endpoint, string body = "");
         Task<string> PostAsync(string endpoint, JToken body);
         Task<T> PostAsync<T>(string endpoint, string body = "");
         Task<T> PostAsync<T>(string endpoint, JToken body);
+        Task<T> PostAsync<T>(string endpoint, HttpContent content);
         Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true);
         Task<HttpResponseMessage> PostHttpAsync(string endpoint, JToken body, bool throwOnFailure = true);
 

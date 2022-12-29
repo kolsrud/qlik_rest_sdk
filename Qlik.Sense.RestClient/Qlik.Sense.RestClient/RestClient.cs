@@ -484,6 +484,13 @@ namespace Qlik.Sense.RestClient
             return Post<T>(endpoint, body.ToString(Formatting.None));
         }
 
+        public T Post<T>(string endpoint, HttpContent content)
+        {
+            var task = PostAsync<T>(endpoint, content);
+            task.ConfigureAwait(false);
+            return task.Result;
+        }
+
         public Task<string> PostAsync(string endpoint, string body = "")
         {
             return PerformUploadStringAccessAsync("POST", endpoint, body);
@@ -502,6 +509,16 @@ namespace Qlik.Sense.RestClient
         public Task<T> PostAsync<T>(string endpoint, JToken body)
         {
             return PostAsync<T>(endpoint, body.ToString(Formatting.None));
+        }
+
+        public async Task<T> PostAsync<T>(string endpoint, HttpContent content)
+        {
+            ValidateConfiguration();
+            if (!await AuthenticateAsync().ConfigureAwait(false))
+                throw new AuthenticationException("Authentication failed.");
+            var client = GetClient();
+            var rsp = await client.PostHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
+            return JsonConvert.DeserializeObject<T>(rsp);
         }
 
         public async Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true)

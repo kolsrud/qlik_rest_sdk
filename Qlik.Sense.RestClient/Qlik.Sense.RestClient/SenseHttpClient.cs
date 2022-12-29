@@ -232,6 +232,18 @@ namespace Qlik.Sense.RestClient
             throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
+        public async Task<string> PostHttpContentAsync(Uri uri, HttpContent content)
+        {
+            var client = _client.Value;
+            var rsp = await client.PostAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), content).ConfigureAwait(false);
+            if (rsp.IsSuccessStatusCode)
+            {
+                return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
+
+            throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
+        }
+
         public async Task<string> DeleteAsync(Uri uri)
         {
             var client = _client.Value;
