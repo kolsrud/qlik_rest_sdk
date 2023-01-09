@@ -11,11 +11,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This is a basic SDK for Qlik Sense REST access with authentication configuration built along the same line as the .Net SDK for the Engine API.</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright © 2018-2022 Øystein Kolsrud</copyright>
+    <copyright>Copyright © 2018-2023 Øystein Kolsrud</copyright>
     <tags>qlik sense rest</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="11.0.1" />
     </dependencies>
+    <readme>docs\README.md</readme>
   </metadata>
   <files>
     <file src="Qlik.Sense.RestClient\bin\Release\net452\Qlik.Sense.RestClient.dll" target="lib\net452" />
@@ -23,6 +24,7 @@
     <file src="Qlik.Sense.RestClient\bin\Release\netcoreapp2.1\Qlik.Sense.RestClient.dll" target="lib\netcoreapp2.1" />
     <file src="Qlik.Sense.RestClient\bin\Release\netcoreapp3.1\Qlik.Sense.RestClient.dll" target="lib\netcoreapp3.1" />
     <file src="Qlik.Sense.Jwt\bin\Release\netcoreapp3.1\Qlik.Sense.Jwt.dll" target="lib\netcoreapp3.1" />
+    <file src="..\README.md" target="docs\" />
 <!--    <file src="..\LICENSE" target="licenses\LICENSE" /> -->
   </files>
 </package>
