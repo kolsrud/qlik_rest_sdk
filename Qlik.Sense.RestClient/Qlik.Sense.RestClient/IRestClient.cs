@@ -60,10 +60,13 @@ namespace Qlik.Sense.RestClient
         string Put(string endpoint, JToken body);
         T Put<T>(string endpoint, string body);
         T Put<T>(string endpoint, JToken body);
+        T Put<T>(string endpoint, HttpContent content);
         Task<string> PutAsync(string endpoint, string body);
         Task<string> PutAsync(string endpoint, JToken body);
         Task<T> PutAsync<T>(string endpoint, string body);
         Task<T> PutAsync<T>(string endpoint, JToken body);
+        Task<T> PutAsync<T>(string endpoint, HttpContent content);
+
 
         string Delete(string endpoint);
         Task<string> DeleteAsync(string endpoint);
