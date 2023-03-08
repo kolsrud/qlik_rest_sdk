@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.14.1
+* **BUGFIX:** Connections configured using direct connection with certificate should not trigger authentication flow.
+
 ## v1.14.0
 * **NEW FEATURE:** Added overloads for `IRestClient.Put` and `IRestClient.PutAsync` that takes as argument an instance of `HttpContent`.
 

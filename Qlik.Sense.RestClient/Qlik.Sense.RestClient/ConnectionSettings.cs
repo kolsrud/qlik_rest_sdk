@@ -151,6 +151,7 @@ namespace Qlik.Sense.RestClient
             Certificates = certificateCollection;
             var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
             CustomHeaders.Add("X-Qlik-User", userHeaderValue);
+            IsAuthenticated = true;
             _isConfigured = true;
         }
 
