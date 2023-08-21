@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;net462;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net452;net462;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
       <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	  <Deterministic>False</Deterministic>
   </PropertyGroup>
 
     <ItemGroup>

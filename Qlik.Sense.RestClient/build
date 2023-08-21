@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=`git describe --tags | sed 's|-.*-|-|'`
+VERSION=`git describe --tags | sed 's|-\(.*\)-.*|.\1|'`
 VERSION="${VERSION:1}"
 echo "Inferred version: $VERSION"
 echo "Checking configure await..."

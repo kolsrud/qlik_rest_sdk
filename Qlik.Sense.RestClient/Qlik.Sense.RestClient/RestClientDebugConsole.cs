@@ -12,6 +12,8 @@ namespace Qlik.Sense.RestClient
         private const string dotnet_version = ".NET Framework 4.5.2";
 #elif (NET462)
         private const string dotnet_version = ".NET Framework 4.6.2";
+#elif (NET7_0)
+        private const string dotnet_version = ".NET Framework 7.0";
 #endif
 
         public RestClientDebugConsole()

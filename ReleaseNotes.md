@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.15.0
+* **ENVIRONMENTAL:** Added target framework .NET 7.0. 
+
 ## v1.14.1
 * **BUGFIX:** Connections configured using direct connection with certificate should not trigger authentication flow.
 

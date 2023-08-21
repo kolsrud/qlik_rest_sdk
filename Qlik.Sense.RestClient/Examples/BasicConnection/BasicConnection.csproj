@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net462;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
