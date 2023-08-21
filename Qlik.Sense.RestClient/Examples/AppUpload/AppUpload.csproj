@@ -9,4 +9,7 @@
     <ProjectReference Include="..\..\Qlik.Sense.RestClient\Qlik.Sense.RestClient.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Reference Include="System.Net.Http" Condition="'$(TargetFramework)' == 'net462'" />
+	</ItemGroup>
 </Project>
