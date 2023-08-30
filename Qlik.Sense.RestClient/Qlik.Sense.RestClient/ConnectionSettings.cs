@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace Qlik.Sense.RestClient
 {
@@ -285,6 +285,11 @@ namespace Qlik.Sense.RestClient
             EasSid = easSid;
             EasSidSig = easSidSig;
             SessionToken = sessionToken;
+        }
+
+        public JObject GetJObject()
+        {
+            return JObject.FromObject(this);
         }
     }
 }

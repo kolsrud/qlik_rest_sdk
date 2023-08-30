@@ -1,7 +1,9 @@
 # Release Notes for Qlik Sense Rest Client
 
 ## v1.15.0
-* **ENVIRONMENTAL:** Added target framework .NET 7.0. 
+* **NEW FEATURE:** Added method `QcsSessionInfo.GetJObject()` to simplify interaction with the .NET SDK.
+* **ENVIRONMENTAL:** Added target framework .NET 7.0.
+* **ENVIRONMENTAL:** Added nuget dependency on `System.IdentityModel.Tokens.Jwt` as this is necessary for JWT connections to QCS.
 
 ## v1.14.1
 * **BUGFIX:** Connections configured using direct connection with certificate should not trigger authentication flow.
