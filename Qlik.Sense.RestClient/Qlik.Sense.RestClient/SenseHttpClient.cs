@@ -148,14 +148,15 @@ namespace Qlik.Sense.RestClient
 
         public Task<HttpResponseMessage> PostHttpAsync(Uri uri, string body, bool throwOnFailure = true)
         {
-            return PostHttpAsync(uri, new StringContent(body, Encoding.UTF8, _connectionSettings.ContentType), throwOnFailure);
+            var content = new StringContent(body, Encoding.UTF8, _connectionSettings.ContentType);
+            content.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
+            return PostHttpAsync(uri, content, throwOnFailure);
         }
 
-        private async Task<HttpResponseMessage> PostHttpAsync(Uri uri, HttpContent body, bool throwOnFailure = true)
+        public async Task<HttpResponseMessage> PostHttpAsync(Uri uri, HttpContent content, bool throwOnFailure = true)
         {
             var client = _client.Value;
-            body.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
-            var rsp = await client.PostAsync(AddDefaultArguments(uri), body).ConfigureAwait(false);
+            var rsp = await client.PostAsync(AddDefaultArguments(uri), content).ConfigureAwait(false);
 
             if (rsp.IsSuccessStatusCode || !throwOnFailure)
             {
@@ -254,6 +255,27 @@ namespace Qlik.Sense.RestClient
             }
 
             throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
+        }
+
+        public async Task<HttpResponseMessage> PutHttpAsync(Uri uri, HttpContent content, bool throwOnFailure = true)
+        {
+            var client = _client.Value;
+            var rsp = await client.PutAsync(AddDefaultArguments(uri), content).ConfigureAwait(false);
+
+            if (rsp.IsSuccessStatusCode || !throwOnFailure)
+            {
+                return rsp;
+            }
+
+            var message = (int)rsp.StatusCode + ": " + rsp.ReasonPhrase;
+            try
+            {
+                var reason = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+                message += ", " + reason;
+            }
+            catch { }
+
+            throw new HttpRequestException(message);
         }
 
         public async Task<string> DeleteAsync(Uri uri)

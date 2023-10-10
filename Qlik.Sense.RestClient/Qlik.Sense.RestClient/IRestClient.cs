@@ -40,16 +40,20 @@ namespace Qlik.Sense.RestClient
 
         string Post(string endpoint, string body = "");
         string Post(string endpoint, JToken body);
+        string Post(string endpoint, HttpContent content);
         T Post<T>(string endpoint, string body = "");
         T Post<T>(string endpoint, JToken body);
         T Post<T>(string endpoint, HttpContent content);
+        HttpResponseMessage PostHttp(string endpoint, HttpContent content, bool throwOnFailure = true);
         Task<string> PostAsync(string endpoint, string body = "");
         Task<string> PostAsync(string endpoint, JToken body);
+        Task<string> PostAsync(string endpoint, HttpContent content);
         Task<T> PostAsync<T>(string endpoint, string body = "");
         Task<T> PostAsync<T>(string endpoint, JToken body);
         Task<T> PostAsync<T>(string endpoint, HttpContent content);
         Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true);
         Task<HttpResponseMessage> PostHttpAsync(string endpoint, JToken body, bool throwOnFailure = true);
+        Task<HttpResponseMessage> PostHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true);
 
         string Post(string endpoint, byte[] body);
         T Post<T>(string endpoint, byte[] body);
@@ -58,14 +62,17 @@ namespace Qlik.Sense.RestClient
 
         string Put(string endpoint, string body);
         string Put(string endpoint, JToken body);
+        string Put(string endpoint, HttpContent content);
         T Put<T>(string endpoint, string body);
         T Put<T>(string endpoint, JToken body);
         T Put<T>(string endpoint, HttpContent content);
+        HttpResponseMessage PutHttp(string endpoint, HttpContent content, bool throwOnFailure = true);
         Task<string> PutAsync(string endpoint, string body);
         Task<string> PutAsync(string endpoint, JToken body);
         Task<T> PutAsync<T>(string endpoint, string body);
         Task<T> PutAsync<T>(string endpoint, JToken body);
         Task<T> PutAsync<T>(string endpoint, HttpContent content);
+        Task<HttpResponseMessage> PutHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true);
 
 
         string Delete(string endpoint);

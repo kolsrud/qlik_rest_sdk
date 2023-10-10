@@ -474,6 +474,13 @@ namespace Qlik.Sense.RestClient
             return Post(endpoint, body.ToString(Formatting.None));
         }
 
+        public string Post(string endpoint, HttpContent content)
+        {
+            var task = PostAsync(endpoint, content);
+            task.ConfigureAwait(false);
+            return task.Result;
+        }
+
         public T Post<T>(string endpoint, string body = "")
         {
             return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
@@ -486,7 +493,12 @@ namespace Qlik.Sense.RestClient
 
         public T Post<T>(string endpoint, HttpContent content)
         {
-            var task = PostAsync<T>(endpoint, content);
+            return JsonConvert.DeserializeObject<T>(Post(endpoint, content));
+        }
+
+        public HttpResponseMessage PostHttp(string endpoint, HttpContent content, bool throwOnFailure = true)
+        {
+            var task = PostHttpAsync(endpoint, content, throwOnFailure);
             task.ConfigureAwait(false);
             return task.Result;
         }
@@ -501,6 +513,15 @@ namespace Qlik.Sense.RestClient
             return PostAsync(endpoint, body.ToString(Formatting.None));
         }
 
+        public async Task<string> PostAsync(string endpoint, HttpContent content)
+        {
+            ValidateConfiguration();
+            if (!await AuthenticateAsync().ConfigureAwait(false))
+                throw new AuthenticationException("Authentication failed.");
+            var client = GetClient();
+            return await client.PostHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
+        }
+
         public Task<T> PostAsync<T>(string endpoint, string body)
         {
             return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
@@ -511,14 +532,9 @@ namespace Qlik.Sense.RestClient
             return PostAsync<T>(endpoint, body.ToString(Formatting.None));
         }
 
-        public async Task<T> PostAsync<T>(string endpoint, HttpContent content)
+        public Task<T> PostAsync<T>(string endpoint, HttpContent content)
         {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            var client = GetClient();
-            var rsp = await client.PostHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<T>(rsp);
+            return PostAsync(endpoint, content).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
 
         public async Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true)
@@ -533,6 +549,15 @@ namespace Qlik.Sense.RestClient
         public Task<HttpResponseMessage> PostHttpAsync(string endpoint, JToken body, bool throwOnFailure = true)
         {
             return PostHttpAsync(endpoint, body.ToString(Formatting.None), throwOnFailure);
+        }
+
+        public async Task<HttpResponseMessage> PostHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true)
+        {
+            ValidateConfiguration();
+            if (!await AuthenticateAsync().ConfigureAwait(false))
+                throw new AuthenticationException("Authentication failed.");
+            var client = GetClient();
+            return await client.PostHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure).ConfigureAwait(false);
         }
 
         public string Post(string endpoint, byte[] body)
@@ -572,6 +597,13 @@ namespace Qlik.Sense.RestClient
             return Put(endpoint, body.ToString(Formatting.None));
         }
 
+        public string Put(string endpoint, HttpContent content)
+        {
+            var task = PutAsync(endpoint, content);
+            task.ConfigureAwait(false);
+            return task.Result;
+        }
+
         public T Put<T>(string endpoint, string body)
         {
             return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
@@ -589,6 +621,13 @@ namespace Qlik.Sense.RestClient
             return task.Result;
         }
 
+        public HttpResponseMessage PutHttp(string endpoint, HttpContent content, bool throwOnFailure = true)
+        {
+            var task = PutHttpAsync(endpoint, content, throwOnFailure);
+            task.ConfigureAwait(false);
+            return task.Result;
+        }
+
         public Task<string> PutAsync(string endpoint, string body)
         {
             return PerformUploadStringAccessAsync("PUT", endpoint, body);
@@ -597,6 +636,15 @@ namespace Qlik.Sense.RestClient
         public Task<string> PutAsync(string endpoint, JToken body)
         {
             return PutAsync(endpoint, body.ToString(Formatting.None));
+        }
+
+        public async Task<string> PutAsync(string endpoint, HttpContent content)
+        {
+            ValidateConfiguration();
+            if (!await AuthenticateAsync().ConfigureAwait(false))
+                throw new AuthenticationException("Authentication failed.");
+            var client = GetClient();
+            return await client.PutHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
         }
 
         public Task<T> PutAsync<T>(string endpoint, string body)
@@ -609,14 +657,18 @@ namespace Qlik.Sense.RestClient
             return PutAsync<T>(endpoint, body.ToString(Formatting.None));
         }
 
-        public async Task<T> PutAsync<T>(string endpoint, HttpContent content)
+        public Task<T> PutAsync<T>(string endpoint, HttpContent content)
+        {
+            return PutAsync(endpoint, content).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+        }
+
+        public async Task<HttpResponseMessage> PutHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true)
         {
             ValidateConfiguration();
             if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
             var client = GetClient();
-            var rsp = await client.PutHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<T>(rsp);
+            return await client.PostHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure).ConfigureAwait(false);
         }
 
         public string Delete(string endpoint)
