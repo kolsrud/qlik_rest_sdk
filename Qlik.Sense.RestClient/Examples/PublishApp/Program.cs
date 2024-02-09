@@ -17,7 +17,7 @@ namespace PublishApp
             var appId = "app-identifer";
             var streamId = "stream-identifier";
             using (new RestClientDebugConsole())
-                restClient.Put(string.Format("/qrs/app/{0}/publish?stream={1}", appId, streamId), "");
+                restClient.Put($"/qrs/app/{appId}/publish?stream={streamId}");
         }
     }
 }
