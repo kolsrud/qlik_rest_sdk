@@ -684,7 +684,7 @@ namespace Qlik.Sense.RestClient
             if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
             var client = GetClient();
-            return await client.PostHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure).ConfigureAwait(false);
+            return await client.PutHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure).ConfigureAwait(false);
         }
 
         public string Delete(string endpoint)
