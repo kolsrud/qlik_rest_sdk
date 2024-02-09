@@ -536,7 +536,7 @@ namespace Qlik.Sense.RestClient
             return await LogReceive(client.PostHttpContentAsync(BaseUri.Append(endpoint), content)).ConfigureAwait(false);
         }
 
-        public Task<T> PostAsync<T>(string endpoint, string body)
+        public Task<T> PostAsync<T>(string endpoint, string body = "")
         {
             return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
@@ -603,7 +603,7 @@ namespace Qlik.Sense.RestClient
             return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
 
-        public string Put(string endpoint, string body)
+        public string Put(string endpoint, string body = "")
         {
             return PerformUploadStringAccess("PUT", endpoint, body);
         }
@@ -620,7 +620,7 @@ namespace Qlik.Sense.RestClient
             return task.Result;
         }
 
-        public T Put<T>(string endpoint, string body)
+        public T Put<T>(string endpoint, string body = "")
         {
             return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
         }
@@ -644,7 +644,7 @@ namespace Qlik.Sense.RestClient
             return task.Result;
         }
 
-        public Task<string> PutAsync(string endpoint, string body)
+        public Task<string> PutAsync(string endpoint, string body = "")
         {
             return PerformUploadStringAccessAsync("PUT", endpoint, body);
         }
@@ -663,7 +663,7 @@ namespace Qlik.Sense.RestClient
             return await client.PutHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
         }
 
-        public Task<T> PutAsync<T>(string endpoint, string body)
+        public Task<T> PutAsync<T>(string endpoint, string body = "")
         {
             return PutAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
