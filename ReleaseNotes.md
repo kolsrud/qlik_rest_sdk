@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v1.16.0
+* **NEW FEATURE:** Added debug logging for PostHttp endpoints.
+
 ## v1.15.0
 * **NEW FEATURE:** Added method `QcsSessionInfo.GetJObject()` to simplify interaction with the .NET SDK.
 * **NEW FEATURE:** Added additional endpoints accepting `HttpContent` as argument.

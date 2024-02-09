@@ -291,6 +291,19 @@ namespace Qlik.Sense.RestClient
             return stream;
         }
 
+        private static async Task<HttpResponseMessage> LogReceive(Task<HttpResponseMessage> streamTask)
+        {
+	        var rsp = await streamTask.ConfigureAwait(false);
+	        var contents = new[]
+	        {
+		        "Status Code:    " + (int) rsp.StatusCode + " (" + rsp.StatusCode + ")",
+		        "Content length: " + rsp.Content.Headers.ContentLength,
+                "Content type:   " + rsp.Content.Headers.ContentType
+	        }.Select(str => "   " + str).ToArray();
+	        RestClientDebugConsole?.Log($"Receiving HTTP response:\n" + string.Join(Environment.NewLine, contents));
+	        return rsp;
+        }
+
         public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
         {
             return LoadCertificateFromDirectory(path, p => new X509Certificate2(p));
@@ -518,8 +531,9 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
-            var client = GetClient();
-            return await client.PostHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
+            LogCall("POST", endpoint);
+			var client = GetClient();
+            return await LogReceive(client.PostHttpContentAsync(BaseUri.Append(endpoint), content)).ConfigureAwait(false);
         }
 
         public Task<T> PostAsync<T>(string endpoint, string body)
@@ -542,8 +556,9 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
-            var client = GetClient();
-            return await client.PostHttpAsync(BaseUri.Append(endpoint), body, throwOnFailure).ConfigureAwait(false);
+            LogCall("POST", endpoint);
+			var client = GetClient();
+            return await LogReceive(client.PostHttpAsync(BaseUri.Append(endpoint), body, throwOnFailure)).ConfigureAwait(false);
         }
 
         public Task<HttpResponseMessage> PostHttpAsync(string endpoint, JToken body, bool throwOnFailure = true)
@@ -556,8 +571,9 @@ namespace Qlik.Sense.RestClient
             ValidateConfiguration();
             if (!await AuthenticateAsync().ConfigureAwait(false))
                 throw new AuthenticationException("Authentication failed.");
-            var client = GetClient();
-            return await client.PostHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure).ConfigureAwait(false);
+            LogCall("POST", endpoint);
+			var client = GetClient();
+            return await LogReceive(client.PostHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure)).ConfigureAwait(false);
         }
 
         public string Post(string endpoint, byte[] body)
