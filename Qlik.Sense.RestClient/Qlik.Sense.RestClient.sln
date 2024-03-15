@@ -45,7 +45,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsConnectApiKey", "Example
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsConnectJwt", "Examples\QcsConnectJwt\QcsConnectJwt.csproj", "{C45E56CE-FEDE-4882-8857-B2260F2A2FD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QcsUploadDataFile", "Examples\QcsUploadDataFile\QcsUploadDataFile.csproj", "{CAA53B6D-058E-4051-BF37-EC63A383C34B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsUploadDataFile", "Examples\QcsUploadDataFile\QcsUploadDataFile.csproj", "{CAA53B6D-058E-4051-BF37-EC63A383C34B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QcsExportPdf", "Examples\QcsExportPdf\QcsExportPdf.csproj", "{CD9FBF6D-D57D-4090-A8FE-713DB1937021}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,6 +123,10 @@ Global
 		{CAA53B6D-058E-4051-BF37-EC63A383C34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAA53B6D-058E-4051-BF37-EC63A383C34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAA53B6D-058E-4051-BF37-EC63A383C34B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,6 +147,7 @@ Global
 		{4C08115D-AF41-4CA6-B221-3D042B779910} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{C45E56CE-FEDE-4882-8857-B2260F2A2FD7} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 		{CAA53B6D-058E-4051-BF37-EC63A383C34B} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
+		{CD9FBF6D-D57D-4090-A8FE-713DB1937021} = {8A6FDDB7-49FB-4DF6-B44A-3D09B7AC0D0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62407092-C20D-43DF-A754-AB8F1BC671F5}
