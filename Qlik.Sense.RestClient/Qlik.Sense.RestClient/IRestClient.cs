@@ -29,6 +29,7 @@ namespace Qlik.Sense.RestClient
         Task<byte[]> GetBytesAsync(string endpoint);
         Stream GetStream(string endpoint);
         Task<Stream> GetStreamAsync(string endpoint);
+        HttpResponseMessage GetHttp(string endpoint, bool throwOnFailure = true);
         Task<HttpResponseMessage> GetHttpAsync(string endpoint, bool throwOnFailure = true);
 
         /// <summary>

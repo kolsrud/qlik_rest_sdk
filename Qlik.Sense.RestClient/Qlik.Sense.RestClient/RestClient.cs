@@ -61,7 +61,7 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
-        private readonly Lazy<SenseHttpClient> _client;
+		private readonly Lazy<SenseHttpClient> _client;
 
         private RestClient(ConnectionSettings settings, Statistics stats) : this(settings)
         {
@@ -291,20 +291,32 @@ namespace Qlik.Sense.RestClient
             return stream;
         }
 
+        private HttpResponseMessage LogReceive(HttpResponseMessage rsp)
+        {
+	        RestClientDebugConsole?.Log(PrintHttpResponseLog(rsp));
+	        return rsp;
+        }
+
         private static async Task<HttpResponseMessage> LogReceive(Task<HttpResponseMessage> streamTask)
         {
 	        var rsp = await streamTask.ConfigureAwait(false);
+	        RestClientDebugConsole?.Log(PrintHttpResponseLog(rsp));
+	        return rsp;
+        }
+
+        private static string PrintHttpResponseLog(HttpResponseMessage rsp)
+        {
 	        var contents = new[]
 	        {
 		        "Status Code:    " + (int) rsp.StatusCode + " (" + rsp.StatusCode + ")",
 		        "Content length: " + rsp.Content.Headers.ContentLength,
-                "Content type:   " + rsp.Content.Headers.ContentType
+		        "Content type:   " + rsp.Content.Headers.ContentType
 	        }.Select(str => "   " + str).ToArray();
-	        RestClientDebugConsole?.Log($"Receiving HTTP response:\n" + string.Join(Environment.NewLine, contents));
-	        return rsp;
+
+	        return $"Receiving HTTP response:\n" + string.Join(Environment.NewLine, contents);
         }
 
-        public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
+		public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
         {
             return LoadCertificateFromDirectory(path, p => new X509Certificate2(p));
         }
@@ -400,10 +412,20 @@ namespace Qlik.Sense.RestClient
             return GetAsync(endpoint).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
 
+        public HttpResponseMessage GetHttp(string endpoint, bool throwOnFailure = true)
+        {
+	        var client = GetClient();
+	        LogCall("GET", endpoint);
+	        var task = client.GetHttpAsync(BaseUri.Append(endpoint), throwOnFailure);
+	        task.ConfigureAwait(false);
+	        return LogReceive(task.Result);
+		}
+
         public Task<HttpResponseMessage> GetHttpAsync(string endpoint, bool throwOnFailure = true)
         {
-            var client = GetClient();
-            return client.GetHttpAsync(BaseUri.Append(endpoint), throwOnFailure);
+	        LogCall("GET", endpoint);
+	        var client = GetClient();
+            return LogReceive(client.GetHttpAsync(BaseUri.Append(endpoint), throwOnFailure));
         }
 
         public byte[] GetBytes(string endpoint)

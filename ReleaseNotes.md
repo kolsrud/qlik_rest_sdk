@@ -1,8 +1,9 @@
 # Release Notes for Qlik Sense Rest Client
 
 ## v1.16.0
-* **NEW FEATURE:** Added debug logging for `PostHttp` endpoints.
+* **NEW FEATURE:** Added debug logging for `GetHttp` and `PostHttp` endpoints.
 * **NEW FEATURE:** String body of `PUT` endpoints now default to empty string.
+* **NEW FEATURE:** Added method `GetHttp`, synchronous version of `GetHttpAsync`.
 * **BUG FIX:** `PutHttp` endpoints now correctly call `PUT` instead of `POST`.
 
 ## v1.15.0
