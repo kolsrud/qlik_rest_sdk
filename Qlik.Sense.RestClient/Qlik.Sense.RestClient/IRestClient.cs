@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -13,8 +14,10 @@ namespace Qlik.Sense.RestClient
         string UserId { get; }
         string UserDirectory { get; }
         QcsSessionInfo QcsSessionInfo { get; }
-
-        bool Authenticate();
+        Cookie GetCookie(string name);
+        CookieCollection GetCookies();
+        
+		bool Authenticate();
 
         IRestClient ConnectAsQmc();
         IRestClient ConnectAsHub();

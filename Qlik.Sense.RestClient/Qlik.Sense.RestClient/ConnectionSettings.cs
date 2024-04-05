@@ -270,11 +270,16 @@ namespace Qlik.Sense.RestClient
 
         internal Cookie GetCookie(string name)
         {
-            return CookieJar.GetCookies(BaseUri)[name];
+            return GetCookies()[name];
+        }
+
+        internal CookieCollection GetCookies()
+        {
+	        return CookieJar.GetCookies(BaseUri);
         }
     }
 
-    public class QcsSessionInfo
+	public class QcsSessionInfo
     {
         public string EasSid { get; }
         public string EasSidSig { get; }

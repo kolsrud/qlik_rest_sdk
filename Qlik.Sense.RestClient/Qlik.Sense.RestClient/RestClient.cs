@@ -61,6 +61,16 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
+        public Cookie GetCookie(string name)
+        {
+	        return _connectionSettings.GetCookie(name);
+        }
+
+        public CookieCollection GetCookies()
+        {
+	        return _connectionSettings.GetCookies();
+        }
+
 		private readonly Lazy<SenseHttpClient> _client;
 
         private RestClient(ConnectionSettings settings, Statistics stats) : this(settings)
