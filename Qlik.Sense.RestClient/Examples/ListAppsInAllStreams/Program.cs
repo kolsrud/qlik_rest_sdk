@@ -9,9 +9,9 @@ namespace ListAppsInAllStreams
     {
         static void Main(string[] args)
         {
-            var senseServerUrl = args.Any() ? args[0] : "https://my.server.url";
-            var restClient = new RestClient(senseServerUrl);
-            restClient.AsNtlmUserViaProxy();
+	        var url = "<url>";
+	        var restClient = new RestClient(url);
+			restClient.AsNtlmUserViaProxy();
             foreach (var stream in restClient.Get<JArray>("/qrs/stream"))
             {
                 Console.WriteLine($"Apps in stream: {stream["id"]}: {stream["name"]}");

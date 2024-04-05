@@ -9,8 +9,8 @@ namespace CreateStream
     {
         static void Main(string[] args)
         {
-            var senseServerUrl = args.Any() ? args[0] : "https://my.server.url";
-            var restClient = new RestClient(senseServerUrl);
+	        var url = "<url>";
+            var restClient = new RestClient(url);
             restClient.AsNtlmUserViaProxy();
 
             dynamic body = new JObject();

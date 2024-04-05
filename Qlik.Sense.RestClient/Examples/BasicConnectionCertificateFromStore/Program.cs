@@ -8,8 +8,8 @@ namespace BasicConnectionCertificateFromStore
     {
         static void Main(string[] args)
         {
-            var senseServerUrl = args.Any() ? args[0] : "https://my.server.url";
-            var restClient = new RestClient(senseServerUrl);
+	        var url = "<url>";
+            var restClient = new RestClient(url);
             var certs = RestClient.LoadCertificateFromStore();
             restClient.AsDirectConnection(4242, false, certs);
             using (new RestClientDebugConsole())

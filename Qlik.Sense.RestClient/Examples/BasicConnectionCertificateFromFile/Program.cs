@@ -9,8 +9,8 @@ namespace BasicConnectionCertificateFromFile
     {
         static void Main(string[] args)
         {
-            var senseServerUrl = args.Any() ? args[0] : "https://my.server.url";
-            var restClient = new RestClient(senseServerUrl);
+	        var url = "<url>";
+            var restClient = new RestClient(url);
 
             var securePassword = new SecureString();
             foreach (var c in "mypassword".ToCharArray())

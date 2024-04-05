@@ -10,8 +10,8 @@ namespace AppExport
     {
         static void Main(string[] args)
         {
+	        var url = "<url>";
             var appId = "<appId>";
-            var url = "<url>";
 
             var restClient = new RestClient(url);
             restClient.AsNtlmUserViaProxy(false);

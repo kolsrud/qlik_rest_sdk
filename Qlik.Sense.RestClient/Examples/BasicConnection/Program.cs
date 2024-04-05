@@ -8,8 +8,8 @@ namespace BasicConnection
     {
         static void Main(string[] args)
         {
-            var senseServerUrl = args.Any() ? args[0] : "https://rd-yko-dnettest.rdlund.qliktech.com";
-            var restClient = new RestClient(senseServerUrl);
+	        var url = "<url>";
+            var restClient = new RestClient(url);
             restClient.AsNtlmUserViaProxy(false);
             using (new RestClientDebugConsole())
                 restClient.Get("/qrs/about");
