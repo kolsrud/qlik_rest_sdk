@@ -203,26 +203,34 @@ namespace Qlik.Sense.RestClient
         public void AsJwtViaProxy(string key, bool certificateValidation = true)
         {
 	        _connectionType = ConnectionType.JwtTokenViaProxy;
-	        _connectionSettings.AsJwtViaProxy(key, certificateValidation);
+            _connectionSettings.CertificateValidation = certificateValidation;
+            AsJwtToken(key);
         }
 
-        [Obsolete("Use method AsJwtViaProxy.")] // Obsolete since June 2020 
+		[Obsolete("Use method AsJwtViaProxy.")] // Obsolete since June 2020 
         public void AsJwtTokenViaProxy(string key, bool certificateValidation = true)
         {
             AsJwtViaProxy(key, certificateValidation);
         }
 
-        public void AsApiKeyViaQcs(string apiKey)
+        private void AsJwtToken(string key)
+        {
+	        CustomHeaders.Add("Authorization", "Bearer " + key);
+	        _connectionSettings.IsAuthenticated = false;
+        }
+
+		public void AsApiKeyViaQcs(string apiKey)
         {
 			_connectionType = ConnectionType.ApiKeyViaQcs;
-			_connectionSettings.AsApiKeyViaQcs(apiKey);
 			_connectionSettings.AllowAutoRedirect = false;
 			_connectionSettings.IsQcs = true;
+			AsJwtToken(apiKey);
+			_connectionSettings.IsAuthenticated = true;
         }
 
 		public void AsJsonWebTokenViaQcs(string key)
         {
-            _connectionSettings.AsJwtViaQcs(key);
+            AsJwtToken(key);
             _connectionSettings.IsQcs = true;
             _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
         }
@@ -812,7 +820,8 @@ namespace Qlik.Sense.RestClient
         {
             var token = await GetAccessTokenAsync().ConfigureAwait(false);
             _connectionType = ConnectionType.ApiKeyViaQcs;
-			_connectionSettings.AsApiKeyViaQcs(token);
+			AsJwtToken(token);
+			_connectionSettings.IsAuthenticated = true;
 			_connectionSettings.AllowAutoRedirect = false;
 			_connectionSettings.IsQcs = true;
 			RestClientDebugConsole?.Log($"Authentication complete.");

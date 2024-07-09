@@ -137,29 +137,6 @@ namespace Qlik.Sense.RestClient
             IsAuthenticated = true;
         }
 
-        private void AsJwtToken(string key)
-        {
-            CustomHeaders.Add("Authorization", "Bearer " + key);
-            IsAuthenticated = false;
-        }
-
-        public void AsJwtViaProxy(string key, bool certificateValidation)
-        {
-            CertificateValidation = certificateValidation;
-            AsJwtToken(key);
-        }
-
-        public void AsApiKeyViaQcs(string key)
-        {
-            AsJwtToken(key);
-            IsAuthenticated = true;
-        }
-
-        public void AsJwtViaQcs(string key)
-        {
-            AsJwtToken(key);
-        }
-
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
             ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
