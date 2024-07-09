@@ -15,6 +15,20 @@ using Qlik.Sense.RestClient.Qrs;
 
 namespace Qlik.Sense.RestClient
 {
+	public enum ConnectionType
+	{
+		DirectConnection,
+		NtlmUserViaProxy,
+		StaticHeaderUserViaProxy,
+		AnonymousViaProxy,
+		JwtTokenViaProxy,
+		JwtTokenViaQcs,
+		ApiKeyViaQcs,
+		ClientCredentialsViaQcs,
+		ExistingSessionViaProxy,
+		ExistingSessionViaQcs
+	}
+
     public class RestClient : IRestClient
     {
         internal static RestClientDebugConsole RestClientDebugConsole { private get; set; }
@@ -59,7 +73,9 @@ namespace Qlik.Sense.RestClient
 
         private readonly ConnectionSettings _connectionSettings;
 
-		public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
+        public ConnectionType CurrentConnectionType => _connectionType;
+
+        private ConnectionType _connectionType;
 
         public Cookie GetCookie(string name)
         {
@@ -83,6 +99,7 @@ namespace Qlik.Sense.RestClient
 			_client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
 			_connectionSettings = source._connectionSettings;
             _stats = source._stats;
+            _connectionType = source._connectionType;
 		}
 
         /// <summary>
@@ -165,18 +182,25 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
-            _connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
+	        if (certificateCollection == null)
+		        throw new ArgumentNullException(nameof(certificateCollection));
+			_connectionType = ConnectionType.DirectConnection;
+			_connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
         }
 
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
             bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
-            _connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation, certificateCollection);
+	        if (certificateCollection == null)
+		        throw new ArgumentNullException(nameof(certificateCollection));
+	        _connectionType = ConnectionType.DirectConnection;
+			_connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation, certificateCollection);
         }
 
         public void AsJwtViaProxy(string key, bool certificateValidation = true)
         {
-            _connectionSettings.AsJwtViaProxy(key, certificateValidation);
+	        _connectionType = ConnectionType.JwtTokenViaProxy;
+	        _connectionSettings.AsJwtViaProxy(key, certificateValidation);
         }
 
         [Obsolete("Use method AsJwtViaProxy.")] // Obsolete since June 2020 
@@ -187,30 +211,39 @@ namespace Qlik.Sense.RestClient
 
         public void AsApiKeyViaQcs(string apiKey)
         {
-            _connectionSettings.AsApiKeyViaQcs(apiKey);
+			_connectionType = ConnectionType.ApiKeyViaQcs;
+			_connectionSettings.AsApiKeyViaQcs(apiKey);
+			_connectionSettings.AllowAutoRedirect = false;
+			_connectionSettings.IsQcs = true;
         }
 
-        public void AsJsonWebTokenViaQcs(string key)
+		public void AsJsonWebTokenViaQcs(string key)
         {
             _connectionSettings.AsJwtViaQcs(key);
+            _connectionSettings.IsQcs = true;
             _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
         }
 
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
-            _connectionSettings.AsClientCredentialsViaQcs(clientId, clientSecret);
-            _connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
+	        _connectionType = ConnectionType.ClientCredentialsViaQcs;
+			_connectionSettings.AsClientCredentialsViaQcs(clientId, clientSecret);
+			_connectionSettings.AllowAutoRedirect = false;
+			_connectionSettings.IsQcs = true;
+			_connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
         }
 
         public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
         {
-            _connectionSettings.AsExistingSessionViaQcs(sessionInfo);
+	        _connectionType = ConnectionType.ExistingSessionViaQcs;
+	        _connectionSettings.IsQcs = true;
+	        _connectionSettings.AsExistingSessionViaQcs(sessionInfo);
         }
 
         [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
         public void AsJwtViaQcs(string key)
         {
-            _connectionSettings.AsApiKeyViaQcs(key);
+            AsApiKeyViaQcs(key);
         }
 
         [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since May 2020
@@ -221,27 +254,32 @@ namespace Qlik.Sense.RestClient
 
         public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)
         {
-            _connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
+	        _connectionType = ConnectionType.NtlmUserViaProxy;
+			_connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
+	        _connectionType = ConnectionType.NtlmUserViaProxy;
             _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
         }
 
         public void AsAnonymousUserViaProxy(bool certificateValidation = true)
         {
-            _connectionSettings.AsAnonymousUserViaProxy(certificateValidation);
+	        _connectionType = ConnectionType.AnonymousViaProxy;
+			_connectionSettings.AsAnonymousUserViaProxy(certificateValidation);
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
+	        _connectionType = ConnectionType.StaticHeaderUserViaProxy;
             _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
         }
 
         public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
-            _connectionSettings.AsExistingSessionViaProxy(sessionId, cookieHeaderName, proxyUsesSsl, certificateValidation);
+	        _connectionType = ConnectionType.ExistingSessionViaProxy;
+			_connectionSettings.AsExistingSessionViaProxy(sessionId, cookieHeaderName, proxyUsesSsl, certificateValidation);
         }
 
         public static X509Certificate2Collection LoadCertificateFromStore()
@@ -763,8 +801,11 @@ namespace Qlik.Sense.RestClient
         private async Task CollectAccessTokenViaOauthAsync()
         {
             var token = await GetAccessTokenAsync().ConfigureAwait(false);
-            _connectionSettings.AsApiKeyViaQcs(token);
-            RestClientDebugConsole?.Log($"Authentication complete.");
+            _connectionType = ConnectionType.ApiKeyViaQcs;
+			_connectionSettings.AsApiKeyViaQcs(token);
+			_connectionSettings.AllowAutoRedirect = false;
+			_connectionSettings.IsQcs = true;
+			RestClientDebugConsole?.Log($"Authentication complete.");
         }
 
         private async Task<string> GetAccessTokenAsync()
