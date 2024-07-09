@@ -16,7 +16,6 @@ namespace Qlik.Sense.RestClient
         public CookieContainer CookieJar { get; set; }
         public bool IsAuthenticated { get; private set; }
 
-        private bool _isConfigured = false;
         public bool AllowAutoRedirect = true;
         public bool IsQcs = false;
         public string UserDirectory;
@@ -80,7 +79,6 @@ namespace Qlik.Sense.RestClient
                 BaseUri = this.BaseUri,
                 CookieJar = this.CookieJar,
                 IsAuthenticated = this.IsAuthenticated,
-                _isConfigured = this._isConfigured,
 		        AllowAutoRedirect = this.AllowAutoRedirect,
 				IsQcs = this.IsQcs,
 				UserDirectory = this.UserDirectory,
@@ -139,13 +137,11 @@ namespace Qlik.Sense.RestClient
             var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
             CustomHeaders.Add("X-Qlik-User", userHeaderValue);
             IsAuthenticated = true;
-            _isConfigured = true;
         }
 
         private void AsJwtToken(string key)
         {
             CustomHeaders.Add("Authorization", "Bearer " + key);
-            _isConfigured = true;
             IsAuthenticated = false;
         }
 
@@ -169,7 +165,6 @@ namespace Qlik.Sense.RestClient
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
             ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
-            _isConfigured = true;
             IsAuthenticated = false;
         }
 
@@ -189,7 +184,6 @@ namespace Qlik.Sense.RestClient
         public void AsAnonymousUserViaProxy(bool certificateValidation = true)
         {
             CertificateValidation = certificateValidation;
-            _isConfigured = true;
             IsAuthenticated = true;
         }
 
@@ -203,7 +197,6 @@ namespace Qlik.Sense.RestClient
                 CustomCredential = credentialCache;
             }
             CustomHeaders.Add("User-Agent", "Windows");
-            _isConfigured = true;
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation)
@@ -213,14 +206,12 @@ namespace Qlik.Sense.RestClient
             UserDirectory = Environment.UserDomainName;
             StaticHeaderName = headerName;
             CustomHeaders.Add(headerName, userId);
-            _isConfigured = true;
         }
 
         public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
             CertificateValidation = certificateValidation;
             CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
-            _isConfigured = true;
             IsAuthenticated = true;
         }
 
@@ -229,8 +220,6 @@ namespace Qlik.Sense.RestClient
             CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
             CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
             CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
-
-            _isConfigured = true;
         }
 
         public QcsSessionInfo SessionInfo => new QcsSessionInfo(
@@ -238,12 +227,6 @@ namespace Qlik.Sense.RestClient
             GetCookie("eas.sid.sig")?.Value,
             GetCookie("_csrfToken")?.Value
         );
-
-        public void Validate()
-        {
-            if (!_isConfigured)
-                throw new RestClient.ConnectionNotConfiguredException();
-        }
 
         internal Cookie GetCookie(string name)
         {
