@@ -129,25 +129,6 @@ namespace Qlik.Sense.RestClient
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-        public void AsNtlmUserViaProxy(bool certificateValidation = true)
-        {
-            UserId = Environment.UserName;
-            UserDirectory = Environment.UserDomainName;
-            AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
-        }
-
-        public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
-        {
-            CertificateValidation = certificateValidation;
-            if (credential != null)
-            {
-                var credentialCache = new CredentialCache();
-                credentialCache.Add(this.BaseUri, "ntlm", credential);
-                CustomCredential = credentialCache;
-            }
-            CustomHeaders.Add("User-Agent", "Windows");
-        }
-
         public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
             CertificateValidation = certificateValidation;
