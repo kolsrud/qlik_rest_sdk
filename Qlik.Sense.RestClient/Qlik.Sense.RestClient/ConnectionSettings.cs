@@ -117,26 +117,6 @@ namespace Qlik.Sense.RestClient
         {
         }
 
-        public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
-            X509Certificate2Collection certificateCollection = null)
-        {
-            AsDirectConnection(Environment.UserDomainName, Environment.UserName, port, certificateValidation, certificateCollection);
-        }
-
-        public void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true,
-            X509Certificate2Collection certificateCollection = null)
-        {
-            var uriBuilder = new UriBuilder(BaseUri) { Port = port };
-            BaseUri = uriBuilder.Uri;
-            UserId = userId;
-            UserDirectory = userDirectory;
-            CertificateValidation = certificateValidation;
-            Certificates = certificateCollection;
-            var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
-            CustomHeaders.Add("X-Qlik-User", userHeaderValue);
-            IsAuthenticated = true;
-        }
-
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
             ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);

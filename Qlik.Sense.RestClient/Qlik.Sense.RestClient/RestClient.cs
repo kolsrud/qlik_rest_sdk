@@ -185,10 +185,7 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
-	        if (certificateCollection == null)
-		        throw new ArgumentNullException(nameof(certificateCollection));
-			_connectionType = ConnectionType.DirectConnection;
-			_connectionSettings.AsDirectConnection(port, certificateValidation, certificateCollection);
+            AsDirectConnection(Environment.UserDomainName, Environment.UserName, port, certificateValidation, certificateCollection);
         }
 
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
@@ -197,7 +194,15 @@ namespace Qlik.Sense.RestClient
 	        if (certificateCollection == null)
 		        throw new ArgumentNullException(nameof(certificateCollection));
 	        _connectionType = ConnectionType.DirectConnection;
-			_connectionSettings.AsDirectConnection(userDirectory, userId, port, certificateValidation, certificateCollection);
+	        var uriBuilder = new UriBuilder(BaseUri) { Port = port };
+	        _connectionSettings.BaseUri = uriBuilder.Uri;
+	        _connectionSettings.UserId = userId;
+	        _connectionSettings.UserDirectory = userDirectory;
+	        _connectionSettings.CertificateValidation = certificateValidation;
+	        _connectionSettings.Certificates = certificateCollection;
+	        var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
+	        CustomHeaders.Add("X-Qlik-User", userHeaderValue);
+	        _connectionSettings.IsAuthenticated = true;
         }
 
         public void AsJwtViaProxy(string key, bool certificateValidation = true)
