@@ -249,12 +249,6 @@ namespace Qlik.Sense.RestClient
 			_connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
         }
 
-        public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
-        {
-	        _connectionType = ConnectionType.ExistingSessionViaQcs;
-	        _connectionSettings.IsQcs = true;
-	        _connectionSettings.AsExistingSessionViaQcs(sessionInfo);
-        }
 
         [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
         public void AsJwtViaQcs(string key)
@@ -308,10 +302,21 @@ namespace Qlik.Sense.RestClient
 		public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
 	        _connectionType = ConnectionType.ExistingSessionViaProxy;
-			_connectionSettings.AsExistingSessionViaProxy(sessionId, cookieHeaderName, proxyUsesSsl, certificateValidation);
+			_connectionSettings.CertificateValidation = certificateValidation;
+			_connectionSettings.CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
+			_connectionSettings.IsAuthenticated = true;
         }
 
-        public static X509Certificate2Collection LoadCertificateFromStore()
+        public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
+		{
+			_connectionType = ConnectionType.ExistingSessionViaQcs;
+			_connectionSettings.IsQcs = true;
+			_connectionSettings.CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
+			_connectionSettings.CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
+			CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
+		}
+
+		public static X509Certificate2Collection LoadCertificateFromStore()
         {
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);

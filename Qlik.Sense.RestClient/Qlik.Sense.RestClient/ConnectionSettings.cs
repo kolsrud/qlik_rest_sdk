@@ -129,20 +129,6 @@ namespace Qlik.Sense.RestClient
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-        public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
-        {
-            CertificateValidation = certificateValidation;
-            CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
-            IsAuthenticated = true;
-        }
-
-        public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
-        {
-            CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
-            CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
-            CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
-        }
-
         public QcsSessionInfo SessionInfo => new QcsSessionInfo(
             GetCookie("eas.sid")?.Value,
             GetCookie("eas.sid.sig")?.Value,
