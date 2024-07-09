@@ -276,10 +276,14 @@ namespace Qlik.Sense.RestClient
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
 	        _connectionType = ConnectionType.StaticHeaderUserViaProxy;
-            _connectionSettings.AsStaticHeaderUserViaProxy(userId, headerName, certificateValidation);
-        }
+            _connectionSettings.CertificateValidation = certificateValidation;
+            _connectionSettings.UserId = userId;
+            // Todo: This is incorrect. We do not know the UserDirectory in this case. That's controlled by the virtual proxy.
+            _connectionSettings.UserDirectory = Environment.UserDomainName;
+            _connectionSettings.CustomHeaders.Add(headerName, userId);
+		}
 
-        public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
+		public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
 	        _connectionType = ConnectionType.ExistingSessionViaProxy;
 			_connectionSettings.AsExistingSessionViaProxy(sessionId, cookieHeaderName, proxyUsesSsl, certificateValidation);
