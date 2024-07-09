@@ -63,12 +63,7 @@ namespace Qlik.Sense.RestClient
             if (_connectionSettings.CertificateValidation == false)
                 DeactivateCertificateValidation();
 
-            if (_connectionSettings.ConnectionType == ConnectionType.ApiKeyViaQcs
-                || _connectionSettings.ConnectionType == ConnectionType.ClientCredentialsViaQcs
-                )
-            {
-                _clientHandler.AllowAutoRedirect = false;
-            }
+            _clientHandler.AllowAutoRedirect = _connectionSettings.AllowAutoRedirect;
 
             var client = new HttpClient(_clientHandler);
             foreach (var header in _connectionSettings.CustomHeaders)
@@ -96,7 +91,7 @@ namespace Qlik.Sense.RestClient
             client.DefaultRequestHeaders.Add(name, value);
         }
 
-        private bool UseXrfKey => !new[] { ConnectionType.JwtTokenViaQcs, ConnectionType.ApiKeyViaQcs, ConnectionType.ClientCredentialsViaQcs }.Contains(_connectionSettings.ConnectionType);
+        private bool UseXrfKey => !_connectionSettings.IsQcs;
 
         public Task<HttpResponseMessage> GetHttpAsync(Uri uri, bool throwOnFailure = true)
         {

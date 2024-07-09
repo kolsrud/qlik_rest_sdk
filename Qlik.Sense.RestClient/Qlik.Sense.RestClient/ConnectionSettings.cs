@@ -9,20 +9,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Qlik.Sense.RestClient
 {
-    public enum ConnectionType
-    {
-        DirectConnection,
-        NtlmUserViaProxy,
-        StaticHeaderUserViaProxy,
-        AnonymousViaProxy,
-        JwtTokenViaProxy,
-        JwtTokenViaQcs,
-        ApiKeyViaQcs,
-        ClientCredentialsViaQcs,
-        ExistingSessionViaProxy,
-        ExistingSessionViaQcs
-    }
-
     internal class ConnectionSettings : IConnectionConfigurator
     {
         public Uri BaseUri { get; set; }
@@ -31,7 +17,8 @@ namespace Qlik.Sense.RestClient
         public bool IsAuthenticated { get; private set; }
 
         private bool _isConfigured = false;
-        public ConnectionType ConnectionType;
+        public bool AllowAutoRedirect = true;
+        public bool IsQcs = false;
         public string UserDirectory;
         public string UserId;
         public string StaticHeaderName;
@@ -94,8 +81,9 @@ namespace Qlik.Sense.RestClient
                 CookieJar = this.CookieJar,
                 IsAuthenticated = this.IsAuthenticated,
                 _isConfigured = this._isConfigured,
-                ConnectionType = this.ConnectionType,
-                UserDirectory = this.UserDirectory,
+		        AllowAutoRedirect = this.AllowAutoRedirect,
+				IsQcs = this.IsQcs,
+				UserDirectory = this.UserDirectory,
                 UserId = this.UserId,
                 StaticHeaderName = this.StaticHeaderName,
                 CertificateValidation = this.CertificateValidation,
@@ -142,7 +130,6 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242, bool certificateValidation = true,
             X509Certificate2Collection certificateCollection = null)
         {
-            ConnectionType = ConnectionType.DirectConnection;
             var uriBuilder = new UriBuilder(BaseUri) { Port = port };
             BaseUri = uriBuilder.Uri;
             UserId = userId;
@@ -155,10 +142,8 @@ namespace Qlik.Sense.RestClient
             _isConfigured = true;
         }
 
-        private void AsJwtToken(string key, ConnectionType type)
+        private void AsJwtToken(string key)
         {
-            if (!_isConfigured)
-                ConnectionType = type;
             CustomHeaders.Add("Authorization", "Bearer " + key);
             _isConfigured = true;
             IsAuthenticated = false;
@@ -167,23 +152,22 @@ namespace Qlik.Sense.RestClient
         public void AsJwtViaProxy(string key, bool certificateValidation)
         {
             CertificateValidation = certificateValidation;
-            AsJwtToken(key, ConnectionType.JwtTokenViaProxy);
+            AsJwtToken(key);
         }
 
         public void AsApiKeyViaQcs(string key)
         {
-            AsJwtToken(key, ConnectionType.ApiKeyViaQcs);
+            AsJwtToken(key);
             IsAuthenticated = true;
         }
 
         public void AsJwtViaQcs(string key)
         {
-            AsJwtToken(key, ConnectionType.JwtTokenViaQcs);
+            AsJwtToken(key);
         }
 
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
-            ConnectionType = ConnectionType.ClientCredentialsViaQcs;
             ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
             _isConfigured = true;
             IsAuthenticated = false;
@@ -204,7 +188,6 @@ namespace Qlik.Sense.RestClient
 
         public void AsAnonymousUserViaProxy(bool certificateValidation = true)
         {
-            ConnectionType = ConnectionType.AnonymousViaProxy;
             CertificateValidation = certificateValidation;
             _isConfigured = true;
             IsAuthenticated = true;
@@ -212,7 +195,6 @@ namespace Qlik.Sense.RestClient
 
         public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
         {
-            ConnectionType = ConnectionType.NtlmUserViaProxy;
             CertificateValidation = certificateValidation;
             if (credential != null)
             {
@@ -226,7 +208,6 @@ namespace Qlik.Sense.RestClient
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation)
         {
-            ConnectionType = ConnectionType.StaticHeaderUserViaProxy;
             CertificateValidation = certificateValidation;
             UserId = userId;
             UserDirectory = Environment.UserDomainName;
@@ -237,7 +218,6 @@ namespace Qlik.Sense.RestClient
 
         public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
-            ConnectionType = ConnectionType.ExistingSessionViaProxy;
             CertificateValidation = certificateValidation;
             CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
             _isConfigured = true;
@@ -246,7 +226,6 @@ namespace Qlik.Sense.RestClient
 
         public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
         {
-            ConnectionType = ConnectionType.ExistingSessionViaQcs;
             CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
             CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
             CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
@@ -264,8 +243,6 @@ namespace Qlik.Sense.RestClient
         {
             if (!_isConfigured)
                 throw new RestClient.ConnectionNotConfiguredException();
-            if (ConnectionType == ConnectionType.DirectConnection && Certificates == null)
-                throw new RestClient.CertificatesNotLoadedException();
         }
 
         internal Cookie GetCookie(string name)
