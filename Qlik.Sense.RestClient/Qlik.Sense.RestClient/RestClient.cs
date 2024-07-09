@@ -17,6 +17,7 @@ namespace Qlik.Sense.RestClient
 {
 	public enum ConnectionType
 	{
+        Undefined,
 		DirectConnection,
 		NtlmUserViaProxy,
 		StaticHeaderUserViaProxy,
@@ -75,7 +76,9 @@ namespace Qlik.Sense.RestClient
 
         public ConnectionType CurrentConnectionType => _connectionType;
 
-        private ConnectionType _connectionType;
+        private ConnectionType _connectionType = ConnectionType.Undefined;
+
+        private bool IsConfigured => _connectionType != ConnectionType.Undefined;
 
         public Cookie GetCookie(string name)
         {
@@ -769,9 +772,11 @@ namespace Qlik.Sense.RestClient
             return PerformUploadStringAccessAsync("DELETE", endpoint, "");
         }
 
+
         private void ValidateConfiguration()
         {
-            _connectionSettings.Validate();
+	        if (!IsConfigured)
+		        throw new RestClient.ConnectionNotConfiguredException();
         }
 
         private async Task CollectCookieAsync()
