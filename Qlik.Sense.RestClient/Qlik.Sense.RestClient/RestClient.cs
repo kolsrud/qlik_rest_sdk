@@ -268,16 +268,24 @@ namespace Qlik.Sense.RestClient
             AsJwtViaQcs(key);
         }
 
-        public void AsNtlmUserViaProxy(NetworkCredential credentials, bool certificateValidation = true)
-        {
-	        _connectionType = ConnectionType.NtlmUserViaProxy;
-			_connectionSettings.AsNtlmUserViaProxy(credentials, certificateValidation);
-        }
-
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
+	        _connectionSettings.UserId = Environment.UserName;
+	        _connectionSettings.UserDirectory = Environment.UserDomainName;
+	        AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
+        }
+
+        public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
+        {
 	        _connectionType = ConnectionType.NtlmUserViaProxy;
-            _connectionSettings.AsNtlmUserViaProxy(certificateValidation);
+			_connectionSettings.CertificateValidation = certificateValidation;
+	        if (credential != null)
+	        {
+		        var credentialCache = new CredentialCache();
+		        credentialCache.Add(this.BaseUri, "ntlm", credential);
+		        _connectionSettings.CustomCredential = credentialCache;
+	        }
+	        CustomHeaders.Add("User-Agent", "Windows");
         }
 
         public void AsAnonymousUserViaProxy(bool certificateValidation = true)
