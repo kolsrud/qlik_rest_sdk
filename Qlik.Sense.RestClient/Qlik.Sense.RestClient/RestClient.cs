@@ -59,7 +59,7 @@ namespace Qlik.Sense.RestClient
 
         private readonly ConnectionSettings _connectionSettings;
 
-        public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
+		public ConnectionType CurrentConnectionType => _connectionSettings.ConnectionType;
 
         public Cookie GetCookie(string name)
         {
@@ -73,16 +73,17 @@ namespace Qlik.Sense.RestClient
 
 		private readonly Lazy<SenseHttpClient> _client;
 
-        private RestClient(ConnectionSettings settings, Statistics stats) : this(settings)
-        {
-            _stats = stats;
-        }
+		private RestClient()
+		{
+			_client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
+		}
 
-        private RestClient(ConnectionSettings settings)
-        {
-            _connectionSettings = settings;
-            _client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
-        }
+		private RestClient(RestClient source) : this()
+		{
+			_client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
+			_connectionSettings = source._connectionSettings;
+            _stats = source._stats;
+		}
 
         /// <summary>
         /// Experimental
@@ -94,9 +95,10 @@ namespace Qlik.Sense.RestClient
             _stats = stats;
         }
 
-        public RestClient(Uri uri) : this(new ConnectionSettings(uri))
+        public RestClient(Uri uri) : this()
         {
-            _connectionSettings.AuthenticationFunc = CollectCookieAsync;
+	        _connectionSettings = new ConnectionSettings(uri);
+			_connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
         public RestClient(string uri) : this(new Uri(uri))
@@ -105,28 +107,28 @@ namespace Qlik.Sense.RestClient
 
         public IRestClient ConnectAsQmc()
         {
-            var client = new RestClient(_connectionSettings.Clone(), _stats);
+            var client = new RestClient(this);
             client.CustomHeaders["X-Qlik-Security"] = "Context=ManagementAccess";
             return client;
         }
 
         public IRestClient ConnectAsHub()
         {
-            var client = new RestClient(_connectionSettings.Clone(), _stats);
+	        var client = new RestClient(this);
             client.CustomHeaders["X-Qlik-Security"] = "Context=AppAccess";
             return client;
         }
 
         public IRestClient WithXrfkey(string xrfkey)
         {
-            var client = new RestClient(_connectionSettings.Clone(), _stats);
+            var client = new RestClient(this);
             client._connectionSettings.SetXrfKey(xrfkey);
             return client;
         }
 
         public IRestClient WithContentType(string contentType)
         {
-            var client = new RestClient(_connectionSettings.Clone(), _stats);
+            var client = new RestClient(this);
             client._connectionSettings.ContentType = contentType;
             return client;
         }
