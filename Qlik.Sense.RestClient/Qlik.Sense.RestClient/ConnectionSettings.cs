@@ -14,7 +14,7 @@ namespace Qlik.Sense.RestClient
         public Uri BaseUri { get; set; }
 
         public CookieContainer CookieJar { get; set; }
-        public bool IsAuthenticated { get; private set; }
+        public bool IsAuthenticated { get; set; }
 
         public bool AllowAutoRedirect = true;
         public bool IsQcs = false;
@@ -177,12 +177,6 @@ namespace Qlik.Sense.RestClient
             UserId = Environment.UserName;
             UserDirectory = Environment.UserDomainName;
             AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
-        }
-
-        public void AsAnonymousUserViaProxy(bool certificateValidation = true)
-        {
-            CertificateValidation = certificateValidation;
-            IsAuthenticated = true;
         }
 
         public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)

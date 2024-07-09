@@ -270,7 +270,8 @@ namespace Qlik.Sense.RestClient
         public void AsAnonymousUserViaProxy(bool certificateValidation = true)
         {
 	        _connectionType = ConnectionType.AnonymousViaProxy;
-			_connectionSettings.AsAnonymousUserViaProxy(certificateValidation);
+	        _connectionSettings.CertificateValidation = certificateValidation;
+	        _connectionSettings.IsAuthenticated = true;
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
