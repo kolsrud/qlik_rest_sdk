@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Qlik.Sense.RestClient
 {
-    internal class ConnectionSettings : IConnectionConfigurator
+    internal class ConnectionSettings
     {
         public Uri BaseUri { get; set; }
 
@@ -20,7 +20,6 @@ namespace Qlik.Sense.RestClient
         public bool IsQcs = false;
         public string UserDirectory;
         public string UserId;
-        public string StaticHeaderName;
         public string ClientCredentialsEncoded;
         public ICredentials CustomCredential;
         public TimeSpan Timeout;
@@ -83,7 +82,6 @@ namespace Qlik.Sense.RestClient
 				IsQcs = this.IsQcs,
 				UserDirectory = this.UserDirectory,
                 UserId = this.UserId,
-                StaticHeaderName = this.StaticHeaderName,
                 CertificateValidation = this.CertificateValidation,
                 Certificates = this.Certificates,
                 CustomCredential = this.CustomCredential,
@@ -197,15 +195,6 @@ namespace Qlik.Sense.RestClient
                 CustomCredential = credentialCache;
             }
             CustomHeaders.Add("User-Agent", "Windows");
-        }
-
-        public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation)
-        {
-            CertificateValidation = certificateValidation;
-            UserId = userId;
-            UserDirectory = Environment.UserDomainName;
-            StaticHeaderName = headerName;
-            CustomHeaders.Add(headerName, userId);
         }
 
         public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
