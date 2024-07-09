@@ -243,14 +243,14 @@ namespace Qlik.Sense.RestClient
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
 	        _connectionType = ConnectionType.ClientCredentialsViaQcs;
-			_connectionSettings.AsClientCredentialsViaQcs(clientId, clientSecret);
+            _connectionSettings.SetClientCredentials(clientId, clientSecret);
+			_connectionSettings.IsAuthenticated = false;
 			_connectionSettings.AllowAutoRedirect = false;
 			_connectionSettings.IsQcs = true;
 			_connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
         }
 
-
-        [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
+		[Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
         public void AsJwtViaQcs(string key)
         {
             AsApiKeyViaQcs(key);

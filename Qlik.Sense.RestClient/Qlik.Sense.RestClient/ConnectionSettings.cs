@@ -117,13 +117,12 @@ namespace Qlik.Sense.RestClient
         {
         }
 
-        public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
+        public void SetClientCredentials(string clientId, string clientSecret)
         {
-            ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
-            IsAuthenticated = false;
+	        ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
         }
 
-        private static string Base64Encode(string plainText)
+		private static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             return System.Convert.ToBase64String(plainTextBytes);
