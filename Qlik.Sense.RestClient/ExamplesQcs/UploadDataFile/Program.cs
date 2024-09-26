@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
-namespace QcsUploadDataFile
+namespace UploadDataFile
 {
     internal class Program
     {
