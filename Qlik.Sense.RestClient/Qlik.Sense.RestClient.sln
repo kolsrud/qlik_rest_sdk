@@ -51,6 +51,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExamplesQcs", "ExamplesQcs"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExamplesClientManaged", "ExamplesClientManaged", "{38AD5232-8F19-4F27-B2C0-BDE98EA1E7BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QcsListAllApps", "ExamplesQcs\QcsListAllApps\QcsListAllApps.csproj", "{5884A77D-3298-4611-AC39-D72BDB7F8818}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD9FBF6D-D57D-4090-A8FE-713DB1937021}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5884A77D-3298-4611-AC39-D72BDB7F8818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5884A77D-3298-4611-AC39-D72BDB7F8818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5884A77D-3298-4611-AC39-D72BDB7F8818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5884A77D-3298-4611-AC39-D72BDB7F8818}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{C45E56CE-FEDE-4882-8857-B2260F2A2FD7} = {36E045ED-754D-4D8F-8419-7A81E8BB102F}
 		{CAA53B6D-058E-4051-BF37-EC63A383C34B} = {36E045ED-754D-4D8F-8419-7A81E8BB102F}
 		{CD9FBF6D-D57D-4090-A8FE-713DB1937021} = {36E045ED-754D-4D8F-8419-7A81E8BB102F}
+		{5884A77D-3298-4611-AC39-D72BDB7F8818} = {36E045ED-754D-4D8F-8419-7A81E8BB102F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62407092-C20D-43DF-A754-AB8F1BC671F5}
