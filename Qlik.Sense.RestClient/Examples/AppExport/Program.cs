@@ -10,7 +10,7 @@ namespace AppExport
     {
         static void Main(string[] args)
         {
-	        var url = "<url>";
+            var url = "<url>";
             var appId = "<appId>";
 
             var restClient = new RestClient(url);
