@@ -31,27 +31,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qlik.Sense.Jwt", "Qlik.Sens
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListAppsInAllStreams", "ExamplesClientManaged\ListAppsInAllStreams\ListAppsInAllStreams.csproj", "{1B0976A8-9280-4403-8B01-828C17313A10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsExportExcel", "ExamplesQcs\QcsExportExcel\QcsExportExcel.csproj", "{74E19033-AAFE-4550-BE32-62C7EB51C939}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExportExcel", "ExamplesQcs\ExportExcel\ExportExcel.csproj", "{74E19033-AAFE-4550-BE32-62C7EB51C939}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsConnectClientCredentials", "ExamplesQcs\QcsConnectClientCredentials\QcsConnectClientCredentials.csproj", "{5DBEFD5C-B160-4593-BDC5-C7DEE640559D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectClientCredentials", "ExamplesQcs\ConnectClientCredentials\ConnectClientCredentials.csproj", "{5DBEFD5C-B160-4593-BDC5-C7DEE640559D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsImportExtension", "ExamplesQcs\QcsImportExtension\QcsImportExtension.csproj", "{9D2F8DF0-B13C-4BDE-B9CF-BE033C1A47A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportExtension", "ExamplesQcs\ImportExtension\ImportExtension.csproj", "{9D2F8DF0-B13C-4BDE-B9CF-BE033C1A47A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsAppExport", "ExamplesQcs\QcsAppExport\QcsAppExport.csproj", "{5101E581-CA3F-47D0-90C9-E52DEBB98B95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppExport", "ExamplesQcs\AppExport\AppExport.csproj", "{5101E581-CA3F-47D0-90C9-E52DEBB98B95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsConnectApiKey", "ExamplesQcs\QcsConnectApiKey\QcsConnectApiKey.csproj", "{4C08115D-AF41-4CA6-B221-3D042B779910}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectApiKey", "ExamplesQcs\ConnectApiKey\ConnectApiKey.csproj", "{4C08115D-AF41-4CA6-B221-3D042B779910}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsConnectJwt", "ExamplesQcs\QcsConnectJwt\QcsConnectJwt.csproj", "{C45E56CE-FEDE-4882-8857-B2260F2A2FD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectJwt", "ExamplesQcs\ConnectJwt\ConnectJwt.csproj", "{C45E56CE-FEDE-4882-8857-B2260F2A2FD7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsUploadDataFile", "ExamplesQcs\QcsUploadDataFile\QcsUploadDataFile.csproj", "{CAA53B6D-058E-4051-BF37-EC63A383C34B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UploadDataFile", "ExamplesQcs\UploadDataFile\UploadDataFile.csproj", "{CAA53B6D-058E-4051-BF37-EC63A383C34B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QcsExportPdf", "ExamplesQcs\QcsExportPdf\QcsExportPdf.csproj", "{CD9FBF6D-D57D-4090-A8FE-713DB1937021}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExportPdf", "ExamplesQcs\ExportPdf\ExportPdf.csproj", "{CD9FBF6D-D57D-4090-A8FE-713DB1937021}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExamplesQcs", "ExamplesQcs", "{36E045ED-754D-4D8F-8419-7A81E8BB102F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExamplesClientManaged", "ExamplesClientManaged", "{38AD5232-8F19-4F27-B2C0-BDE98EA1E7BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QcsListAllApps", "ExamplesQcs\QcsListAllApps\QcsListAllApps.csproj", "{5884A77D-3298-4611-AC39-D72BDB7F8818}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListAllApps", "ExamplesQcs\ListAllApps\ListAllApps.csproj", "{5884A77D-3298-4611-AC39-D72BDB7F8818}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

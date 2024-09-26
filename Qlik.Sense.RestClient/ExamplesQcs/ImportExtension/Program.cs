@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
-namespace QcsImportExtension
+namespace ImportExtension
 {
     internal class Program
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using Qlik.Sense.RestClient;
 
-namespace QcsAppExport
+namespace AppExport
 {
     internal class Program
     {

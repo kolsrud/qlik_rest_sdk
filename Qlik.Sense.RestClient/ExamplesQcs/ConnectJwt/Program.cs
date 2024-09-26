@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using Qlik.Sense.Jwt;
 using Qlik.Sense.RestClient;
 
-namespace QcsConnectJwt
+namespace ConnectJwt
 {
     internal class Program
     {

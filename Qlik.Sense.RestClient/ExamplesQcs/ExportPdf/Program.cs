@@ -4,9 +4,9 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
-namespace QcsExportExcel
+namespace ExportPdf
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
@@ -15,7 +15,7 @@ namespace QcsExportExcel
             var appId = "<appId>";
             var objectId = "<objectId>";
 
-            var outputFile = "output.xlsx";
+            var outputFile = "output.pdf";
 
             var client = new RestClient(url);
             client.AsApiKeyViaQcs(apiKey);
@@ -46,6 +46,7 @@ namespace QcsExportExcel
                 Thread.Sleep(TimeSpan.FromSeconds(1));
                 rsp = client.Get<JToken>(statusLocation);
             }
+
             Console.WriteLine("    Current status: " + rsp["status"]);
 
             return rsp["results"][0]["location"].Value<string>();
@@ -55,17 +56,23 @@ namespace QcsExportExcel
         {
             var body = new
             {
-                type = "sense-data-1.0",
+                type = "sense-image-1.0",
                 output = new
                 {
-                    outputId = "Chart_excel",
-                    type = "xlsx"
+                    outputId = "Chart_pdf",
+                    type = "pdf",
+                    pdfOutput = new { }
                 },
-                senseDataTemplate = new
+                senseImageTemplate = new
                 {
                     appId = appId,
-                    id = objectId
-                }
+                    visualization = new
+                    {
+                        id = objectId,
+                        widthPx = 613,
+                        heightPx = 409,
+                    }
+                },
             };
             return JToken.FromObject(body);
         }
