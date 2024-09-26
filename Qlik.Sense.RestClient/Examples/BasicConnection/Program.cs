@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
 namespace BasicConnection
@@ -8,11 +8,10 @@ namespace BasicConnection
     {
         static void Main(string[] args)
         {
-	        var url = "<url>";
+            var url = "<url>";
             var restClient = new RestClient(url);
             restClient.AsNtlmUserViaProxy(false);
-            using (new RestClientDebugConsole())
-                restClient.Get("/qrs/about");
+            Console.WriteLine(restClient.Get<JToken>("/qrs/about"));
         }
     }
 }

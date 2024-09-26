@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
@@ -9,7 +8,7 @@ namespace CreateStream
     {
         static void Main(string[] args)
         {
-	        var url = "<url>";
+            var url = "<url>";
             var restClient = new RestClient(url);
             restClient.AsNtlmUserViaProxy();
 

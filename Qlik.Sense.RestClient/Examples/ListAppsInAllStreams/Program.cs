@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
@@ -9,9 +8,9 @@ namespace ListAppsInAllStreams
     {
         static void Main(string[] args)
         {
-	        var url = "<url>";
-	        var restClient = new RestClient(url);
-			restClient.AsNtlmUserViaProxy();
+            var url = "<url>";
+            var restClient = new RestClient(url);
+            restClient.AsNtlmUserViaProxy();
             foreach (var stream in restClient.Get<JArray>("/qrs/stream"))
             {
                 Console.WriteLine($"Apps in stream: {stream["id"]}: {stream["name"]}");

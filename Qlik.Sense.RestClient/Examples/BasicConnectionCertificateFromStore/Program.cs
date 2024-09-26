@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using Newtonsoft.Json.Linq;
 using Qlik.Sense.RestClient;
 
 namespace BasicConnectionCertificateFromStore
@@ -8,12 +8,11 @@ namespace BasicConnectionCertificateFromStore
     {
         static void Main(string[] args)
         {
-	        var url = "<url>";
+            var url = "<url>";
             var restClient = new RestClient(url);
             var certs = RestClient.LoadCertificateFromStore();
             restClient.AsDirectConnection(4242, false, certs);
-            using (new RestClientDebugConsole())
-                restClient.Get("/qrs/about");
+            Console.WriteLine(restClient.Get<JToken>("/qrs/about"));
         }
     }
 }
