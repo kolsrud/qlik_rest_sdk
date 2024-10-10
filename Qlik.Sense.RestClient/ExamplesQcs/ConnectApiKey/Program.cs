@@ -11,8 +11,8 @@ namespace ConnectApiKey
             var url = "<url>";
             var apiKey = "<apiKey>";
 
-            var restClient = new RestClient(url);
-            restClient.AsApiKeyViaQcs(apiKey);
+            var restClient = new RestClientQcs(url);
+            restClient.AsApiKey(apiKey);
 
             Console.WriteLine(restClient.Get<JToken>("/api/v1/users/me"));
         }

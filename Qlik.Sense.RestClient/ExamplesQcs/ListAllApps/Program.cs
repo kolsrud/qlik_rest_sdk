@@ -14,8 +14,8 @@ namespace ListAllApps
             var url = "<url>";
             var apiKey = "<apiKey>";
 
-            var restClient = new RestClient(url);
-            restClient.AsApiKeyViaQcs(apiKey);
+            var restClient = new RestClientQcs(url);
+            restClient.AsApiKey(apiKey);
 
             // Fetch app items using page size 20 (maximum is 100).
             var allApps = FetchAll(restClient, "/api/v1/items?resourceType=app&limit=20").ToArray();
@@ -26,7 +26,7 @@ namespace ListAllApps
             }
         }
 
-        public static IEnumerable<JObject> FetchAll(IRestClient restClient, string endpoint)
+        public static IEnumerable<JObject> FetchAll(IRestClientGeneric restClient, string endpoint)
         {
             var data = new List<JObject>();
             var next = endpoint;
