@@ -2,9 +2,10 @@
 
 ## v2.0.0
 * **NEW FEATURE:** Introduced class `RestClientQcs` that encapsulates QCS connection logic. Replaces all `As<connectionType>ViaQcs` methods in `RestClient`.
-* **DEPRECATED:** Deprecated all QCS connection methods from `RestClient`. Use cöass `RestClientQcs` instead.
+* **DEPRECATED:** Deprecated all QCS connection methods from `RestClient`. Use class `RestClientQcs` instead.
 * **EXAMPLE:** Added QCS example `AppUpload`.
 * **EXAMPLE:** Removed QCS example `ConnectClientCredentials`.
+* **REMOVED:** Removed support for .NET Framework 4.5.2 and .NET Core 2.1. Deprecated since v1.9.0.
 * **REMOVED:** Removed deprecated class `DebugConsole`. Class deprecated since v1.8.0.
 * **REMOVED:** Removed deprecated method `RestClient.AsJwtViaQcs`. Method deprecated since v1.7.0.
 * **REMOVED:** Removed deprecated methods `RestClient.AsJwtTokenViaProxy` and `RestClient.AsJwtTokenViaQcs`. Method deprecated since v1.1.0.
