@@ -18,7 +18,7 @@ namespace Qlik.Sense.RestClient
 
         public RestClientDebugConsole()
         {
-            RestClient.RestClientDebugConsole = this;
+            RestClientGeneric.RestClientDebugConsole = this;
             Log("Debug console activated (" + dotnet_version + ")");
         }
 

@@ -11,98 +11,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Qlik.Sense.RestClient.Qrs;
 
 namespace Qlik.Sense.RestClient
 {
-	public enum ConnectionType
-	{
-        Undefined,
-		DirectConnection,
-		NtlmUserViaProxy,
-		StaticHeaderUserViaProxy,
-		AnonymousViaProxy,
-		JwtTokenViaProxy,
-		JwtTokenViaQcs,
-		ApiKeyViaQcs,
-		ClientCredentialsViaQcs,
-		ExistingSessionViaProxy,
-		ExistingSessionViaQcs
-	}
-
-    public class RestClient : IRestClient
+    public class RestClient : RestClientGeneric, IRestClient
     {
-        internal static RestClientDebugConsole RestClientDebugConsole { private get; set; }
-
-        public static int MaximumConcurrentCalls
-        {
-            get => ServicePointManager.DefaultConnectionLimit;
-            set => ServicePointManager.DefaultConnectionLimit = value;
-        }
-
-        public TimeSpan Timeout
-        {
-            get => _connectionSettings.Timeout;
-            set => _connectionSettings.Timeout = value;
-        }
-
-        public IWebProxy Proxy
-        {
-            get => _connectionSettings.Proxy;
-            set => _connectionSettings.Proxy = value;
-        }
-
-        public Dictionary<string, string> CustomHeaders => _connectionSettings.CustomHeaders;
-
-        /// <summary>
-        /// Custom HTTP user-agent header for identifying application.
-        /// </summary>
-        public string CustomUserAgent
-        {
-            get => _connectionSettings.CustomUserAgent;
-            set => _connectionSettings.CustomUserAgent = value;
-        }
-        private User _user;
-        public User User => _user ?? (_user = new User { Directory = UserDirectory, Id = UserId });
-        public string Url => _connectionSettings.BaseUri.AbsoluteUri;
-        public string UserId => _connectionSettings.UserId;
-        public string UserDirectory => _connectionSettings.UserDirectory;
-
-        public QcsSessionInfo QcsSessionInfo => _connectionSettings.SessionInfo;
-
-        public Uri BaseUri => _connectionSettings.BaseUri;
-
-        private readonly ConnectionSettings _connectionSettings;
-
-        public ConnectionType CurrentConnectionType => _connectionType;
-
-        private ConnectionType _connectionType = ConnectionType.Undefined;
-
-        private bool IsConfigured => _connectionType != ConnectionType.Undefined;
-
-        public Cookie GetCookie(string name)
-        {
-	        return _connectionSettings.GetCookie(name);
-        }
-
-        public CookieCollection GetCookies()
-        {
-	        return _connectionSettings.GetCookies();
-        }
-
-		private readonly Lazy<SenseHttpClient> _client;
-
-		private RestClient()
+		private RestClient(RestClient source) : base(source)
 		{
-			_client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
-		}
-
-		private RestClient(RestClient source) : this()
-		{
-			_client = new Lazy<SenseHttpClient>(() => new SenseHttpClient(_connectionSettings));
-			_connectionSettings = source._connectionSettings;
-            _stats = source._stats;
-            _connectionType = source._connectionType;
 		}
 
         /// <summary>
@@ -110,15 +25,14 @@ namespace Qlik.Sense.RestClient
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="stats"></param>
-        public RestClient(string uri, Statistics stats) : this(uri)
+        public RestClient(string uri, Statistics stats) : base(uri, stats)
         {
-            _stats = stats;
+            _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
-        public RestClient(Uri uri) : this()
+        public RestClient(Uri uri) : base(uri)
         {
-	        _connectionSettings = new ConnectionSettings(uri);
-			_connectionSettings.AuthenticationFunc = CollectCookieAsync;
+            _connectionSettings.AuthenticationFunc = CollectCookieAsync;
         }
 
         public RestClient(string uri) : this(new Uri(uri))
@@ -151,35 +65,6 @@ namespace Qlik.Sense.RestClient
             var client = new RestClient(this);
             client._connectionSettings.ContentType = contentType;
             return client;
-        }
-
-        public bool Authenticate()
-        {
-            var t = AuthenticateAsync();
-            t.ConfigureAwait(false);
-            return t.Result;
-        }
-
-        public async Task<bool> AuthenticateAsync()
-        {
-            if (_connectionSettings.IsAuthenticated)
-                return true;
-
-            try
-            {
-                await _connectionSettings.PerformAuthentication().ConfigureAwait(false);
-                return true;
-            }
-            catch (AggregateException e)
-            {
-                RestClientDebugConsole?.Log("Authentication failed: " + e.InnerException?.Message);
-                return false;
-            }
-            catch (Exception e)
-            {
-                RestClientDebugConsole?.Log("Authentication failed: " + e.Message);
-                return false;
-            }
         }
 
         public void AsDirectConnection(int port = 4242, bool certificateValidation = true,
@@ -224,7 +109,8 @@ namespace Qlik.Sense.RestClient
 	        _connectionSettings.IsAuthenticated = false;
         }
 
-		public void AsApiKeyViaQcs(string apiKey)
+        [Obsolete("Use method IRestClientQcs.AsApiKey")] // Obsolete since October 2024
+        public void AsApiKeyViaQcs(string apiKey)
         {
 			_connectionType = ConnectionType.ApiKeyViaQcs;
 			_connectionSettings.AllowAutoRedirect = false;
@@ -233,13 +119,15 @@ namespace Qlik.Sense.RestClient
 			_connectionSettings.IsAuthenticated = true;
         }
 
-		public void AsJsonWebTokenViaQcs(string key)
+        [Obsolete("Use method IRestClientQcs.AsJwt")] // Obsolete since October 2024
+        public void AsJsonWebTokenViaQcs(string key)
         {
             AsJwtToken(key);
             _connectionSettings.IsQcs = true;
             _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
         }
 
+        [Obsolete("Use method IRestClientQcs.AsApiKey and acquire access token separately.")] // Obsolete since October 2024
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
 	        _connectionType = ConnectionType.ClientCredentialsViaQcs;
@@ -260,6 +148,65 @@ namespace Qlik.Sense.RestClient
         public void AsJwtTokenViaQcs(string key)
         {
             AsJwtViaQcs(key);
+        }
+
+        private async Task CollectCookieAsync()
+        {
+            RestClientDebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
+            var client = GetClient();
+            await LogReceive(client.GetStringAsync(BaseUri.Append("/qrs/about"))).ConfigureAwait(false);
+            RestClientDebugConsole?.Log($"Authentication complete.");
+        }
+
+        private async Task CollectCookieJwtViaQcsAsync()
+        {
+            RestClientDebugConsole?.Log($"Authenticating (calling POST /login/jwt-session)");
+            var client = GetClient();
+            await LogReceive(client.PostStringAsync(BaseUri.Append("/login/jwt-session"), "")).ConfigureAwait(false);
+
+            var csrfToken = _connectionSettings.GetCookie("_csrfToken").Value;
+            if (csrfToken == null)
+            {
+                throw new AuthenticationException("Call to /login/jwt-session did not return a csrf token cookie.");
+            }
+
+            client.AddDefaultHeader(SenseHttpClient.CSRF_TOKEN_ID, csrfToken);
+            RestClientDebugConsole?.Log($"Authentication complete.");
+        }
+
+        private async Task CollectAccessTokenViaOauthAsync()
+        {
+            var token = await GetAccessTokenAsync().ConfigureAwait(false);
+            _connectionType = ConnectionType.ApiKeyViaQcs;
+            CustomHeaders.Add("Authorization", "Bearer " + token);
+            _connectionSettings.IsAuthenticated = true;
+            _connectionSettings.AllowAutoRedirect = false;
+            _connectionSettings.IsQcs = true;
+            RestClientDebugConsole?.Log($"Authentication complete.");
+        }
+
+        private async Task<string> GetAccessTokenAsync()
+        {
+            var endpoint = "/oauth/token";
+            RestClientDebugConsole?.Log($"Authenticating (calling POST {endpoint})");
+            var body = JToken.FromObject(new
+            {
+                scope = "user_default",
+                grant_type = "client_credentials"
+            });
+
+            var client = new SenseHttpClient(_connectionSettings.Clone());
+            client.AddDefaultHeader("Authorization", "Basic " + _connectionSettings.ClientCredentialsEncoded);
+            try
+            {
+                var rsp = await client.PostStringAsync(BaseUri.Append(endpoint), body.ToString(Formatting.None)).ConfigureAwait(false);
+                var rspJson = JObject.Parse(rsp);
+                return rspJson["access_token"].Value<string>();
+            }
+            catch (Exception e)
+            {
+                throw new AuthenticationException("Failed to retrieve access token.", e);
+            }
         }
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
@@ -307,6 +254,7 @@ namespace Qlik.Sense.RestClient
 			_connectionSettings.IsAuthenticated = true;
         }
 
+        [Obsolete("Use method IRestClientQcs.AsExistingSessionViaQcs")] // Obsolete since October 2024
         public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
 		{
 			_connectionType = ConnectionType.ExistingSessionViaQcs;
@@ -329,75 +277,6 @@ namespace Qlik.Sense.RestClient
             }
 
             throw new CertificatesNotLoadedException();
-        }
-
-        private static void LogCall(string method, string endpoint)
-        {
-            RestClientDebugConsole?.Log($"Calling:\t{method} {endpoint}");
-        }
-
-        private static string LogReceive(string message)
-        {
-            RestClientDebugConsole?.Log($"Receiving:\t{message}");
-            return message;
-        }
-
-        private static byte[] LogReceive(byte[] data)
-        {
-            RestClientDebugConsole?.Log($"Receiving binary data of size {data.Length}");
-            return data;
-        }
-
-        private static Stream LogReceive(Stream stream)
-        {
-            RestClientDebugConsole?.Log($"Receiving data stream");
-            return stream;
-        }
-
-        private static async Task<string> LogReceive(Task<string> messageTask)
-        {
-            var message = await messageTask.ConfigureAwait(false);
-            RestClientDebugConsole?.Log($"Receiving:\t{message}");
-            return message;
-        }
-
-        private static async Task<byte[]> LogReceive(Task<byte[]> messageTask)
-        {
-            var data = await messageTask.ConfigureAwait(false);
-            RestClientDebugConsole?.Log($"Receiving binary data of size {data.Length}");
-            return data;
-        }
-
-        private static async Task<Stream> LogReceive(Task<Stream> streamTask)
-        {
-            var stream = await streamTask.ConfigureAwait(false);
-            RestClientDebugConsole?.Log($"Receiving data stream");
-            return stream;
-        }
-
-        private HttpResponseMessage LogReceive(HttpResponseMessage rsp)
-        {
-	        RestClientDebugConsole?.Log(PrintHttpResponseLog(rsp));
-	        return rsp;
-        }
-
-        private static async Task<HttpResponseMessage> LogReceive(Task<HttpResponseMessage> streamTask)
-        {
-	        var rsp = await streamTask.ConfigureAwait(false);
-	        RestClientDebugConsole?.Log(PrintHttpResponseLog(rsp));
-	        return rsp;
-        }
-
-        private static string PrintHttpResponseLog(HttpResponseMessage rsp)
-        {
-	        var contents = new[]
-	        {
-		        "Status Code:    " + (int) rsp.StatusCode + " (" + rsp.StatusCode + ")",
-		        "Content length: " + rsp.Content.Headers.ContentLength,
-		        "Content type:   " + rsp.Content.Headers.ContentType
-	        }.Select(str => "   " + str).ToArray();
-
-	        return $"Receiving HTTP response:\n" + string.Join(Environment.NewLine, contents);
         }
 
 		public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
@@ -428,453 +307,6 @@ namespace Qlik.Sense.RestClient
             if (!Directory.Exists(path)) throw new DirectoryNotFoundException(path);
             if (!File.Exists(clientCertPath)) throw new FileNotFoundException(clientCertPath);
             return new X509Certificate2Collection(f(clientCertPath));
-        }
-
-        private SenseHttpClient GetClient()
-        {
-            return _client.Value;
-        }
-
-        public string Get(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            var task = client.GetStringAsync(BaseUri.Append(endpoint));
-            task.ConfigureAwait(false);
-            return LogReceive(task.Result);
-        }
-
-        private readonly Statistics _stats = new Statistics();
-
-        /// <summary>
-        /// Experimental
-        /// </summary>
-        public void PrintStats()
-        {
-            Console.WriteLine(_stats);
-        }
-
-        /// <summary>
-        /// Experimental
-        /// </summary>
-        /// <param name="endpoint"></param>
-        /// <returns></returns>
-        public Result GetEx(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            var task = Result.CreateAsync(() => client.GetHttpAsync(BaseUri.Append(endpoint), false), _stats.Add);
-            task.ConfigureAwait(false);
-            var rsp = task.Result;
-            LogReceive(rsp.Body);
-            return rsp;
-        }
-
-        public T Get<T>(string endpoint)
-        {
-            return JsonConvert.DeserializeObject<T>(Get(endpoint));
-        }
-
-        public async Task<string> GetAsync(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            return await LogReceive(client.GetStringAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
-        }
-
-        public Task<T> GetAsync<T>(string endpoint)
-        {
-            return GetAsync(endpoint).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
-        }
-
-        public HttpResponseMessage GetHttp(string endpoint, bool throwOnFailure = true)
-        {
-	        var client = GetClient();
-	        LogCall("GET", endpoint);
-	        var task = client.GetHttpAsync(BaseUri.Append(endpoint), throwOnFailure);
-	        task.ConfigureAwait(false);
-	        return LogReceive(task.Result);
-		}
-
-        public Task<HttpResponseMessage> GetHttpAsync(string endpoint, bool throwOnFailure = true)
-        {
-	        LogCall("GET", endpoint);
-	        var client = GetClient();
-            return LogReceive(client.GetHttpAsync(BaseUri.Append(endpoint), throwOnFailure));
-        }
-
-        public byte[] GetBytes(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            var task = client.GetBytesAsync(BaseUri.Append(endpoint));
-            task.ConfigureAwait(false);
-            return LogReceive(task.Result);
-        }
-
-        public async Task<byte[]> GetBytesAsync(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            return await LogReceive(client.GetBytesAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
-        }
-
-        public Stream GetStream(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!Authenticate())
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            var task = client.GetStreamAsync(BaseUri.Append(endpoint));
-            task.ConfigureAwait(false);
-            return LogReceive(task.Result);
-        }
-
-        public async Task<Stream> GetStreamAsync(string endpoint)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("GET", endpoint);
-            var client = GetClient();
-            return await LogReceive(client.GetStreamAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
-        }
-
-        private string PerformUploadStringAccess(string method, string endpoint, string body)
-        {
-            var task = PerformUploadStringAccessAsync(method, endpoint, body);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        private async Task<string> PerformUploadStringAccessAsync(string method, string endpoint, string body)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall(method, endpoint);
-            var client = GetClient();
-            switch (method.ToUpper())
-            {
-                case "POST":
-                    return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
-                case "PUT":
-                    return await LogReceive(client.PutStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
-                case "DELETE":
-                    return await LogReceive(client.DeleteAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
-            }
-
-            return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
-        }
-
-        public string Post(string endpoint, string body = "")
-        {
-            return PerformUploadStringAccess("POST", endpoint, body);
-        }
-
-        public string Post(string endpoint, JToken body)
-        {
-            return Post(endpoint, body.ToString(Formatting.None));
-        }
-
-        public string Post(string endpoint, HttpContent content)
-        {
-            var task = PostAsync(endpoint, content);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        public T Post<T>(string endpoint, string body = "")
-        {
-            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
-        }
-
-        public T Post<T>(string endpoint, JToken body)
-        {
-            return Post<T>(endpoint, body.ToString(Formatting.None));
-        }
-
-        public T Post<T>(string endpoint, HttpContent content)
-        {
-            return JsonConvert.DeserializeObject<T>(Post(endpoint, content));
-        }
-
-        public HttpResponseMessage PostHttp(string endpoint, HttpContent content, bool throwOnFailure = true)
-        {
-            var task = PostHttpAsync(endpoint, content, throwOnFailure);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        public Task<string> PostAsync(string endpoint, string body = "")
-        {
-            return PerformUploadStringAccessAsync("POST", endpoint, body);
-        }
-
-        public Task<string> PostAsync(string endpoint, JToken body)
-        {
-            return PostAsync(endpoint, body.ToString(Formatting.None));
-        }
-
-        public async Task<string> PostAsync(string endpoint, HttpContent content)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("POST", endpoint);
-			var client = GetClient();
-            return await LogReceive(client.PostHttpContentAsync(BaseUri.Append(endpoint), content)).ConfigureAwait(false);
-        }
-
-        public Task<T> PostAsync<T>(string endpoint, string body = "")
-        {
-            return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
-        }
-
-        public Task<T> PostAsync<T>(string endpoint, JToken body)
-        {
-            return PostAsync<T>(endpoint, body.ToString(Formatting.None));
-        }
-
-        public Task<T> PostAsync<T>(string endpoint, HttpContent content)
-        {
-            return PostAsync(endpoint, content).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
-        }
-
-        public async Task<HttpResponseMessage> PostHttpAsync(string endpoint, string body = "", bool throwOnFailure = true)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("POST", endpoint);
-			var client = GetClient();
-            return await LogReceive(client.PostHttpAsync(BaseUri.Append(endpoint), body, throwOnFailure)).ConfigureAwait(false);
-        }
-
-        public Task<HttpResponseMessage> PostHttpAsync(string endpoint, JToken body, bool throwOnFailure = true)
-        {
-            return PostHttpAsync(endpoint, body.ToString(Formatting.None), throwOnFailure);
-        }
-
-        public async Task<HttpResponseMessage> PostHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("POST", endpoint);
-			var client = GetClient();
-            return await LogReceive(client.PostHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure)).ConfigureAwait(false);
-        }
-
-        public string Post(string endpoint, byte[] body)
-        {
-            var task = PostAsync(endpoint, body);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        public T Post<T>(string endpoint, byte[] body)
-        {
-            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
-        }
-
-        public async Task<string> PostAsync(string endpoint, byte[] body)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            LogCall("POST", endpoint);
-            var client = GetClient();
-            return await LogReceive(client.PostDataAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
-        }
-
-        public Task<T> PostAsync<T>(string endpoint, byte[] body)
-        {
-            return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
-        }
-
-        public string Put(string endpoint, string body = "")
-        {
-            return PerformUploadStringAccess("PUT", endpoint, body);
-        }
-
-        public string Put(string endpoint, JToken body)
-        {
-            return Put(endpoint, body.ToString(Formatting.None));
-        }
-
-        public string Put(string endpoint, HttpContent content)
-        {
-            var task = PutAsync(endpoint, content);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        public T Put<T>(string endpoint, string body = "")
-        {
-            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
-        }
-
-        public T Put<T>(string endpoint, JToken body)
-        {
-            return Put<T>(endpoint, body.ToString(Formatting.None));
-        }
-
-        public T Put<T>(string endpoint, HttpContent content)
-        {
-            var task = PutAsync<T>(endpoint, content);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        public HttpResponseMessage PutHttp(string endpoint, HttpContent content, bool throwOnFailure = true)
-        {
-            var task = PutHttpAsync(endpoint, content, throwOnFailure);
-            task.ConfigureAwait(false);
-            return task.Result;
-        }
-
-        public Task<string> PutAsync(string endpoint, string body = "")
-        {
-            return PerformUploadStringAccessAsync("PUT", endpoint, body);
-        }
-
-        public Task<string> PutAsync(string endpoint, JToken body)
-        {
-            return PutAsync(endpoint, body.ToString(Formatting.None));
-        }
-
-        public async Task<string> PutAsync(string endpoint, HttpContent content)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            var client = GetClient();
-            return await client.PutHttpContentAsync(BaseUri.Append(endpoint), content).ConfigureAwait(false);
-        }
-
-        public Task<T> PutAsync<T>(string endpoint, string body = "")
-        {
-            return PutAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
-        }
-
-        public Task<T> PutAsync<T>(string endpoint, JToken body)
-        {
-            return PutAsync<T>(endpoint, body.ToString(Formatting.None));
-        }
-
-        public Task<T> PutAsync<T>(string endpoint, HttpContent content)
-        {
-            return PutAsync(endpoint, content).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
-        }
-
-        public async Task<HttpResponseMessage> PutHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true)
-        {
-            ValidateConfiguration();
-            if (!await AuthenticateAsync().ConfigureAwait(false))
-                throw new AuthenticationException("Authentication failed.");
-            var client = GetClient();
-            return await client.PutHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure).ConfigureAwait(false);
-        }
-
-        public string Delete(string endpoint)
-        {
-            return PerformUploadStringAccess("DELETE", endpoint, "");
-        }
-
-        public Task<string> DeleteAsync(string endpoint)
-        {
-            return PerformUploadStringAccessAsync("DELETE", endpoint, "");
-        }
-
-
-        private void ValidateConfiguration()
-        {
-	        if (!IsConfigured)
-		        throw new RestClient.ConnectionNotConfiguredException();
-        }
-
-        private async Task CollectCookieAsync()
-        {
-            RestClientDebugConsole?.Log($"Authenticating (calling GET /qrs/about)");
-            var client = GetClient();
-            await LogReceive(client.GetStringAsync(BaseUri.Append("/qrs/about"))).ConfigureAwait(false);
-            RestClientDebugConsole?.Log($"Authentication complete.");
-        }
-
-        private async Task CollectCookieJwtViaQcsAsync()
-        {
-            RestClientDebugConsole?.Log($"Authenticating (calling POST /login/jwt-session)");
-            var client = GetClient();
-            await LogReceive(client.PostStringAsync(BaseUri.Append("/login/jwt-session"), "")).ConfigureAwait(false);
-            
-            var csrfToken = _connectionSettings.GetCookie("_csrfToken").Value;
-            if (csrfToken == null)
-            {
-                throw new AuthenticationException("Call to /login/jwt-session did not return a csrf token cookie.");
-            }
-
-            client.AddDefaultHeader(SenseHttpClient.CSRF_TOKEN_ID, csrfToken);
-            RestClientDebugConsole?.Log($"Authentication complete.");
-        }
-
-        private async Task CollectAccessTokenViaOauthAsync()
-        {
-            var token = await GetAccessTokenAsync().ConfigureAwait(false);
-            _connectionType = ConnectionType.ApiKeyViaQcs;
-			AsJwtToken(token);
-			_connectionSettings.IsAuthenticated = true;
-			_connectionSettings.AllowAutoRedirect = false;
-			_connectionSettings.IsQcs = true;
-			RestClientDebugConsole?.Log($"Authentication complete.");
-        }
-
-        private async Task<string> GetAccessTokenAsync()
-        {
-            var endpoint = "/oauth/token";
-            RestClientDebugConsole?.Log($"Authenticating (calling POST {endpoint})");
-            var body = JToken.FromObject(new
-            {
-                scope = "user_default",
-                grant_type = "client_credentials"
-            });
-
-            var client = new SenseHttpClient(_connectionSettings.Clone());
-            client.AddDefaultHeader("Authorization", "Basic " + _connectionSettings.ClientCredentialsEncoded);
-            try
-            {
-                var rsp = await client.PostStringAsync(BaseUri.Append(endpoint), body.ToString(Formatting.None)).ConfigureAwait(false);
-                var rspJson = JObject.Parse(rsp);
-                return rspJson["access_token"].Value<string>();
-            }
-            catch (Exception e)
-            {
-                throw new AuthenticationException("Failed to retrieve access token.", e);
-            }
-        }
-        
-        public class ConnectionNotConfiguredException : Exception
-        {
-        }
-
-        public class CertificatesNotLoadedException : Exception
-        {
         }
     }
 
