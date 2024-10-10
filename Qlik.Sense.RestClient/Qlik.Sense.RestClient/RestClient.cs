@@ -103,7 +103,7 @@ namespace Qlik.Sense.RestClient
 	        _connectionSettings.IsAuthenticated = false;
         }
 
-        [Obsolete("Use method IRestClientQcs.AsApiKey")] // Obsolete since October 2024
+        [Obsolete("Use method IRestClientQcs.AsApiKey")] // Obsolete since October 2024, v2.0.0
         public void AsApiKeyViaQcs(string apiKey)
         {
 			_connectionType = ConnectionType.ApiKeyViaQcs;
@@ -113,7 +113,7 @@ namespace Qlik.Sense.RestClient
 			_connectionSettings.IsAuthenticated = true;
         }
 
-        [Obsolete("Use method IRestClientQcs.AsJwt")] // Obsolete since October 2024
+        [Obsolete("Use method IRestClientQcs.AsJwt")] // Obsolete since October 2024, v2.0.0
         public void AsJsonWebTokenViaQcs(string key)
         {
             AsJwtToken(key);
@@ -121,7 +121,7 @@ namespace Qlik.Sense.RestClient
             _connectionSettings.AuthenticationFunc = CollectCookieJwtViaQcsAsync;
         }
 
-        [Obsolete("Use method IRestClientQcs.AsApiKey and acquire access token separately.")] // Obsolete since October 2024
+        [Obsolete("Use method IRestClientQcs.AsApiKey and acquire access token separately.")] // Obsolete since October 2024, v2.0.0
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
 	        _connectionType = ConnectionType.ClientCredentialsViaQcs;
@@ -236,7 +236,7 @@ namespace Qlik.Sense.RestClient
 			_connectionSettings.IsAuthenticated = true;
         }
 
-        [Obsolete("Use method IRestClientQcs.AsExistingSessionViaQcs")] // Obsolete since October 2024
+        [Obsolete("Use method IRestClientQcs.AsExistingSessionViaQcs")] // Obsolete since October 2024, v2.0.0
         public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
 		{
 			_connectionType = ConnectionType.ExistingSessionViaQcs;

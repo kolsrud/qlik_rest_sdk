@@ -11,7 +11,7 @@ namespace Qlik.Sense.RestClient
         User User { get; }
         string UserId { get; }
         string UserDirectory { get; }
-        [Obsolete("Use class IRestClientQcs to interact with QCS.")] // Obsolete since October 2024
+        [Obsolete("Use class IRestClientQcs to interact with QCS.")] // Obsolete since October 2024, v2.0.0
         QcsSessionInfo QcsSessionInfo { get; }
 
         void AsDirectConnection(int port = 4242, bool certificateValidation = true, X509Certificate2Collection certificateCollection = null);
