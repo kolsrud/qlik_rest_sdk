@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
     <Compile Condition="Exists('..\VersionAssemblyInfo.cs')" Include="..\VersionAssemblyInfo.cs" />
   </ItemGroup>
 
