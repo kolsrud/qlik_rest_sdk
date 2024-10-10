@@ -13,8 +13,8 @@ namespace UploadDataFile
             var filePath = @"<path to file>";
 
             var fileName = Path.GetFileName(filePath);
-            var restClient = new RestClient(url);
-            restClient.AsApiKeyViaQcs(apiKey);
+            var restClient = new RestClientQcs(url);
+            restClient.AsApiKey(apiKey);
 
             // ********************************************************
             // * Large files must first be uploaded to temp-contents

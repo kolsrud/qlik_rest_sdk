@@ -17,8 +17,8 @@ namespace ExportPdf
 
             var outputFile = "output.pdf";
 
-            var client = new RestClient(url);
-            client.AsApiKeyViaQcs(apiKey);
+            var client = new RestClientQcs(url);
+            client.AsApiKey(apiKey);
 
             var requestBody = CreateRequestBody(appId, objectId);
             var httpRsp = client.PostHttpAsync("/api/v1/reports", requestBody);
@@ -37,7 +37,7 @@ namespace ExportPdf
             Console.WriteLine($"Wrote {bytes.Length} to file: {outputFile}");
         }
 
-        private static string AwaitExportCompletion(RestClient client, string statusLocation)
+        private static string AwaitExportCompletion(RestClientQcs client, string statusLocation)
         {
             var rsp = client.Get<JToken>(statusLocation);
             while (rsp["status"].Value<string>() != "done")

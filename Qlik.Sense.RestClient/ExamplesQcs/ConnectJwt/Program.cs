@@ -19,8 +19,8 @@ namespace ConnectJwt
             var jwtFactory = new QcsJwtFactory(privateKeyPath, keyId, issuer);
             var jwt = jwtFactory.MakeJwt(subject, name);
 
-            var restClient = new RestClient(url);
-            restClient.AsJsonWebTokenViaQcs(jwt);
+            var restClient = new RestClientQcs(url);
+            restClient.AsJwt(jwt);
 
             Console.WriteLine(restClient.Get<JToken>("/api/v1/users/me"));
         }

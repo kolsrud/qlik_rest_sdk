@@ -14,8 +14,8 @@ namespace ImportExtension
             var url = "<url>";
             var apiKey = "<apiKey>";
 
-            var restClient = new RestClient(url);
-            restClient.AsApiKeyViaQcs(apiKey);
+            var restClient = new RestClientQcs(url);
+            restClient.AsApiKey(apiKey);
 
             var extensionPath = @"C:\Path\To\Extension.zip";
             var tags = new [] { "MyTag" }; // Set of tags. Optional
