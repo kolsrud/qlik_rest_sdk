@@ -1,5 +1,11 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v2.0.0
+* **NEW FEATURE:** Introduced class `RestClientQcs` that encapsulates QCS connection logic. Replaces all `As<connectionType>ViaQcs` methods in `RestClient`.
+* **DEPRECATED:** Deprecated all QCS connection methods from `RestClient`. Use cöass `RestClientQcs` instead.
+* **EXAMPLE:** Added QCS example `AppUpload`.
+* **EXAMPLE:** Removed QCS example `ConnectClientCredentials`.
+
 ## v1.16.0
 * **NEW FEATURE:** Added debug logging for `GetHttp` and `PostHttp` endpoints.
 * **NEW FEATURE:** String body of `PUT` endpoints now default to empty string.
