@@ -5,6 +5,8 @@
 * **DEPRECATED:** Deprecated all QCS connection methods from `RestClient`. Use cöass `RestClientQcs` instead.
 * **EXAMPLE:** Added QCS example `AppUpload`.
 * **EXAMPLE:** Removed QCS example `ConnectClientCredentials`.
+* **REMOVED:** Removed deprecated method `RestClient.AsJwtViaQcs`. Method deprecated since v1.7.0.
+* **REMOVED:** Removed deprecated methods `RestClient.AsJwtTokenViaProxy` and `RestClient.AsJwtTokenViaQcs`. Method deprecated since v1.1.0.
 
 ## v1.16.0
 * **NEW FEATURE:** Added debug logging for `GetHttp` and `PostHttp` endpoints.

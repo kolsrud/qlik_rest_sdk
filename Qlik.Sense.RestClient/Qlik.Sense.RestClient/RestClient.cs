@@ -97,12 +97,6 @@ namespace Qlik.Sense.RestClient
             AsJwtToken(key);
         }
 
-		[Obsolete("Use method AsJwtViaProxy.")] // Obsolete since June 2020 
-        public void AsJwtTokenViaProxy(string key, bool certificateValidation = true)
-        {
-            AsJwtViaProxy(key, certificateValidation);
-        }
-
         private void AsJwtToken(string key)
         {
 	        CustomHeaders.Add("Authorization", "Bearer " + key);
@@ -136,18 +130,6 @@ namespace Qlik.Sense.RestClient
 			_connectionSettings.AllowAutoRedirect = false;
 			_connectionSettings.IsQcs = true;
 			_connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
-        }
-
-		[Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since September 2021
-        public void AsJwtViaQcs(string key)
-        {
-            AsApiKeyViaQcs(key);
-        }
-
-        [Obsolete("Use method AsApiKeyViaQcs.")] // Obsolete since May 2020
-        public void AsJwtTokenViaQcs(string key)
-        {
-            AsJwtViaQcs(key);
         }
 
         private async Task CollectCookieAsync()
