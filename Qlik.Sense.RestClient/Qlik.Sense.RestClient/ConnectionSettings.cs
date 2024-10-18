@@ -78,9 +78,9 @@ namespace Qlik.Sense.RestClient
                 BaseUri = this.BaseUri,
                 CookieJar = this.CookieJar,
                 IsAuthenticated = this.IsAuthenticated,
-		        AllowAutoRedirect = this.AllowAutoRedirect,
-				IsQcs = this.IsQcs,
-				UserDirectory = this.UserDirectory,
+                AllowAutoRedirect = this.AllowAutoRedirect,
+                IsQcs = this.IsQcs,
+                UserDirectory = this.UserDirectory,
                 UserId = this.UserId,
                 CertificateValidation = this.CertificateValidation,
                 Certificates = this.Certificates,
@@ -119,10 +119,10 @@ namespace Qlik.Sense.RestClient
 
         public void SetClientCredentials(string clientId, string clientSecret)
         {
-	        ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
+            ClientCredentialsEncoded = Base64Encode(clientId + ":" + clientSecret);
         }
 
-		private static string Base64Encode(string plainText)
+        private static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             return System.Convert.ToBase64String(plainTextBytes);
@@ -141,11 +141,11 @@ namespace Qlik.Sense.RestClient
 
         internal CookieCollection GetCookies()
         {
-	        return CookieJar.GetCookies(BaseUri);
+            return CookieJar.GetCookies(BaseUri);
         }
     }
 
-	public class QcsSessionInfo
+    public class QcsSessionInfo
     {
         public string EasSid { get; }
         public string EasSidSig { get; }

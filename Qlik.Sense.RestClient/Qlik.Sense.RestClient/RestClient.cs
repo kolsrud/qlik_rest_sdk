@@ -16,9 +16,9 @@ namespace Qlik.Sense.RestClient
 {
     public class RestClient : RestClientGeneric, IRestClient
     {
-		private RestClient(RestClient source) : base(source)
-		{
-		}
+        private RestClient(RestClient source) : base(source)
+        {
+        }
 
         /// <summary>
         /// Experimental
@@ -48,7 +48,7 @@ namespace Qlik.Sense.RestClient
 
         public IRestClient ConnectAsHub()
         {
-	        var client = new RestClient(this);
+            var client = new RestClient(this);
             client.CustomHeaders["X-Qlik-Security"] = "Context=AppAccess";
             return client;
         }
@@ -76,41 +76,41 @@ namespace Qlik.Sense.RestClient
         public void AsDirectConnection(string userDirectory, string userId, int port = 4242,
             bool certificateValidation = true, X509Certificate2Collection certificateCollection = null)
         {
-	        if (certificateCollection == null)
-		        throw new ArgumentNullException(nameof(certificateCollection));
-	        _connectionType = ConnectionType.DirectConnection;
-	        var uriBuilder = new UriBuilder(BaseUri) { Port = port };
-	        _connectionSettings.BaseUri = uriBuilder.Uri;
-	        _connectionSettings.UserId = userId;
-	        _connectionSettings.UserDirectory = userDirectory;
-	        _connectionSettings.CertificateValidation = certificateValidation;
-	        _connectionSettings.Certificates = certificateCollection;
-	        var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
-	        CustomHeaders.Add("X-Qlik-User", userHeaderValue);
-	        _connectionSettings.IsAuthenticated = true;
+            if (certificateCollection == null)
+                throw new ArgumentNullException(nameof(certificateCollection));
+            _connectionType = ConnectionType.DirectConnection;
+            var uriBuilder = new UriBuilder(BaseUri) { Port = port };
+            _connectionSettings.BaseUri = uriBuilder.Uri;
+            _connectionSettings.UserId = userId;
+            _connectionSettings.UserDirectory = userDirectory;
+            _connectionSettings.CertificateValidation = certificateValidation;
+            _connectionSettings.Certificates = certificateCollection;
+            var userHeaderValue = string.Format("UserDirectory={0};UserId={1}", UserDirectory, UserId);
+            CustomHeaders.Add("X-Qlik-User", userHeaderValue);
+            _connectionSettings.IsAuthenticated = true;
         }
 
         public void AsJwtViaProxy(string key, bool certificateValidation = true)
         {
-	        _connectionType = ConnectionType.JwtTokenViaProxy;
+            _connectionType = ConnectionType.JwtTokenViaProxy;
             _connectionSettings.CertificateValidation = certificateValidation;
             AsJwtToken(key);
         }
 
         private void AsJwtToken(string key)
         {
-	        CustomHeaders.Add("Authorization", "Bearer " + key);
-	        _connectionSettings.IsAuthenticated = false;
+            CustomHeaders.Add("Authorization", "Bearer " + key);
+            _connectionSettings.IsAuthenticated = false;
         }
 
         [Obsolete("Use method IRestClientQcs.AsApiKey")] // Obsolete since October 2024, v2.0.0
         public void AsApiKeyViaQcs(string apiKey)
         {
-			_connectionType = ConnectionType.ApiKeyViaQcs;
-			_connectionSettings.AllowAutoRedirect = false;
-			_connectionSettings.IsQcs = true;
-			AsJwtToken(apiKey);
-			_connectionSettings.IsAuthenticated = true;
+            _connectionType = ConnectionType.ApiKeyViaQcs;
+            _connectionSettings.AllowAutoRedirect = false;
+            _connectionSettings.IsQcs = true;
+            AsJwtToken(apiKey);
+            _connectionSettings.IsAuthenticated = true;
         }
 
         [Obsolete("Use method IRestClientQcs.AsJwt")] // Obsolete since October 2024, v2.0.0
@@ -124,12 +124,12 @@ namespace Qlik.Sense.RestClient
         [Obsolete("Use method IRestClientQcs.AsApiKey and acquire access token separately.")] // Obsolete since October 2024, v2.0.0
         public void AsClientCredentialsViaQcs(string clientId, string clientSecret)
         {
-	        _connectionType = ConnectionType.ClientCredentialsViaQcs;
+            _connectionType = ConnectionType.ClientCredentialsViaQcs;
             _connectionSettings.SetClientCredentials(clientId, clientSecret);
-			_connectionSettings.IsAuthenticated = false;
-			_connectionSettings.AllowAutoRedirect = false;
-			_connectionSettings.IsQcs = true;
-			_connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
+            _connectionSettings.IsAuthenticated = false;
+            _connectionSettings.AllowAutoRedirect = false;
+            _connectionSettings.IsQcs = true;
+            _connectionSettings.AuthenticationFunc = CollectAccessTokenViaOauthAsync;
         }
 
         private async Task CollectCookieAsync()
@@ -193,60 +193,61 @@ namespace Qlik.Sense.RestClient
 
         public void AsNtlmUserViaProxy(bool certificateValidation = true)
         {
-	        _connectionSettings.UserId = Environment.UserName;
-	        _connectionSettings.UserDirectory = Environment.UserDomainName;
-	        AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
+            _connectionSettings.UserId = Environment.UserName;
+            _connectionSettings.UserDirectory = Environment.UserDomainName;
+            AsNtlmUserViaProxy(CredentialCache.DefaultNetworkCredentials, certificateValidation);
         }
 
         public void AsNtlmUserViaProxy(NetworkCredential credential, bool certificateValidation = true)
         {
-	        _connectionType = ConnectionType.NtlmUserViaProxy;
-			_connectionSettings.CertificateValidation = certificateValidation;
-	        if (credential != null)
-	        {
-		        var credentialCache = new CredentialCache();
-		        credentialCache.Add(this.BaseUri, "ntlm", credential);
-		        _connectionSettings.CustomCredential = credentialCache;
-	        }
-	        CustomHeaders.Add("User-Agent", "Windows");
+            _connectionType = ConnectionType.NtlmUserViaProxy;
+            _connectionSettings.CertificateValidation = certificateValidation;
+            if (credential != null)
+            {
+                var credentialCache = new CredentialCache();
+                credentialCache.Add(this.BaseUri, "ntlm", credential);
+                _connectionSettings.CustomCredential = credentialCache;
+            }
+
+            CustomHeaders.Add("User-Agent", "Windows");
         }
 
         public void AsAnonymousUserViaProxy(bool certificateValidation = true)
         {
-	        _connectionType = ConnectionType.AnonymousViaProxy;
-	        _connectionSettings.CertificateValidation = certificateValidation;
-	        _connectionSettings.IsAuthenticated = true;
+            _connectionType = ConnectionType.AnonymousViaProxy;
+            _connectionSettings.CertificateValidation = certificateValidation;
+            _connectionSettings.IsAuthenticated = true;
         }
 
         public void AsStaticHeaderUserViaProxy(string userId, string headerName, bool certificateValidation = true)
         {
-	        _connectionType = ConnectionType.StaticHeaderUserViaProxy;
+            _connectionType = ConnectionType.StaticHeaderUserViaProxy;
             _connectionSettings.CertificateValidation = certificateValidation;
             _connectionSettings.UserId = userId;
             // Todo: This is incorrect. We do not know the UserDirectory in this case. That's controlled by the virtual proxy.
             _connectionSettings.UserDirectory = Environment.UserDomainName;
             _connectionSettings.CustomHeaders.Add(headerName, userId);
-		}
+        }
 
-		public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
+        public void AsExistingSessionViaProxy(string sessionId, string cookieHeaderName, bool proxyUsesSsl = true, bool certificateValidation = true)
         {
-	        _connectionType = ConnectionType.ExistingSessionViaProxy;
-			_connectionSettings.CertificateValidation = certificateValidation;
-			_connectionSettings.CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
-			_connectionSettings.IsAuthenticated = true;
+            _connectionType = ConnectionType.ExistingSessionViaProxy;
+            _connectionSettings.CertificateValidation = certificateValidation;
+            _connectionSettings.CookieJar.Add(new Cookie(cookieHeaderName, sessionId) { Domain = BaseUri.Host });
+            _connectionSettings.IsAuthenticated = true;
         }
 
         [Obsolete("Use method IRestClientQcs.AsExistingSessionViaQcs")] // Obsolete since October 2024, v2.0.0
         public void AsExistingSessionViaQcs(QcsSessionInfo sessionInfo)
-		{
-			_connectionType = ConnectionType.ExistingSessionViaQcs;
-			_connectionSettings.IsQcs = true;
-			_connectionSettings.CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
-			_connectionSettings.CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
-			CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
-		}
+        {
+            _connectionType = ConnectionType.ExistingSessionViaQcs;
+            _connectionSettings.IsQcs = true;
+            _connectionSettings.CookieJar.Add(BaseUri, new Cookie("eas.sid", sessionInfo.EasSid));
+            _connectionSettings.CookieJar.Add(BaseUri, new Cookie("eas.sid.sig", sessionInfo.EasSidSig));
+            CustomHeaders[SenseHttpClient.CSRF_TOKEN_ID] = sessionInfo.SessionToken;
+        }
 
-		public static X509Certificate2Collection LoadCertificateFromStore()
+        public static X509Certificate2Collection LoadCertificateFromStore()
         {
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
@@ -261,7 +262,7 @@ namespace Qlik.Sense.RestClient
             throw new CertificatesNotLoadedException();
         }
 
-		public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
+        public static X509Certificate2Collection LoadCertificateFromDirectory(string path)
         {
             return LoadCertificateFromDirectory(path, p => new X509Certificate2(p));
         }
