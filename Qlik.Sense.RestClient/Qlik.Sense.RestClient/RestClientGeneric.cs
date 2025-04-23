@@ -583,7 +583,7 @@ namespace Qlik.Sense.RestClient
 
         public T Put<T>(string endpoint, string body = "")
         {
-            return JsonConvert.DeserializeObject<T>(Post(endpoint, body));
+            return JsonConvert.DeserializeObject<T>(Put(endpoint, body));
         }
 
         public T Put<T>(string endpoint, JToken body)

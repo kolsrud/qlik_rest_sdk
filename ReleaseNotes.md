@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v2.0.1
+* **BUG FIX:** `Put<T>` endpoints now correctly call `PUT` instead of `POST`.
+
 ## v2.0.0
 * **NEW FEATURE:** Introduced class `RestClientQcs` that encapsulates QCS connection logic. Replaces all `As<connectionType>ViaQcs` methods in `RestClient`.
 * **DEPRECATED:** Deprecated all QCS connection methods from `RestClient`. Use class `RestClientQcs` instead.
