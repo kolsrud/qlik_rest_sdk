@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v2.x.x
+* **EXAMPLE:** Added QCS example `ConnectOAuthBrowser`.
+
 ## v2.0.1
 * **BUG FIX:** `Put<T>` endpoints now correctly call `PUT` instead of `POST`.
 
