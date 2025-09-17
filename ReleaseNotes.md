@@ -1,6 +1,6 @@
 # Release Notes for Qlik Sense Rest Client
 
-## v2.x.x
+## v2.1.0
 * **NEW FEATURE:** Added `RestClientQcs` utility methods `FetchAll` and `FetchAllItems`.
 * **EXAMPLE:** Added QCS example `ConnectOAuthBrowser`.
 
