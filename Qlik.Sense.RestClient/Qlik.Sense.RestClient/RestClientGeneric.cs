@@ -74,7 +74,26 @@ namespace Qlik.Sense.RestClient
         Task<string> PostAsync(string endpoint, byte[] body);
         Task<T> PostAsync<T>(string endpoint, byte[] body);
 
-        string Put(string endpoint, string body = "");
+#if (NETCOREAPP)
+        string Patch(string endpoint, string body = "");
+        string Patch(string endpoint, JToken body);
+        string Patch(string endpoint, HttpContent content);
+        T Patch<T>(string endpoint, string body = "");
+        T Patch<T>(string endpoint, JToken body);
+        T Patch<T>(string endpoint, HttpContent content);
+        HttpResponseMessage PatchHttp(string endpoint, HttpContent content, bool throwOnFailure = true);
+        Task<string> PatchAsync(string endpoint, string body = "");
+        Task<string> PatchAsync(string endpoint, JToken body);
+        Task<string> PatchAsync(string endpoint, HttpContent content);
+        Task<T> PatchAsync<T>(string endpoint, string body = "");
+        Task<T> PatchAsync<T>(string endpoint, JToken body);
+        Task<T> PatchAsync<T>(string endpoint, HttpContent content);
+        Task<HttpResponseMessage> PatchHttpAsync(string endpoint, string body = "", bool throwOnFailure = true);
+        Task<HttpResponseMessage> PatchHttpAsync(string endpoint, JToken body, bool throwOnFailure = true);
+        Task<HttpResponseMessage> PatchHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true);
+#endif
+
+		string Put(string endpoint, string body = "");
         string Put(string endpoint, JToken body);
         string Put(string endpoint, HttpContent content);
         T Put<T>(string endpoint, string body = "");
@@ -429,7 +448,11 @@ namespace Qlik.Sense.RestClient
             {
                 case "POST":
                     return await LogReceive(client.PostStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
-                case "PUT":
+#if (NETCOREAPP)
+                case "PATCH":
+	                return await LogReceive(client.PatchStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
+#endif
+				case "PUT":
                     return await LogReceive(client.PutStringAsync(BaseUri.Append(endpoint), body)).ConfigureAwait(false);
                 case "DELETE":
                     return await LogReceive(client.DeleteAsync(BaseUri.Append(endpoint))).ConfigureAwait(false);
@@ -564,7 +587,108 @@ namespace Qlik.Sense.RestClient
             return PostAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
         }
 
-        public string Put(string endpoint, string body = "")
+#if (NETCOREAPP)
+		public string Patch(string endpoint, string body = "")
+		{
+			return PerformUploadStringAccess("PATCH", endpoint, body);
+		}
+
+		public string Patch(string endpoint, JToken body)
+		{
+			return Patch(endpoint, body.ToString(Formatting.None));
+		}
+
+		public string Patch(string endpoint, HttpContent content)
+		{
+			var task = PatchAsync(endpoint, content);
+			task.ConfigureAwait(false);
+			return task.Result;
+		}
+
+		public T Patch<T>(string endpoint, string body = "")
+		{
+			return JsonConvert.DeserializeObject<T>(Patch(endpoint, body));
+		}
+
+		public T Patch<T>(string endpoint, JToken body)
+		{
+			return Patch<T>(endpoint, body.ToString(Formatting.None));
+		}
+
+		public T Patch<T>(string endpoint, HttpContent content)
+		{
+			return JsonConvert.DeserializeObject<T>(Patch(endpoint, content));
+		}
+
+		public HttpResponseMessage PatchHttp(string endpoint, HttpContent content, bool throwOnFailure = true)
+		{
+			var task = PatchHttpAsync(endpoint, content, throwOnFailure);
+			task.ConfigureAwait(false);
+			return task.Result;
+		}
+
+		public Task<string> PatchAsync(string endpoint, string body = "")
+		{
+			return PerformUploadStringAccessAsync("PATCH", endpoint, body);
+		}
+
+		public Task<string> PatchAsync(string endpoint, JToken body)
+		{
+			return PatchAsync(endpoint, body.ToString(Formatting.None));
+		}
+
+		public async Task<string> PatchAsync(string endpoint, HttpContent content)
+		{
+			ValidateConfiguration();
+			if (!await AuthenticateAsync().ConfigureAwait(false))
+				throw new AuthenticationException("Authentication failed.");
+			LogCall("PATCH", endpoint);
+			var client = GetClient();
+			return await LogReceive(client.PatchHttpContentAsync(BaseUri.Append(endpoint), content)).ConfigureAwait(false);
+		}
+
+		public Task<T> PatchAsync<T>(string endpoint, string body = "")
+		{
+			return PatchAsync(endpoint, body).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+		}
+
+		public Task<T> PatchAsync<T>(string endpoint, JToken body)
+		{
+			return PatchAsync<T>(endpoint, body.ToString(Formatting.None));
+		}
+
+		public Task<T> PatchAsync<T>(string endpoint, HttpContent content)
+		{
+			return PatchAsync(endpoint, content).ContinueWith(t => JsonConvert.DeserializeObject<T>(t.Result));
+		}
+
+		public async Task<HttpResponseMessage> PatchHttpAsync(string endpoint, string body = "", bool throwOnFailure = true)
+		{
+			ValidateConfiguration();
+			if (!await AuthenticateAsync().ConfigureAwait(false))
+				throw new AuthenticationException("Authentication failed.");
+			LogCall("PATCH", endpoint);
+			var client = GetClient();
+			return await LogReceive(client.PatchHttpAsync(BaseUri.Append(endpoint), body, throwOnFailure)).ConfigureAwait(false);
+		}
+
+		public Task<HttpResponseMessage> PatchHttpAsync(string endpoint, JToken body, bool throwOnFailure = true)
+		{
+			return PatchHttpAsync(endpoint, body.ToString(Formatting.None), throwOnFailure);
+		}
+
+		public async Task<HttpResponseMessage> PatchHttpAsync(string endpoint, HttpContent content, bool throwOnFailure = true)
+		{
+			ValidateConfiguration();
+			if (!await AuthenticateAsync().ConfigureAwait(false))
+				throw new AuthenticationException("Authentication failed.");
+			LogCall("PATCH", endpoint);
+			var client = GetClient();
+			return await LogReceive(client.PatchHttpAsync(BaseUri.Append(endpoint), content, throwOnFailure)).ConfigureAwait(false);
+		}
+#endif
+
+		public string Put(string endpoint, string body = "")
         {
             return PerformUploadStringAccess("PUT", endpoint, body);
         }

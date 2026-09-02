@@ -1,5 +1,8 @@
 # Release Notes for Qlik Sense Rest Client
 
+## v2.2.0
+* **NEW FEATURE:** Added support for PATCH endpoints. (Not available for .NET Framework 4.6.2.)
+
 ## v2.1.0
 * **NEW FEATURE:** Added `RestClientQcs` utility methods `FetchAll` and `FetchAllItems`.
 * **EXAMPLE:** Added QCS example `ConnectOAuthBrowser`.

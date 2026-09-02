@@ -169,7 +169,37 @@ namespace Qlik.Sense.RestClient
             throw new HttpRequestException(message);
         }
 
-        private Uri AddDefaultArguments(Uri uri, bool isGetRequest = false)
+#if (NETCOREAPP)
+	    public Task<HttpResponseMessage> PatchHttpAsync(Uri uri, string body, bool throwOnFailure = true)
+	    {
+		    var content = new StringContent(body, Encoding.UTF8, _connectionSettings.ContentType);
+		    content.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
+		    return PatchHttpAsync(uri, content, throwOnFailure);
+	    }
+
+        public async Task<HttpResponseMessage> PatchHttpAsync(Uri uri, HttpContent content, bool throwOnFailure = true)
+        {
+	        var client = _client.Value;
+	        var rsp = await client.PatchAsync(AddDefaultArguments(uri), content).ConfigureAwait(false);
+
+	        if (rsp.IsSuccessStatusCode || !throwOnFailure)
+	        {
+		        return rsp;
+	        }
+
+	        var message = (int)rsp.StatusCode + ": " + rsp.ReasonPhrase;
+	        try
+	        {
+		        var reason = await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+		        message += ", " + reason;
+	        }
+	        catch { }
+
+	        throw new HttpRequestException(message);
+        }
+#endif
+
+		private Uri AddDefaultArguments(Uri uri, bool isGetRequest = false)
         {
             if (UseXrfKey)
                 return AddXrefKey(true, uri, _xrfkey);
@@ -200,6 +230,21 @@ namespace Qlik.Sense.RestClient
             throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
+#if (NETCOREAPP)
+        public async Task<string> PatchStringAsync(Uri uri, string body)
+        {
+	        var client = _client.Value;
+	        var rbody = new StringContent(body, Encoding.ASCII, _connectionSettings.ContentType);
+	        rbody.Headers.ContentType = new MediaTypeWithQualityHeaderValue(_connectionSettings.ContentType);
+	        var rsp = await client.PatchAsync(AddDefaultArguments(uri), rbody).ConfigureAwait(false);
+	        if (rsp.IsSuccessStatusCode)
+	        {
+		        return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+	        }
+
+	        throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
+        }
+#endif
         public async Task<string> PutStringAsync(Uri uri, string body)
         {
             var client = _client.Value;
@@ -240,7 +285,20 @@ namespace Qlik.Sense.RestClient
             throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
         }
 
-        public async Task<string> PutHttpContentAsync(Uri uri, HttpContent content)
+#if (NETCOREAPP)
+        public async Task<string> PatchHttpContentAsync(Uri uri, HttpContent content)
+        {
+	        var client = _client.Value;
+	        var rsp = await client.PatchAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), content).ConfigureAwait(false);
+	        if (rsp.IsSuccessStatusCode)
+	        {
+		        return await rsp.Content.ReadAsStringAsync().ConfigureAwait(false);
+	        }
+
+	        throw new HttpRequestException((int)rsp.StatusCode + ": " + rsp.ReasonPhrase);
+        }
+#endif
+		public async Task<string> PutHttpContentAsync(Uri uri, HttpContent content)
         {
             var client = _client.Value;
             var rsp = await client.PutAsync(AddXrefKey(UseXrfKey, uri, _xrfkey), content).ConfigureAwait(false);
